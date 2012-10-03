@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+ 
+    <title>EZ Access Testing</title>
+    <meta name="description" content="">
+    <meta name="author" content="Trace Center at University of Wisconsin-Madison">
+ 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ 
+    <link rel="stylesheet" href="css/style.css">
+    <script type="text/JavaScript" src="alerts.json"></script>
+    <script type="text/JavaScript" src="js/speakClient.js"></script>
+    <script type="text/JavaScript" src="js/ezaccess.js"></script>
+
+</head>
+<body data-ez-startat="#start #start">
+
+<p id="logo"><img src="img/trace_logo.jpg" alt="The Trace Center logo" /></p>
+
+<h1 id="start">Welcome to the test site!</h1>
+<p data-ez-focusable="false">Skip this. :*(</p>
+<p>Here, we will test many <b>different</b> functionalities of the EZ access browser plugin/library thing for kiosks.</p>
+<p>Each block of text will be seperately navigateable.</p>
+<p data-ez-focusable="false">Skip!</p>
+<p data-ez-focusable="false">This too!</p>
+<div data-ez-chunking="group">
+  <p>Group</p>
+  <p>these</p>
+  <span>paragraph tags! :D</span>
+</div>
+<div data-ez-chunking="block">Hello to you, <a href="http://google.com">link!</a></div>
+<div>
+<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+  <p>Hi!</p>
+  <a href="http://google.com/">Google! Search it!</a>
+  <div>
+    <p>What?</p>
+    <p id="123">Nothing</p><br />
+    <button type="button" onclick="alert('you clicked me! :)');">Click Me!</button>
+  </div>
+</div>
+<img src="img/keyboard.png" alt="Easy Access keyboard" />
+</body>
+</html>
