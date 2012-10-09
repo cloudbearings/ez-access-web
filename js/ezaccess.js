@@ -57,9 +57,6 @@ var repeatAlert = 0;
 // Current index (of selectElements array) for navigation purposes
 var currIndex = 0;
 
-// Mouse button press state
-var mouseDown = 0;
-
 // Provide easy place to change method of speech synthesis
 function voice(obj,repeat) {
   var data;
@@ -194,11 +191,8 @@ function ez_enter() {
   }
 }
 
-// On page load, load key_event() listener
-window.onload=function() {
-  document.onkeydown = key_event;
-  document.onkeypress = key_event;
-  
+//Index elements on the page.
+function indexElements() {
   // INITIAL INDEXING OF PAGE ELEMENTS
   selectElements = getElementsByTagNames(COMPATIBLE_TAGS);
   for(var i = 0; i < selectElements.length;) {
@@ -221,6 +215,13 @@ window.onload=function() {
     }
     else { i++; }
   }
+}
+// On page load, load key_event() listener
+window.onload=function() {
+  document.onkeydown = key_event;
+  document.onkeypress = key_event;
+  
+  indexElements();
   
   // ADDING SOUND DIV -- ONLY NEEDED FOR speak.js
   var div = document.createElement('div');
@@ -232,28 +233,31 @@ window.onload=function() {
     document.body.appendChild(div);
   }
   
-  // INITIAL ONMOUSEOVER LISTENER SETUPS
-  for(var i = 0; i < selectElements.length;i++) {
-    selectElements[i].onmouseover = new Function("mouseOver("+i+");");
-  }
-  
-  // Load listener for button presses
-  document.body.onmousedown = function() { 
-    ++mouseDown;
-  }
-  document.body.onmouseup = function() {
-    --mouseDown;
-  }
+  // Multitouch gesture dragging
+  var hammer = new Hammer(document.body);
+  hammer.ondrag = function(ev) {
+  mouseOver(document.elementFromPoint(parseFloat(ev.position.x)-parseFloat(window.scrollX), parseFloat(ev.position.y)-parseFloat(window.scrollY)));
+  };
 }
 
-// Launched when element is mouseover'd
-// Each element calls this when mouseover'd
+// Check if new element (and exists to be highlighted), and then highlights
 function mouseOver(e) {
-  if(mouseDown){
-    currIndex = e;
+  var newElement = true;
+  var found = false;
+  for(var i = 0; i < selectElements.length;i++) {
+    if(e == selectElements[i]) {
+      if(currIndex == i) {
+        newElement = false;
+      }
+      currIndex = i;
+      found = true;
+    }
+  }
+  if(newElement && found) {
     ez_navigateToggle = true;
     drawSelected(selectElements[currIndex]);
     voice(selectElements[currIndex]);
+    console.log("why");
   }
 }
 
