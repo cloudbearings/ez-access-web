@@ -10,11 +10,3 @@
   z-index: 999;
   pointer-events:none; /* Make click-able through the DIV (for example, if it's on top of something with an event with kb) */
 }
-html {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}

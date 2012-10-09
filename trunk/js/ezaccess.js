@@ -257,7 +257,6 @@ function mouseOver(e) {
     ez_navigateToggle = true;
     drawSelected(selectElements[currIndex]);
     voice(selectElements[currIndex]);
-    console.log("why");
   }
 }
 
