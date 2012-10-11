@@ -15,6 +15,9 @@
             
 */
 
+// Tab keycodes
+const KB_TAB = 9;
+const KB_SHIFT = 16;
 
 //EZ-Access keycode declarations
 const EZ_KEY_SKIPFORWARD = 135; // is >>
@@ -48,14 +51,23 @@ const COMPATIBLE_TAGS = 'p,img,span,a,div,button,h1,h2,h3,h4,h5,ul,ol,li';
 // Array of tags generated on pageload initialized globally
 var selectElements;
 
+// Current index (of selectElements array) for navigation purposes
+var currIndex = 0;
+
 // Whether EZ navigation mode is activated or not
 var ez_navigateToggle = false;
 
+// Wrap elements on the screen
+var screenWrap = false;
+
+// Whether to allow reordering elements manually from DOM standard.
+var allowReorder = false;
+
+// Tabular navigation behavior (& cooperation w/ browser)
+var tabNav = 'ezaccess';
+
 // Alert of how many times user has pressed up
 var repeatAlert = 0;
-
-// Current index (of selectElements array) for navigation purposes
-var currIndex = 0;
 
 // Provide easy place to change method of speech synthesis
 function voice(obj,repeat) {
@@ -121,7 +133,7 @@ function getElementsByTagNames(list,obj) {
 
 // Event listener if window is resized the selected box will be redrawn
 window.onresize = function() {
-  drawSelected(selectElements[currIndex]);
+  if(ez_navigateToggle) { drawSelected(selectElements[currIndex]); }
 }
 
 // Draws selected box around DOM object referenced to
@@ -165,20 +177,40 @@ function ez_navigate(move) {
       currIndex++;
       drawSelected(selectElements[currIndex]);
       voice(selectElements[currIndex]);
-    } else {
-      if(repeatAlert < alerts.bottom.length-1) { repeatAlert++; }
-      voice(alerts.bottom[repeatAlert].value);
+    } else { // Basically, keep looping through 'warnings' until user stops or if there are no more speech elements, and wrap is true, jump to bottom of screen.
+      if(repeatAlert < alerts.bottom.length-1) {
+        repeatAlert++;
+        voice(alerts.bottom[repeatAlert].value);
+      } else {
+        if(screenWrap) {
+          currIndex = 0;
+          drawSelected(selectElements[currIndex]);
+          voice(selectElements[currIndex]);
+        } else {
+          voice(alerts.bottom[repeatAlert].value);
+        }
+      }
     }
   }
   else if(move == 'up') {
     if (currIndex > 0) {
-    repeatAlert = 0;
-    currIndex--;
-    drawSelected(selectElements[currIndex]);
-    voice(selectElements[currIndex]);
+      repeatAlert = 0;
+      currIndex--;
+      drawSelected(selectElements[currIndex]);
+      voice(selectElements[currIndex]);
     } else {
-      if(repeatAlert < alerts.top.length-1) { repeatAlert++; }
-      voice(alerts.top[repeatAlert].value);
+      if(repeatAlert < alerts.top.length-1) {
+        repeatAlert++;
+        voice(alerts.top[repeatAlert].value);
+      } else {
+        if(screenWrap) {
+          currIndex = selectElements.length-1;
+          drawSelected(selectElements[currIndex]);
+          voice(selectElements[currIndex]);
+        } else {
+          voice(alerts.bottom[repeatAlert].value);
+        }
+      }
     }
   }
 }
@@ -193,14 +225,37 @@ function ez_enter() {
 
 //Index elements on the page.
 function indexElements() {
+  // "Universal" body tag stuff
+  if(document.body.getAttribute('data-ez-screenwrap') !== null) {
+    screenWrap = true;
+  }
+  
+  // Isn't implemented yet
+  if(document.body.getAttribute('data-ez-allowreorder') !== null) {
+    allowReorder = true;
+  }
+  
+  // Not actually implemented yet (just default is)
+  if(document.body.getAttribute('data-ez-tabnav') == 'standard') {
+    tabNav = 'standard';
+  } else if (document.body.getAttribute('data-ez-tabnav') == 'hybrid') {
+    tabNav = 'hybrid';
+  } else if (document.body.getAttribute('data-ez-tabnav') == 'none') {
+    tabNav = 'none';
+  }
+  
   // INITIAL INDEXING OF PAGE ELEMENTS
   selectElements = getElementsByTagNames(COMPATIBLE_TAGS);
+  
+  // Check if ez-focusable to remove (+ CHILDREN)
   for(var i = 0; i < selectElements.length;) {
     if(selectElements[i].getAttribute('data-ez-focusable') == 'false') {
       selectElements.splice(i,getElementsByTagNames(COMPATIBLE_TAGS,selectElements[i]).length+1); // Remove entry + CHILDREN
     }
     else { i++; }
   }
+  
+  // Check if ez-chunking == group; if so, group 'em
   for(var i = 0; i < selectElements.length;) {
     if(selectElements[i].getAttribute('data-ez-chunking') == 'group') {
       var removeAmount = getElementsByTagNames(COMPATIBLE_TAGS,selectElements[i]).length;
@@ -209,12 +264,15 @@ function indexElements() {
     }
     else { i++; }
   }
+  
+  // Check and remove elements with children (excluding grouped stuff). MUST BE LAST THING DONE
   for(var i = 0; i < selectElements.length;) {
     if(getElementsByTagNames(COMPATIBLE_TAGS,selectElements[i]).length > 0 && selectElements[i].getAttribute('data-ez-chunking') != 'group' && selectElements[i].getAttribute('data-ez-chunking') != 'block') {
       selectElements.splice(i,1); // Remove entry
     }
     else { i++; }
   }
+  
 }
 // On page load, load key_event() listener
 window.onload=function() {
@@ -253,11 +311,34 @@ function mouseOver(e) {
       found = true;
     }
   }
-  if(newElement && found) {
+  if((newElement && found) || !ez_navigateToggle) { //Override if ez is not enabled
     ez_navigateToggle = true;
     drawSelected(selectElements[currIndex]);
     voice(selectElements[currIndex]);
   }
+}
+
+map={} // Have to do this weird thing in order to detect two keys at same time (e.g., shift+tab)
+onkeydown=onkeyup=function(e){
+    e=e||event//to deal with IE
+    map[e.keyCode]=e.type=='keydown'?true:false
+    if (map[KB_TAB] && map[KB_SHIFT]){ //SHIFT+TAB
+      if(ez_navigateToggle) {
+        window.scroll(0,findPos(selectElements[currIndex]));
+        ez_navigate('up');
+      } else {
+        ez_navigate_start();
+      }
+      return false; // Overwrite default browser functionality
+    } else if(map[KB_TAB]){//TAB
+      if(ez_navigateToggle) {
+        window.scroll(0,findPos(selectElements[currIndex]));
+        ez_navigate('down');
+      } else {
+        ez_navigate_start();
+      }
+      return false;
+    }
 }
 
 /* Referred to by window.onload anonymous function.
