@@ -1,0 +1,15 @@
+#summary Multiple inputs can be used to control EZ Access.
+
+= Introduction =
+
+Below are the multiple input types to this EZ Access tool. Many different inputs can be anabled at the same time, but some cannot (as described below).
+
+
+= Details =
+
+Add your content here.  Format your content with:
+  * An EZ Access keypad
+  * An EZ Access keyboard
+  * A normal keyboard
+  * The tab + shift+tab buttons on a normal keyboard
+  * 'Slide-to-read' on touchscreen devices
