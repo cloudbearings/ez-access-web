@@ -1,0 +1,13 @@
+#summary All of the functions and their purpose in ezaccess.js.
+
+= Introduction =
+
+Eventually, there will actually be decent documentation here (once a stable release is made). Until then, this page serves as a placeholder.
+
+
+= Details =
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
