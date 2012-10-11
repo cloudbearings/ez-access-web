@@ -60,6 +60,9 @@ var ez_navigateToggle = false;
 // Wrap elements on the screen
 var screenWrap = false;
 
+// Whether slide to read is enabled universally
+var slideToRead = true;
+
 // Whether to allow reordering elements manually from DOM standard.
 var allowReorder = false;
 
@@ -75,17 +78,26 @@ function voice(obj,repeat) {
   if(typeof(obj)=='string') {
     data = obj;
   }
-  else if(obj.tagName != "IMG") {
-    if(obj.textContent.length > 300) { speak.play("One moment."); } // If speech generation will take a while
-    data = obj.textContent;
-  } else {
-    if(obj.alt.length > 300) { speak.play("One moment."); } // If speech generation will take a while
-    data = obj.alt;
+  else {
+    if(obj.getAttribute('data-ez-sayalt') !== null) {
+      data = obj.getAttribute('data-ez-sayalt');
+    }
+    else if(obj.tagName != "IMG") {
+      data = obj.textContent;
+    } else {
+      data = obj.alt;
+    }
+    if(obj.getAttribute('data-ez-saybefore') !== null) {
+      data = obj.getAttribute('data-ez-saybefore') + ' ' + data;
+    }
+    if(obj.getAttribute('data-ez-sayafter') !== null) {
+      data += ' ' + obj.getAttribute('data-ez-sayafter');
+    }
   }
-  
   if(repeat == true) {
     data = "Repeating... " + data;
   }
+  if(data.length > 300) { speak.play("One moment."); } // If speech generation will take a while
   speak.play(data);
 }
 
@@ -244,6 +256,16 @@ function indexElements() {
     tabNav = 'none';
   }
   
+  if(document.body.getAttribute('data-ez-slidetoread') == 'off') {
+    slideToRead = false;
+  }
+  
+  if(document.body.getAttribute('data-ez-startingmode') == 'ezon') {
+    ez_navigate_start();
+  } else if(document.body.getAttribute('data-ez-startingmode') == 'off') {
+    // EZ Turned off on page load no matter yet (but ATM don't have that feature)
+  }
+  
   // INITIAL INDEXING OF PAGE ELEMENTS
   selectElements = getElementsByTagNames(COMPATIBLE_TAGS);
   
@@ -292,10 +314,12 @@ window.onload=function() {
   }
   
   // Multitouch gesture dragging
-  var hammer = new Hammer(document.body);
-  hammer.ondrag = function(ev) {
-  mouseOver(document.elementFromPoint(parseFloat(ev.position.x)-parseFloat(window.scrollX), parseFloat(ev.position.y)-parseFloat(window.scrollY)));
-  };
+  if(slideToRead) { // If not allowed, to not initialize
+    var hammer = new Hammer(document.body);
+    hammer.ondrag = function(ev) {
+      mouseOver(document.elementFromPoint(parseFloat(ev.position.x)-parseFloat(window.scrollX), parseFloat(ev.position.y)-parseFloat(window.scrollY)));
+    };
+  }
 }
 
 // Check if new element (and exists to be highlighted), and then highlights
@@ -311,7 +335,7 @@ function mouseOver(e) {
       found = true;
     }
   }
-  if((newElement && found) || !ez_navigateToggle) { //Override if ez is not enabled
+  if( (newElement && found) || !ez_navigateToggle) { //Override if ez is not enabled
     ez_navigateToggle = true;
     drawSelected(selectElements[currIndex]);
     voice(selectElements[currIndex]);
