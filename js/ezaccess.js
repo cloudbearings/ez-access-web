@@ -1,18 +1,31 @@
 /*
-    Author: Alexander Harding
-            Trace Center
-            University of Wisconsin, Madison
-            (c) 2012 All Rights Reserved
-            Licensing Strategy TBD
+    Author:   Alexander Harding
+              Trace Center
+              University of Wisconsin at Madison
             
-    Desc:   Designed to parse any webpage (when the JS is included)
+    Desc:     Designed to parse any webpage (when the JS is included)
               for accessibility -- utilizes custom HTML attributes
               (see the EZ-Access HTML plug-in manual)
               
-    Roadmap:| VERSION | MM/DD/YY | DESCRIPTION
-            +---------+----------+-----------------------------------
-            | X         10/02/12   Basic maneuvering HTML DOM w/ EZ-KB, & Drag-into-element. Drawing engine around element complete
-            
+    License:  Copyright 2012 Trace Center
+
+                 Licensed under the Apache License, Version 2.0 (the "License");
+                 you may not use this file except in compliance with the License.
+                 You may obtain a copy of the License at
+
+                     http://www.apache.org/licenses/LICENSE-2.0
+
+                 Unless required by applicable law or agreed to in writing, software
+                 distributed under the License is distributed on an "AS IS" BASIS,
+                 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                 See the License for the specific language governing permissions and
+                 limitations under the License.
+                 
+   Scripts:   A few scripts are used in this program. If not identified, they have been released
+              to the public domain:
+                  1. hammer.js - Provides multitouch support
+                  2. speak.js  - Provides speech generation
+                  3. TinyBox   - Modal window script for help
 */
 
 // Tab keycodes
