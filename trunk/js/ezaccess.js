@@ -59,7 +59,7 @@ const KB_KEY_DOWN = 40; // is down arrow key
 const KB_KEY_ENTER = 13; // is green circle enter key */
 
 // Tags that are candidates for highlight
-const COMPATIBLE_TAGS = 'p,img,span,a,div,button,h1,h2,h3,h4,h5,ul,ol,li';
+const COMPATIBLE_TAGS = 'p,img,span,a,div,h1,h2,h3,h4,h5,ul,ol,li,input,button,textarea';
 
 // Array of tags generated on pageload initialized globally
 var selectElements;
@@ -105,6 +105,24 @@ function voice(obj,repeat) {
     }
     if(obj.getAttribute('data-ez-sayafter') !== null) {
       data += ' ' + obj.getAttribute('data-ez-sayafter');
+    }
+    if(obj.tagName == 'BUTTON' || (obj.tagName == 'INPUT' && obj.type == 'button') ) {
+      data += ' button';
+    } else if(obj.tagName == 'INPUT' && obj.type == 'submit' || obj.type == 'image') { // Image acts like submit btn
+      data += ' submit button';
+    } else if(obj.tagName == 'INPUT' && obj.type == 'reset') {
+      data += ' reset button';
+    } else if(obj.tagName == 'INPUT' && obj.type == 'checkbox') {
+      data += ' check box button';
+    } else if(obj.tagName == 'INPUT' && obj.type == 'radio') {
+      data += ' radio button';
+    } else if(obj.tagName == 'INPUT' && obj.type == 'text') {
+      data += ' text field';
+    } else if(obj.tagName == 'INPUT' && obj.type == 'password') {
+      data += ' password input field';
+    }
+    if(obj.tagName == 'TEXTAREA') {
+      data = 'text area containing... ' + data;
     }
   }
   if(repeat == true) {
@@ -198,8 +216,10 @@ function ez_navigate_start() {
 function ez_navigate(move) {
   if(move == 'down') {
     if(currIndex < selectElements.length-1) {
+      selectElements[currIndex].blur(); // Add blur to old element
       repeatAlert = 0;
       currIndex++;
+      selectElements[currIndex].focus(); // Add focus to new element
       drawSelected(selectElements[currIndex]);
       voice(selectElements[currIndex]);
     } else { // Basically, keep looping through 'warnings' until user stops or if there are no more speech elements, and wrap is true, jump to bottom of screen.
@@ -219,8 +239,10 @@ function ez_navigate(move) {
   }
   else if(move == 'up') {
     if (currIndex > 0) {
+      selectElements[currIndex].blur(); // Add blur to old element
       repeatAlert = 0;
       currIndex--;
+      selectElements[currIndex].focus(); // Add focus to new element
       drawSelected(selectElements[currIndex]);
       voice(selectElements[currIndex]);
     } else {
@@ -344,7 +366,9 @@ function mouseOver(e) {
       if(currIndex == i) {
         newElement = false;
       }
+      selectElements[currIndex].blur(); // Add blur to old element
       currIndex = i;
+      selectElements[currIndex].focus(); // Add focus to new element
       found = true;
     }
   }
