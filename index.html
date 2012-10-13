@@ -14,6 +14,7 @@
     <script type="text/JavaScript" src="alerts.json"></script>
     <script type="text/JavaScript" src="js/speakClient.js"></script>
     <script type="text/JavaScript" src="js/hammer.js"></script>
+    <script type="text/JavaScript" src="js/tinybox.js"></script>
     <script type="text/JavaScript" src="js/ezaccess.js"></script>
 
 </head>
@@ -26,11 +27,12 @@
 <p>Each block of text will be seperately navigateable.</p>
 <p data-ez-focusable="false">Skip!</p>
 <p data-ez-focusable="false">This too!</p>
-<div data-ez-chunking="group">
+<div data-ez-chunking="group" data-ez-sayalt-nav="You are scrolling up and down!" data-ez-sayalt-nav="You are navigating with pointing!">
   <p>Group</p>
   <p>these</p>
   <span>paragraph tags! :D</span>
 </div>
+<div class="button" id="testclick2"><strong>Image</strong> - <em>click here</em></div>
 <br>
 <textarea rows="4" cols="50">
 At W3Schools you will find all the Web-building tutorials you need, from basic HTML to advanced XML, SQL, ASP, and PHP. 
@@ -40,6 +42,8 @@ At W3Schools you will find all the Web-building tutorials you need, from basic H
   <span data-ez-saybefore="Enter your">Username: </span><input type="text" name="user">
   <input type="submit" value="Submit">
 </form>
+<br>
+<span data-ez-saybefore-point="Pointing" data-ez-saybefore-nav="Navigating" data-ez-sayafter-point="HAHA POINTING" data-ez-sayafter-nav="HAHA NAVIGATING">Is how I get around this page.</span>
 <br>
 <div data-ez-chunking="block">Hello to you, <a href="http://google.com">link!</a></div>
 <div>
