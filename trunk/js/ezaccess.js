@@ -86,25 +86,50 @@ var tabNav = 'ezaccess';
 var repeatAlert = 0;
 
 // Provide easy place to change method of speech synthesis
-function voice(obj,repeat) {
+function voice(obj,source,repeat) {
   var data;
   if(typeof(obj)=='string') {
     data = obj;
   }
   else {
-    if(obj.getAttribute('data-ez-sayalt') !== null) {
+    if(source == 'nav' && obj.getAttribute('data-ez-sayalt-nav') !== null) {
+      data = obj.getAttribute('data-ez-sayalt-nav');
+    }
+    else if(source == 'point' && obj.getAttribute('data-ez-sayalt-point') !== null) {
+      data = obj.getAttribute('data-ez-sayalt-point');
+    }
+    else if(obj.getAttribute('data-ez-sayalt') !== null) {
       data = obj.getAttribute('data-ez-sayalt');
+    }
+    else if(obj.tagName == 'TEXTAREA') {
+      if(obj.value == '') { data = 'nothing'; }
+      else { data = obj.value; }
     }
     else if(obj.tagName != "IMG") {
       data = obj.textContent;
     } else {
       data = obj.alt;
     }
-    if(obj.getAttribute('data-ez-saybefore') !== null) {
+    if(source == 'nav' && obj.getAttribute('data-ez-saybefore-nav') !== null) {
+      data = obj.getAttribute('data-ez-saybefore-nav') + ' ' + data;
+    }
+    else if(source == 'point' && obj.getAttribute('data-ez-saybefore-point') !== null) {
+      data = obj.getAttribute('data-ez-saybefore-point') + ' ' + data;
+    }
+    else if(obj.getAttribute('data-ez-saybefore') !== null) {
       data = obj.getAttribute('data-ez-saybefore') + ' ' + data;
     }
-    if(obj.getAttribute('data-ez-sayafter') !== null) {
-      data += ' ' + obj.getAttribute('data-ez-sayafter');
+    if(source == 'nav' && obj.getAttribute('data-ez-sayafter-nav') !== null) {
+      data += ' ' + obj.getAttribute('data-ez-sayafter-nav');
+    }
+    else if(source == 'point' && obj.getAttribute('data-ez-sayafter-point') !== null) {
+      data += ' ' + obj.getAttribute('data-ez-sayafter-point');
+    }
+    else if(obj.getAttribute('data-ez-sayafter') !== null) {
+      data += ' ' + obj.getAttribute('data-ez-sayafter-nav');
+    }
+    if(obj.tagName == 'A') {
+      data = "link... " + data;
     }
     if(obj.tagName == 'BUTTON' || (obj.tagName == 'INPUT' && obj.type == 'button') ) {
       data += ' button';
@@ -122,7 +147,7 @@ function voice(obj,repeat) {
       data += ' password input field';
     }
     if(obj.tagName == 'TEXTAREA') {
-      data = 'text area containing... ' + data;
+      data = 'text area contains... ' + data;
     }
   }
   if(repeat == true) {
@@ -131,6 +156,33 @@ function voice(obj,repeat) {
   if(data.length > 300) { speak.play("One moment."); } // If speech generation will take a while
   speak.play(data);
 }
+
+/*======================================================================
+var soundEmbed = null;
+//======================================================================
+function soundPlay(which)
+    {
+    if (!soundEmbed)
+        {
+        soundEmbed = document.createElement("embed");
+        soundEmbed.setAttribute("src", "earcons/"+which+".wav");
+        soundEmbed.setAttribute("hidden", true);
+        soundEmbed.setAttribute("autostart", true);
+        }
+    else
+        {
+        document.body.removeChild(soundEmbed);
+        soundEmbed.removed = true;
+        soundEmbed = null;
+        soundEmbed = document.createElement("embed");
+        soundEmbed.setAttribute("src", "earcons/"+which+".wav");
+        soundEmbed.setAttribute("hidden", true);
+        soundEmbed.setAttribute("autostart", true);
+        }
+    soundEmbed.removed = false;
+    document.body.appendChild(soundEmbed);
+    }
+//======================================================================*/
 
 //Finds y value of given object -- for automated scrolling
 function findPos(obj) {
@@ -210,6 +262,7 @@ function ez_navigate_start() {
       }
     }
     drawSelected(selectElements[currIndex]);
+    voice(selectElements[currIndex],'nav');
   }
 }
 
@@ -221,7 +274,7 @@ function ez_navigate(move) {
       currIndex++;
       selectElements[currIndex].focus(); // Add focus to new element
       drawSelected(selectElements[currIndex]);
-      voice(selectElements[currIndex]);
+      voice(selectElements[currIndex],'nav');
     } else { // Basically, keep looping through 'warnings' until user stops or if there are no more speech elements, and wrap is true, jump to bottom of screen.
       if(repeatAlert < alerts.bottom.length-1) {
         repeatAlert++;
@@ -230,7 +283,7 @@ function ez_navigate(move) {
         if(screenWrap) {
           currIndex = 0;
           drawSelected(selectElements[currIndex]);
-          voice(selectElements[currIndex]);
+          voice(selectElements[currIndex],'nav');
         } else {
           voice(alerts.bottom[repeatAlert].value);
         }
@@ -244,7 +297,7 @@ function ez_navigate(move) {
       currIndex--;
       selectElements[currIndex].focus(); // Add focus to new element
       drawSelected(selectElements[currIndex]);
-      voice(selectElements[currIndex]);
+      voice(selectElements[currIndex],'nav');
     } else {
       if(repeatAlert < alerts.top.length-1) {
         repeatAlert++;
@@ -253,7 +306,7 @@ function ez_navigate(move) {
         if(screenWrap) {
           currIndex = selectElements.length-1;
           drawSelected(selectElements[currIndex]);
-          voice(selectElements[currIndex]);
+          voice(selectElements[currIndex],'nav');
         } else {
           voice(alerts.bottom[repeatAlert].value);
         }
@@ -266,7 +319,7 @@ function ez_enter() {
   if(selectElements[currIndex].href != undefined || selectElements[currIndex].onclick != undefined) {
     selectElements[currIndex].click();
   } else {
-    voice(selectElements[currIndex],true);
+    voice(selectElements[currIndex],0,true);
   }
 }
 
@@ -375,7 +428,7 @@ function mouseOver(e) {
   if( (newElement && found) || !ez_navigateToggle) { //Override if ez is not enabled
     ez_navigateToggle = true;
     drawSelected(selectElements[currIndex]);
-    voice(selectElements[currIndex]);
+    voice(selectElements[currIndex],'point');
   }
 }
 
