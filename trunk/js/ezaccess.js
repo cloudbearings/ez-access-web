@@ -282,6 +282,7 @@ function ez_navigate(move) {
       } else {
         if(screenWrap) {
           currIndex = 0;
+          repeatAlert = 0;
           drawSelected(selectElements[currIndex]);
           voice(selectElements[currIndex],'nav');
         } else {
@@ -305,6 +306,7 @@ function ez_navigate(move) {
       } else {
         if(screenWrap) {
           currIndex = selectElements.length-1;
+          repeatAlert = 0;
           drawSelected(selectElements[currIndex]);
           voice(selectElements[currIndex],'nav');
         } else {
