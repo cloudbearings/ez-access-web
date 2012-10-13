@@ -31,6 +31,7 @@
 // Tab keycodes
 const KB_TAB = 9;
 const KB_SHIFT = 16;
+const KB_ENTER = 13;
 
 //EZ-Access keycode declarations
 const EZ_KEY_SKIPFORWARD = 135; // is >>
@@ -101,6 +102,9 @@ function voice(obj,source,repeat) {
     else if(obj.getAttribute('data-ez-sayalt') !== null) {
       data = obj.getAttribute('data-ez-sayalt');
     }
+    else if(obj.tagName == 'INPUT' && (obj.type == 'radio' || obj.type == 'checkbox') && getlabelforinput(obj.id) !== null) {
+      data = getlabelforinput(obj.id);
+    }
     else if(obj.tagName == 'TEXTAREA') {
       if(obj.value == '') { data = 'nothing'; }
       else { data = obj.value; }
@@ -138,9 +142,11 @@ function voice(obj,source,repeat) {
     } else if(obj.tagName == 'INPUT' && obj.type == 'reset') {
       data += ' reset button';
     } else if(obj.tagName == 'INPUT' && obj.type == 'checkbox') {
-      data += ' check box button';
+      data += ' check box button... ';
+      data += obj.checked ? 'checked' : 'unchecked';
     } else if(obj.tagName == 'INPUT' && obj.type == 'radio') {
-      data += ' radio button';
+      data += ' radio button... ';
+      data += obj.checked ? 'checked' : 'unchecked';
     } else if(obj.tagName == 'INPUT' && obj.type == 'text') {
       data += ' text field';
     } else if(obj.tagName == 'INPUT' && obj.type == 'password') {
@@ -318,10 +324,19 @@ function ez_navigate(move) {
 }
 
 function ez_enter() {
-  if(selectElements[currIndex].href != undefined || selectElements[currIndex].onclick != undefined) {
-    selectElements[currIndex].click();
-  } else {
-    voice(selectElements[currIndex],0,true);
+  var obj = selectElements[currIndex];
+  if(obj.href != undefined || obj.onclick != undefined) {
+    obj.click();
+  }
+  else if(obj.tagName == 'INPUT' && (obj.type == 'radio' || obj.type == 'checkbox') ) {
+    obj.click();
+    voice(obj);
+  }
+  else if(obj.tagName == 'INPUT' && (obj.type == 'submit' || obj.type == 'image') ) {
+    obj.click();
+  }
+  else {
+    voice(obj,0,true);
   }
 }
 
@@ -384,8 +399,19 @@ function indexElements() {
     }
     else { i++; }
   }
-  
 }
+
+// For getting 'for' contents of a form button (we have to iterate and look for it)
+function getlabelforinput(inputname) {
+    var labelElements = document.getElementsByTagName("label");
+    for (var i = 0; i < labelElements.length; i++) {
+      if (labelElements[i].getAttribute("for") == inputname) {
+        return labelElements[i].textContent;
+      }
+    }
+    return null;
+}
+
 // On page load, load key_event() listener
 window.onload=function() {
   document.onkeydown = key_event;
@@ -490,14 +516,14 @@ function key_event(e) {
       ez_navigate_start();
     }
   }
-  else if(e.keyCode == EZ_KEY_ENTER) {
+  else if(e.keyCode == EZ_KEY_ENTER || e.keyCode == KB_ENTER) {
     if(ez_navigateToggle) {
       ez_enter();
     } else {
       ez_navigate_start();
     }
   }
-  
+  return false; // Disable any browser actions
 }
 
 
