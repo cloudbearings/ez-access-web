@@ -74,6 +74,9 @@ var ez_navigateToggle = false;
 // Wrap elements on the screen
 var screenWrap = false;
 
+// Keep track if the TINY modal is open or not.
+var tinyOpen = false;
+
 // Whether slide to read is enabled universally
 var slideToRead = true;
 
@@ -161,6 +164,12 @@ function voice(obj,source,repeat) {
   }
   if(data.length > 300) { speak.play("One moment."); } // If speech generation will take a while
   speak.play(data);
+}
+
+function ez_help() {
+  var helptext = "You have activated the ez help dialogue."; // Temporarily static for development
+  voice(helptext);
+  TINY.box.show("<span style='font-size:250%'>" + helptext + "</span>",0,0,0,1)
 }
 
 /*======================================================================
@@ -465,6 +474,7 @@ onkeydown=onkeyup=function(e){
     e=e||event//to deal with IE
     map[e.keyCode]=e.type=='keydown'?true:false
     if (map[KB_TAB] && map[KB_SHIFT]){ //SHIFT+TAB
+      if(tinyOpen) { tinyOpen = false;  TINY.box.hide(); }
       if(ez_navigateToggle) {
         window.scroll(0,findPos(selectElements[currIndex]));
         ez_navigate('up');
@@ -473,6 +483,7 @@ onkeydown=onkeyup=function(e){
       }
       return false; // Overwrite default browser functionality
     } else if(map[KB_TAB]){//TAB
+      if(tinyOpen) { tinyOpen = false;  TINY.box.hide(); }
       if(ez_navigateToggle) {
         window.scroll(0,findPos(selectElements[currIndex]));
         ez_navigate('down');
@@ -489,41 +500,56 @@ function key_event(e) {
   // 'if' keycode statements
   
   if(e.keyCode == EZ_KEY_HELP) {
-    if(ez_navigateToggle) {
+    if(tinyOpen) {
+      tinyOpen = false;
+      TINY.box.hide();
     } else {
-      ez_navigate_start();
+      tinyOpen = true;
+      ez_help();
     }
   }
   else if(e.keyCode == EZ_KEY_UP) {
-    if(ez_navigateToggle) {
-      window.scroll(0,findPos(selectElements[currIndex]));
-      ez_navigate('up');
-    } else {
-      ez_navigate_start();
+    if(tinyOpen) { tinyOpen = false;  TINY.box.hide(); }
+    else {
+      if(ez_navigateToggle) {
+        window.scroll(0,findPos(selectElements[currIndex]));
+        ez_navigate('up');
+      } else {
+        ez_navigate_start();
+      }
     }
   }
   else if(e.keyCode == EZ_KEY_DOWN) {
-    if(ez_navigateToggle) {
-      window.scroll(0,findPos(selectElements[currIndex]));
-      ez_navigate('down');
-    } else {
-      ez_navigate_start();
+    if(tinyOpen) { tinyOpen = false;  TINY.box.hide(); }
+    else {
+      if(ez_navigateToggle) {
+        window.scroll(0,findPos(selectElements[currIndex]));
+        ez_navigate('down');
+      } else {
+        ez_navigate_start();
+      }
     }
   }
   else if(e.keyCode == EZ_KEY_BACK) {
-    if(ez_navigateToggle) {
-    } else {
-      ez_navigate_start();
+    if(tinyOpen) { tinyOpen = false;  TINY.box.hide(); }
+    else {
+      if(ez_navigateToggle) {
+      } else {
+        ez_navigate_start();
+      }
     }
   }
   else if(e.keyCode == EZ_KEY_ENTER || e.keyCode == KB_ENTER) {
-    if(ez_navigateToggle) {
-      ez_enter();
-    } else {
-      ez_navigate_start();
+    if(tinyOpen) { tinyOpen = false;  TINY.box.hide(); }
+    else {
+      if(ez_navigateToggle) {
+        ez_enter();
+      } else {
+        ez_navigate_start();
+      }
+      return false; // Disable any browser actions
     }
   }
-  return false; // Disable any browser actions
 }
 
 
