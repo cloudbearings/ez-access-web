@@ -6,9 +6,9 @@ This program is made to eventually fully conform with the guidelines outlined he
 Furthermore, below is an outlined review of the guidelines, and keeps track of what aspects of the guidelines have been implemented so far (and which haven't.
 
 
-= Details =
+= Supported? =
 
-Add your content here.  Format your content with:
+Features currently supported, and to what level:
   * Text in *bold* or _italic_
   * Headings, paragraphs, and lists
   * Automatic links to other wiki pages
