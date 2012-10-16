@@ -16,3 +16,10 @@ var alerts = {
     {"value": "The Up arrow button is just above the button that you most recently pressed."}
   ],
 }
+
+var sounds = [
+  {
+    "name": "move",
+    "src": "earcons/move.wav"
+  }
+]
