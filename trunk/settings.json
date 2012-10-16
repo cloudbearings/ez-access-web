@@ -1,3 +1,9 @@
+/* Feel free to change, add and remove elements, but MAKE SURE it is valid JSON. 
+   Common mistakes:
+    1. Not including comma after every element (except for last, or first if only one)
+    2. Including a comma on last element.
+   Use http://jsonlint.com/ to validate WITHOUT the "var foo = " part.
+*/
 var alerts = {
   "top": [
     {"value": ""},
@@ -29,5 +35,9 @@ var sounds = [
   {
     "name": "deselect",
     "src": "earcons/deselect.wav"
+  },
+  {
+    "name": "noaction",
+    "src": "earcons/noaction.wav"
   }
 ]

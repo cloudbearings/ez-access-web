@@ -351,6 +351,7 @@ function ez_enter() {
     obj.click();
   }
   else {
+    sounds[find_audio("noaction")].feed.play();
     voice(obj,0,true);
   }
 }
