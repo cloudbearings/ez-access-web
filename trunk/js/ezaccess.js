@@ -172,32 +172,11 @@ function ez_help() {
   TINY.box.show("<span style='font-size:250%'>" + helptext + "</span>",0,0,0,1)
 }
 
-/*======================================================================
-var soundEmbed = null;
-//======================================================================
-function soundPlay(which)
-    {
-    if (!soundEmbed)
-        {
-        soundEmbed = document.createElement("embed");
-        soundEmbed.setAttribute("src", "earcons/"+which+".wav");
-        soundEmbed.setAttribute("hidden", true);
-        soundEmbed.setAttribute("autostart", true);
-        }
-    else
-        {
-        document.body.removeChild(soundEmbed);
-        soundEmbed.removed = true;
-        soundEmbed = null;
-        soundEmbed = document.createElement("embed");
-        soundEmbed.setAttribute("src", "earcons/"+which+".wav");
-        soundEmbed.setAttribute("hidden", true);
-        soundEmbed.setAttribute("autostart", true);
-        }
-    soundEmbed.removed = false;
-    document.body.appendChild(soundEmbed);
-    }
-//======================================================================*/
+function load_audio() {
+  for(var i = 0; i < sounds.length; i++) {
+    sounds[i].feed = new Audio(sounds[i].src);
+  }
+}
 
 //Finds y value of given object -- for automated scrolling
 function findPos(obj) {
@@ -290,6 +269,7 @@ function ez_navigate_start(propagated) {
 }
 
 function ez_navigate(move) {
+  sounds[0].feed.play();
   if(move == 'down') {
     if(currIndex < selectElements.length-1) {
       selectElements[currIndex].blur(); // Add blur to old element
@@ -440,6 +420,8 @@ window.onload=function() {
   
   indexElements();
   
+  load_audio();
+  
   // ADDING SOUND DIV -- ONLY NEEDED FOR speak.js
   var div = document.createElement('div');
   div.id = 'audio';
@@ -470,11 +452,13 @@ function stopEZ() {
   voice("");
   sessionStorage.setItem("EZ_Toggle", "0");
   var old = document.getElementById("selected");
-  old.style.visibility = "hidden";
-  old.style.left = 0+"px";
-  old.style.top = 0+"px";
-  old.style.width = 0+"px";
-  old.style.height = 0+"px";
+  if (old !== null) {
+    old.style.visibility = "hidden";
+    old.style.left = 0+"px";
+    old.style.top = 0+"px";
+    old.style.width = 0+"px";
+    old.style.height = 0+"px";
+  }
 }
 
 // Check if new element (and exists to be highlighted), and then highlights
