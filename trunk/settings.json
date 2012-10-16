@@ -14,12 +14,20 @@ var alerts = {
     {"value": "You are on the last item on this screen Use the Up arrow button to move back down through the rest of the items."},
     {"value": "You are still on the last item at the bottom of this screen. Please, use the Up arrow button to move back down through the rest of the items on this screen."},
     {"value": "The Up arrow button is just above the button that you most recently pressed."}
-  ],
+  ]
 }
 
 var sounds = [
   {
     "name": "move",
     "src": "earcons/move.wav"
+  },
+  {
+    "name": "select",
+    "src": "earcons/select.wav"
+  },
+  {
+    "name": "deselect",
+    "src": "earcons/deselect.wav"
   }
 ]

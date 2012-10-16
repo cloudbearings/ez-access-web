@@ -172,6 +172,15 @@ function ez_help() {
   TINY.box.show("<span style='font-size:250%'>" + helptext + "</span>",0,0,0,1)
 }
 
+function find_audio(audio_name) {
+  for(var i = 0; i < sounds.length; i++) {
+    if(sounds[i].name == audio_name) {
+      return i;
+    }
+  }
+  return -1;
+}
+
 function load_audio() {
   for(var i = 0; i < sounds.length; i++) {
     sounds[i].feed = new Audio(sounds[i].src);
@@ -269,7 +278,7 @@ function ez_navigate_start(propagated) {
 }
 
 function ez_navigate(move) {
-  sounds[0].feed.play();
+  sounds[find_audio("move")].feed.play();
   if(move == 'down') {
     if(currIndex < selectElements.length-1) {
       selectElements[currIndex].blur(); // Add blur to old element
@@ -331,6 +340,11 @@ function ez_enter() {
   }
   else if(obj.tagName == 'INPUT' && (obj.type == 'radio' || obj.type == 'checkbox') ) {
     obj.click();
+    if(obj.checked) {
+      sounds[find_audio("select")].feed.play();
+    } else {
+      sounds[find_audio("deselect")].feed.play();
+    }
     voice(obj);
   }
   else if(obj.tagName == 'INPUT' && (obj.type == 'submit' || obj.type == 'image') ) {
