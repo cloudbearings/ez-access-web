@@ -260,21 +260,29 @@ function drawSelected(obj) {
     }
     old = document.getElementById('selected'); // Redefine the new selected div
   }
+  old.style.visibility = "visible";
   old.style.left = pos.x-10+'px';
   old.style.top = pos.y-10+'px';
   old.style.width = obj.offsetWidth+10+'px';
   old.style.height = obj.offsetHeight+10+'px';
 }
 
-function ez_navigate_start() {
+function ez_navigate_start(propagated) {
   ez_navigateToggle = true;
+  sessionStorage.setItem("EZ_Toggle", "1");
   if(document.body.getAttribute('data-ez-startat') !== null) {
-    var startid = document.body.getAttribute('data-ez-startat').split(" ")[0].slice(1);
+    if(propagated) {
+      // Of "#<id> #<id>" of second element
+      var startid = document.body.getAttribute('data-ez-startat').split(" ")[1].slice(1);
+    } else {
+      // Of "#<id> #<id>" of first element
+      var startid = document.body.getAttribute('data-ez-startat').split(" ")[0].slice(1);
+    }
     for(var i = 0; i < selectElements.length;i++) {
       if(selectElements[i].id !== null && selectElements[i].id == startid) {
         currIndex = i;
         break;
-      }
+      } // Else, default initial currIndex = 0 (from beginning)
     }
     drawSelected(selectElements[currIndex]);
     voice(selectElements[currIndex],'nav');
@@ -293,6 +301,7 @@ function ez_navigate(move) {
     } else { // Basically, keep looping through 'warnings' until user stops or if there are no more speech elements, and wrap is true, jump to bottom of screen.
       if(repeatAlert < alerts.bottom.length-1) {
         repeatAlert++;
+        drawSelected(selectElements[currIndex]);
         voice(alerts.bottom[repeatAlert].value);
       } else {
         if(screenWrap) {
@@ -301,6 +310,7 @@ function ez_navigate(move) {
           drawSelected(selectElements[currIndex]);
           voice(selectElements[currIndex],'nav');
         } else {
+          drawSelected(selectElements[currIndex]);
           voice(alerts.bottom[repeatAlert].value);
         }
       }
@@ -317,6 +327,7 @@ function ez_navigate(move) {
     } else {
       if(repeatAlert < alerts.top.length-1) {
         repeatAlert++;
+        drawSelected(selectElements[currIndex]);
         voice(alerts.top[repeatAlert].value);
       } else {
         if(screenWrap) {
@@ -325,6 +336,7 @@ function ez_navigate(move) {
           drawSelected(selectElements[currIndex]);
           voice(selectElements[currIndex],'nav');
         } else {
+          drawSelected(selectElements[currIndex]);
           voice(alerts.bottom[repeatAlert].value);
         }
       }
@@ -424,7 +436,7 @@ function getlabelforinput(inputname) {
 // On page load, load key_event() listener
 window.onload=function() {
   document.onkeydown = key_event;
-  document.onkeypress = key_event;
+  //document.onkeypress = key_event;
   
   indexElements();
   
@@ -444,7 +456,25 @@ window.onload=function() {
     hammer.ondrag = function(ev) {
       mouseOver(document.elementFromPoint(parseFloat(ev.position.x)-parseFloat(window.scrollX), parseFloat(ev.position.y)-parseFloat(window.scrollY)));
     };
+    hammer.ontap = function(ev) {
+      stopEZ();
+    };
+    if (parseInt(sessionStorage.getItem("EZ_Toggle") ) == true) {
+      ez_navigate_start(true);
+    }
   }
+}
+
+function stopEZ() {
+  currIndex = 0;
+  voice("");
+  sessionStorage.setItem("EZ_Toggle", "0");
+  var old = document.getElementById("selected");
+  old.style.visibility = "hidden";
+  old.style.left = 0+"px";
+  old.style.top = 0+"px";
+  old.style.width = 0+"px";
+  old.style.height = 0+"px";
 }
 
 // Check if new element (and exists to be highlighted), and then highlights
@@ -463,6 +493,7 @@ function mouseOver(e) {
     }
   }
   if( (newElement && found) || !ez_navigateToggle) { //Override if ez is not enabled
+    sessionStorage.setItem("EZ_Toggle", "1");
     ez_navigateToggle = true;
     drawSelected(selectElements[currIndex]);
     voice(selectElements[currIndex],'point');
@@ -473,7 +504,7 @@ map={} // Have to do this weird thing in order to detect two keys at same time (
 onkeydown=onkeyup=function(e){
     e=e||event//to deal with IE
     map[e.keyCode]=e.type=='keydown'?true:false
-    if (map[KB_TAB] && map[KB_SHIFT]){ //SHIFT+TAB
+    if (map[KB_TAB] && map[KB_SHIFT] && tabNav != 'none'){ //SHIFT+TAB
       if(tinyOpen) { tinyOpen = false;  TINY.box.hide(); }
       if(ez_navigateToggle) {
         window.scroll(0,findPos(selectElements[currIndex]));
@@ -482,7 +513,7 @@ onkeydown=onkeyup=function(e){
         ez_navigate_start();
       }
       return false; // Overwrite default browser functionality
-    } else if(map[KB_TAB]){//TAB
+    } else if(map[KB_TAB] && tabNav != 'none'){//TAB
       if(tinyOpen) { tinyOpen = false;  TINY.box.hide(); }
       if(ez_navigateToggle) {
         window.scroll(0,findPos(selectElements[currIndex]));
