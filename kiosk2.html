@@ -36,18 +36,17 @@
     <script src="js/jquery.js"></script>
   </head>
 
-  <body>
-
+  <body data-ez-startat="#logo #start">
 
     <div class="container">
       <div class="row">
         <div class="span12">
-        <img src="img/southwest.png" alt="Southwest Airlines logo" width="250px" style="float:right">
-          <div data-ez-chunking="group" style="display: inline-block"><h1>For identification purposes only,</h1>
+        <img src="img/southwest.png" id="logo" alt="Southwest Airlines logo" width="250px" style="float:right;margin-bottom:25px;">
+          <div data-ez-chunking="group" id="start"><h1>For identification purposes only,</h1>
           <p>please provide one of the following.</p></div>
         </div>
       </div>
-      <div class="row" style="background-color:rgba(0,80,40,.1);border-radius: 15px;">
+      <div class="row well">
         <div class="span3">
           <h1 style="text-align:center" data-ez-focusable="false">Credit card</h1>
           <img src="img/creditcard.gif" alt="Credit Card" width="100%">
