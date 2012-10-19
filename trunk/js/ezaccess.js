@@ -298,9 +298,12 @@ function ez_navigate_start(propagated) {
         break;
       } // Else, default initial currIndex = 0 (from beginning)
     }
-    drawSelected(selectElements[currIndex]);
-    voice(selectElements[currIndex],'nav');
   }
+  if(!propagated) {
+    sounds[getElementAudio()].feed.play();
+  }
+  drawSelected(selectElements[currIndex]);
+  voice(selectElements[currIndex],'nav');
 }
 
 function ez_navigate(move) {
@@ -527,6 +530,7 @@ function mouseOver(e) {
   if( (newElement && found) || !ez_navigateToggle) { //Override if ez is not enabled
     sessionStorage.setItem("EZ_Toggle", "1");
     ez_navigateToggle = true;
+    sounds[getElementAudio()].feed.play();
     drawSelected(selectElements[currIndex]);
     voice(selectElements[currIndex],'point');
   }
