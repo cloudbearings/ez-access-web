@@ -39,5 +39,9 @@ var sounds = [
   {
     "name": "noaction",
     "src": "earcons/noaction.wav"
+  },
+  {
+    "name": "button",
+    "src": "earcons/button.wav"
   }
 ]

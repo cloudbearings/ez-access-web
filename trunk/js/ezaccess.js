@@ -59,6 +59,44 @@ const KB_KEY_UP = 38; // is up arrow key
 const KB_KEY_DOWN = 40; // is down arrow key
 const KB_KEY_ENTER = 13; // is green circle enter key */
 
+/* AUDIO CONSTANTS finder function */
+function load_audio() {
+  for(var i = 0; i < sounds.length; i++) {
+    sounds[i].feed = new Audio(sounds[i].src);
+  }
+}
+function find_audio(audio_name) {
+  for(var i = 0; i < sounds.length; i++) {
+    if(sounds[i].name == audio_name) {
+      return i;
+    }
+  }
+  console.log('No audio file named "'+audio_name+'" found (below error for more info).'); // Debugging
+  return -1;
+}
+/* AUDIO CONSTANTS
+   These usually shouldn't be changed (cached indexes): just change
+   the URL for the audio name in the settings.json file. */
+const AUDIO_MOVE      = find_audio('move');
+const AUDIO_SELECT    = find_audio('select');
+const AUDIO_SELECT    = find_audio('deselect');
+const AUDIO_NOACTION  = find_audio('noaction');
+const AUDIO_BUTTON    = find_audio('button');
+
+function getElementAudio() {
+  for(var tmp = ['p','span','div','h1','h2','h3','h4','h5','li'], i = 0; i < tmp.length; i++) {
+    // To simplify comparing to a whole lot of possibilities, use a loop
+    if(selectElements[currIndex].href != undefined || selectElements[currIndex].onclick != undefined) {
+      return AUDIO_BUTTON;
+    }
+    if(selectElements[currIndex].tagName == tmp[i].toUpperCase()) {
+      return AUDIO_MOVE;
+    }
+  }
+  console.log('No specific sound for "' + selectElements[currIndex].tagName + '" HTML tag.');
+  return AUDIO_MOVE;
+}
+
 // Tags that are candidates for highlight
 const COMPATIBLE_TAGS = 'p,img,span,a,div,h1,h2,h3,h4,h5,ul,ol,li,input,button,textarea';
 
@@ -172,21 +210,6 @@ function ez_help() {
   TINY.box.show("<span style='font-size:250%'>" + helptext + "</span>",0,0,0,1)
 }
 
-function find_audio(audio_name) {
-  for(var i = 0; i < sounds.length; i++) {
-    if(sounds[i].name == audio_name) {
-      return i;
-    }
-  }
-  return -1;
-}
-
-function load_audio() {
-  for(var i = 0; i < sounds.length; i++) {
-    sounds[i].feed = new Audio(sounds[i].src);
-  }
-}
-
 //Finds y value of given object -- for automated scrolling
 function findPos(obj) {
     var curtop = -100;
@@ -236,6 +259,8 @@ window.onresize = function() {
 
 // Draws selected box around DOM object referenced to
 function drawSelected(obj) {
+  var tmp = obj.style.display;  // INLINE BLOCK OUTLINE FIXER
+  obj.style.display = "inline-block"; // INLINE BLOCK OUTLINE FIXER
   var pos = getElementAbsolutePos(obj);
   var old = document.getElementById('selected');
   if(old === null) {
@@ -253,6 +278,7 @@ function drawSelected(obj) {
   old.style.top = pos.y-10+'px';
   old.style.width = obj.offsetWidth+10+'px';
   old.style.height = obj.offsetHeight+10+'px';
+  obj.style.display = tmp; // INLINE BLOCK OUTLINE FIXER
 }
 
 function ez_navigate_start(propagated) {
@@ -278,27 +304,30 @@ function ez_navigate_start(propagated) {
 }
 
 function ez_navigate(move) {
-  sounds[find_audio("move")].feed.play();
   if(move == 'down') {
     if(currIndex < selectElements.length-1) {
       selectElements[currIndex].blur(); // Add blur to old element
       repeatAlert = 0;
       currIndex++;
+      sounds[getElementAudio()].feed.play();
       selectElements[currIndex].focus(); // Add focus to new element
       drawSelected(selectElements[currIndex]);
       voice(selectElements[currIndex],'nav');
     } else { // Basically, keep looping through 'warnings' until user stops or if there are no more speech elements, and wrap is true, jump to bottom of screen.
       if(repeatAlert < alerts.bottom.length-1) {
+        sounds[AUDIO_NOACTION].feed.play();
         repeatAlert++;
         drawSelected(selectElements[currIndex]);
         voice(alerts.bottom[repeatAlert].value);
       } else {
         if(screenWrap) {
           currIndex = 0;
+          sounds[getElementAudio()].feed.play();
           repeatAlert = 0;
           drawSelected(selectElements[currIndex]);
           voice(selectElements[currIndex],'nav');
         } else {
+          sounds[AUDIO_NOACTION].feed.play();
           drawSelected(selectElements[currIndex]);
           voice(alerts.bottom[repeatAlert].value);
         }
@@ -306,25 +335,29 @@ function ez_navigate(move) {
     }
   }
   else if(move == 'up') {
-    if (currIndex > 0) {
+    if(currIndex > 0) {
       selectElements[currIndex].blur(); // Add blur to old element
       repeatAlert = 0;
       currIndex--;
+      sounds[getElementAudio()].feed.play();
       selectElements[currIndex].focus(); // Add focus to new element
       drawSelected(selectElements[currIndex]);
       voice(selectElements[currIndex],'nav');
     } else {
       if(repeatAlert < alerts.top.length-1) {
+        sounds[AUDIO_NOACTION].feed.play();
         repeatAlert++;
         drawSelected(selectElements[currIndex]);
         voice(alerts.top[repeatAlert].value);
       } else {
         if(screenWrap) {
           currIndex = selectElements.length-1;
+          sounds[getElementAudio()].feed.play();
           repeatAlert = 0;
           drawSelected(selectElements[currIndex]);
           voice(selectElements[currIndex],'nav');
         } else {
+          sounds[AUDIO_NOACTION].feed.play();
           drawSelected(selectElements[currIndex]);
           voice(alerts.bottom[repeatAlert].value);
         }
@@ -341,9 +374,9 @@ function ez_enter() {
   else if(obj.tagName == 'INPUT' && (obj.type == 'radio' || obj.type == 'checkbox') ) {
     obj.click();
     if(obj.checked) {
-      sounds[find_audio("select")].feed.play();
+      sounds[AUDIO_SELECT].feed.play();
     } else {
-      sounds[find_audio("deselect")].feed.play();
+      sounds[AUDIO_DESELECT].feed.play();
     }
     voice(obj);
   }
@@ -351,7 +384,7 @@ function ez_enter() {
     obj.click();
   }
   else {
-    sounds[find_audio("noaction")].feed.play();
+    sounds[AUDIO_NOACTION].feed.play();
     voice(obj,0,true);
   }
 }
