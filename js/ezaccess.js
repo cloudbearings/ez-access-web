@@ -79,7 +79,7 @@ function find_audio(audio_name) {
    the URL for the audio name in the settings.json file. */
 const AUDIO_MOVE      = find_audio('move');
 const AUDIO_SELECT    = find_audio('select');
-const AUDIO_SELECT    = find_audio('deselect');
+const AUDIO_DESELECT  = find_audio('deselect');
 const AUDIO_NOACTION  = find_audio('noaction');
 const AUDIO_BUTTON    = find_audio('button');
 
@@ -262,6 +262,10 @@ function drawSelected(obj) {
   var tmp = obj.style.display;  // INLINE BLOCK OUTLINE FIXER
   obj.style.display = "inline-block"; // INLINE BLOCK OUTLINE FIXER
   var pos = getElementAbsolutePos(obj);
+  if(!pos || obj.offsetWidth == 0 || obj.offsetWidth == 0) {
+    // If there is a problem finding the element position
+    return false;
+  }
   var old = document.getElementById('selected');
   if(old === null) {
     var div = document.createElement('div');
@@ -279,6 +283,7 @@ function drawSelected(obj) {
   old.style.width = obj.offsetWidth+10+'px';
   old.style.height = obj.offsetHeight+10+'px';
   obj.style.display = tmp; // INLINE BLOCK OUTLINE FIXER
+  return true;
 }
 
 function ez_navigate_start(propagated) {
@@ -312,26 +317,25 @@ function ez_navigate(move) {
       selectElements[currIndex].blur(); // Add blur to old element
       repeatAlert = 0;
       currIndex++;
+      // If the element location cannot be found; loop through.
+      if(!drawSelected(selectElements[currIndex])) { ez_navigate('down'); return; }
       sounds[getElementAudio()].feed.play();
       selectElements[currIndex].focus(); // Add focus to new element
-      drawSelected(selectElements[currIndex]);
       voice(selectElements[currIndex],'nav');
     } else { // Basically, keep looping through 'warnings' until user stops or if there are no more speech elements, and wrap is true, jump to bottom of screen.
       if(repeatAlert < alerts.bottom.length-1) {
-        sounds[AUDIO_NOACTION].feed.play();
         repeatAlert++;
-        drawSelected(selectElements[currIndex]);
+        sounds[AUDIO_NOACTION].feed.play();
         voice(alerts.bottom[repeatAlert].value);
       } else {
         if(screenWrap) {
           currIndex = 0;
-          sounds[getElementAudio()].feed.play();
           repeatAlert = 0;
-          drawSelected(selectElements[currIndex]);
+          if(!drawSelected(selectElements[currIndex])) { ez_navigate('down'); return; }
+          sounds[getElementAudio()].feed.play();
           voice(selectElements[currIndex],'nav');
         } else {
           sounds[AUDIO_NOACTION].feed.play();
-          drawSelected(selectElements[currIndex]);
           voice(alerts.bottom[repeatAlert].value);
         }
       }
@@ -342,26 +346,24 @@ function ez_navigate(move) {
       selectElements[currIndex].blur(); // Add blur to old element
       repeatAlert = 0;
       currIndex--;
+      if(!drawSelected(selectElements[currIndex])) { ez_navigate('up'); return; }
       sounds[getElementAudio()].feed.play();
       selectElements[currIndex].focus(); // Add focus to new element
-      drawSelected(selectElements[currIndex]);
       voice(selectElements[currIndex],'nav');
     } else {
       if(repeatAlert < alerts.top.length-1) {
-        sounds[AUDIO_NOACTION].feed.play();
         repeatAlert++;
-        drawSelected(selectElements[currIndex]);
+        sounds[AUDIO_NOACTION].feed.play();
         voice(alerts.top[repeatAlert].value);
       } else {
         if(screenWrap) {
           currIndex = selectElements.length-1;
-          sounds[getElementAudio()].feed.play();
           repeatAlert = 0;
-          drawSelected(selectElements[currIndex]);
+          if(!drawSelected(selectElements[currIndex])) { ez_navigate('up'); return; }
+          sounds[getElementAudio()].feed.play();
           voice(selectElements[currIndex],'nav');
         } else {
           sounds[AUDIO_NOACTION].feed.play();
-          drawSelected(selectElements[currIndex]);
           voice(alerts.bottom[repeatAlert].value);
         }
       }
@@ -763,6 +765,10 @@ function getElementAbsolutePos(elemID) {
             parentNode = offsetParent.parentNode;  
             offsetParent = offsetParent.offsetParent;  
         }  
-    }  
+    }
+    if(res.x < 0 || res.y < 0 || (res.x == 0 && res.y == 0)) {
+      // Finding the element's location probably failed.
+      return false;
+    }
     return res;  
 }
