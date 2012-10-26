@@ -317,13 +317,15 @@ function groupSkip(move) {
     if(move == 'down') {
       var oldIndex = currIndex;
       currIndex = currIndex + indexElements(selectElements[currIndex]).length;
-      selectElements[currIndex].setAttribute("data-tmp-jump",oldIndex);
+      if(selectElements[currIndex].getAttribute("data-tmp-jump") === null) {
+        selectElements[currIndex].setAttribute("data-tmp-jump",oldIndex);
+      }
     }
   }
   else if(move == 'up') {
     if(selectElements[currIndex].getAttribute("data-tmp-jump") !== null) {
       var oldIndex = currIndex;
-      currIndex = selectElements[currIndex].getAttribute("data-tmp-jump");
+      currIndex = parseFloat(selectElements[currIndex].getAttribute("data-tmp-jump"));
       selectElements[oldIndex].removeAttribute("data-tmp-jump");
     }
   }
@@ -419,8 +421,10 @@ function ez_enter() {
   } else if(selectElements[currIndex].getAttribute('data-ez-chunking') == 'group' && selectElements[currIndex].getAttribute('data-ez-subnavtype') == 'nested') {
     var oldIndex = currIndex;
     var tmpIndex = currIndex + indexElements(selectElements[currIndex]).length;
-    selectElements[tmpIndex].setAttribute("data-tmp-jump",oldIndex);
-    ez_jump(currIndex + 2);
+    if(selectElements[tmpIndex].getAttribute("data-tmp-jump") === null) {
+      selectElements[tmpIndex].setAttribute("data-tmp-jump",oldIndex);
+    }
+    ez_jump(currIndex + 1);
   }
   else {
     sounds[AUDIO_NOACTION].feed.play();
