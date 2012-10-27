@@ -1,3 +1,6 @@
+
+
+
 /* Feel free to change, add and remove elements, but MAKE SURE it is valid JSON. 
    Common mistakes:
     1. Not including comma after every element (except for last, or first if only one)
@@ -5,6 +8,10 @@
    Use http://jsonlint.com/ to validate WITHOUT the "var foo = " part.
 */
 var alerts = {
+  "idle": {
+    "value": "If you have difficulty using the touchscreen, press the blue, diamond-shaped EZ Help button.",
+    "wait": "5000" // In milliseconds
+  },
   "top": [
     {"value": ""},
     {"value": "First item on screen."},
