@@ -98,7 +98,7 @@ function getElementAudio() {
 }
 
 // Tags that are candidates for highlight
-const COMPATIBLE_TAGS = 'p,img,span,a,div,h1,h2,h3,h4,h5,ul,ol,li,input,button,textarea';
+const COMPATIBLE_TAGS = 'p,img,span,a,div,h1,h2,h3,h4,h5,figure,figcaption,ul,ol,li,input,button,textarea';
 
 // Array of tags generated on pageload initialized globally
 var selectElements;
@@ -112,8 +112,11 @@ var ez_navigateToggle = false;
 // Wrap elements on the screen
 var screenWrap = false;
 
-// Keep track if the TINY modal is open or not.
+// Keep track if the TINY modal is open or not
 var tinyOpen = false;
+
+// Global idle loop timer if no user action is taken
+var idleLoop;
 
 // Whether slide to read is enabled universally
 var slideToRead = true;
@@ -134,16 +137,7 @@ function voice(obj,source,repeat) {
     data = obj;
   }
   else {
-    if(source == 'nav' && obj.getAttribute('data-ez-sayalt-nav') !== null) {
-      data = obj.getAttribute('data-ez-sayalt-nav');
-    }
-    else if(source == 'point' && obj.getAttribute('data-ez-sayalt-point') !== null) {
-      data = obj.getAttribute('data-ez-sayalt-point');
-    }
-    else if(obj.getAttribute('data-ez-sayalt') !== null) {
-      data = obj.getAttribute('data-ez-sayalt');
-    }
-    else if(obj.tagName == 'INPUT' && (obj.type == 'radio' || obj.type == 'checkbox') && getlabelforinput(obj.id) !== null) {
+    if(obj.tagName == 'INPUT' && (obj.type == 'radio' || obj.type == 'checkbox') && getlabelforinput(obj.id) !== null) {
       data = getlabelforinput(obj.id);
     }
     else if(obj.tagName == 'TEXTAREA') {
@@ -156,6 +150,15 @@ function voice(obj,source,repeat) {
       data = obj.textContent;
     } else {
       data = obj.alt;
+    }
+    if(source == 'nav' && obj.getAttribute('data-ez-sayalt-nav') !== null) {
+      data = obj.getAttribute('data-ez-sayalt-nav');
+    }
+    else if(source == 'point' && obj.getAttribute('data-ez-sayalt-point') !== null) {
+      data = obj.getAttribute('data-ez-sayalt-point');
+    }
+    else if(obj.getAttribute('data-ez-sayalt') !== null) {
+      data = obj.getAttribute('data-ez-sayalt');
     }
     if(source == 'nav' && obj.getAttribute('data-ez-saybefore-nav') !== null) {
       data = obj.getAttribute('data-ez-saybefore-nav') + ' ' + data;
@@ -206,9 +209,13 @@ function voice(obj,source,repeat) {
   speak.play(data);
 }
 
-function ez_help() {
-  var helptext = "You have activated the ez help dialogue."; // Temporarily static for development
-  voice(helptext);
+function ez_help(alert) {
+  if(alert != "") {
+    var helptext = String(alert);
+  } else {
+    var helptext = "You have activated the ez help dialogue."; // Temporarily static for development
+  }
+  voice(String(helptext));
   TINY.box.show("<span style='font-size:250%'>" + helptext + "</span>",0,0,0,1)
 }
 
@@ -317,16 +324,24 @@ function groupSkip(move) {
     if(move == 'down') {
       var oldIndex = currIndex;
       currIndex = currIndex + indexElements(selectElements[currIndex]).length;
-      if(selectElements[currIndex].getAttribute("data-tmp-jump") === null) {
-        selectElements[currIndex].setAttribute("data-tmp-jump",oldIndex);
-      }
     }
   }
   else if(move == 'up') {
     if(selectElements[currIndex].getAttribute("data-tmp-jump") !== null) {
       var oldIndex = currIndex;
       currIndex = parseFloat(selectElements[currIndex].getAttribute("data-tmp-jump"));
-      selectElements[oldIndex].removeAttribute("data-tmp-jump");
+    }
+  }
+}
+
+function idle_loop(display) {
+  if(!display) {
+    clearInterval(idle_loop);
+    idleLoop = setInterval(function(){idle_loop(true)},alerts.idle.wait);
+  } else {
+    if(!tinyOpen && !ez_navigateToggle) {
+      tinyOpen = true;
+      ez_help(alerts.idle.value);
     }
   }
 }
@@ -338,6 +353,7 @@ function ez_navigate(move) {
       repeatAlert = 0;
       groupSkip('down');
       currIndex++;
+      if(selectElements[currIndex].getAttribute('data-ez-focusable-nav') == 'false') { ez_navigate('down'); return; }
       // If the element location cannot be found; loop through.
       if(!drawSelected(selectElements[currIndex])) { ez_navigate('down'); return; }
       sounds[getElementAudio()].feed.play();
@@ -367,6 +383,7 @@ function ez_navigate(move) {
       selectElements[currIndex].blur(); // Add blur to old element
       repeatAlert = 0;
       currIndex--;
+      if(selectElements[currIndex].getAttribute('data-ez-focusable-nav') == 'false') { ez_navigate('up'); return; }
       groupSkip('up');
       if(!drawSelected(selectElements[currIndex])) { ez_navigate('up'); return; }
       sounds[getElementAudio()].feed.play();
@@ -421,9 +438,6 @@ function ez_enter() {
   } else if(selectElements[currIndex].getAttribute('data-ez-chunking') == 'group' && selectElements[currIndex].getAttribute('data-ez-subnavtype') == 'nested') {
     var oldIndex = currIndex;
     var tmpIndex = currIndex + indexElements(selectElements[currIndex]).length;
-    if(selectElements[tmpIndex].getAttribute("data-tmp-jump") === null) {
-      selectElements[tmpIndex].setAttribute("data-tmp-jump",oldIndex);
-    }
     ez_jump(currIndex + 1);
   }
   else {
@@ -477,9 +491,6 @@ function indexElements(world) {
   // Check if ez-chunking == group; if so, group 'em
   for(var i = 0; i < selectElementsTemp.length;) {
     if(selectElementsTemp[i].getAttribute('data-ez-chunking') == 'group' && selectElementsTemp[i].getAttribute('data-ez-subnavtype') == 'nested') {
-      //var remove = getElementsByTagNames(COMPATIBLE_TAGS,selectElements[i]);
-      //selectElements.splice(i+1,remove.length);
-      //i += remove.length+1;
       i++;
     } else if(selectElementsTemp[i].getAttribute('data-ez-chunking') == 'group') {
       var removeAmount = getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]).length;
@@ -497,6 +508,22 @@ function indexElements(world) {
     else { i++; }
   }
   return selectElementsTemp;
+}
+
+function load_jumppoints() {
+  for(var i = 0; i < selectElements.length; i++) {
+    if(selectElements[i].getAttribute('data-ez-chunking') == 'group' && selectElements[i].getAttribute('data-ez-subnavtype') == 'nested') {
+      if(selectElements[i].getAttribute('data-ez-focusable-point') === null) {
+        selectElements[i].setAttribute('data-ez-focusable-point','false'); // Default pointer navigates INSIDE the element (not on the wrapper)
+      }
+      var insideElements = indexElements(selectElements[i]);
+      var endElement = insideElements.length+i;
+      console.log(selectElements[endElement]);
+      if(selectElements[endElement].getAttribute('data-tmp-jump') === null) {
+        selectElements[endElement].setAttribute('data-tmp-jump',i);
+      }
+    }
+  }
 }
 
 // For getting 'for' contents of a form button (we have to iterate and look for it)
@@ -517,7 +544,11 @@ window.onload=function() {
   
   selectElements = indexElements();
   
+  load_jumppoints();
+  
   load_audio();
+  
+  idle_loop(); // TODO/TEMP
   
   // ADDING SOUND DIV -- ONLY NEEDED FOR speak.js
   var div = document.createElement('div');
@@ -545,6 +576,8 @@ window.onload=function() {
 }
 
 function stopEZ() {
+  ez_navigateToggle = false;
+  idle_loop();
   currIndex = 0;
   voice("");
   sessionStorage.setItem("EZ_Toggle", "0");
