@@ -27,61 +27,57 @@
                   2. speak.js  - Provides speech generation
                   3. TinyBox   - Modal window script for help
 */
-
 // Tab keycodes
-const KB_TAB = 9;
-const KB_SHIFT = 16;
-const KB_ENTER = 13;
+var KB_TAB = 9;
+var KB_SHIFT = 16;
+var KB_ENTER = 13;
 
 //EZ-Access keycode declarations
-const EZ_KEY_SKIPFORWARD = 135; // is >>
-const EZ_KEY_SKIPBACKWARD = 134; // is <<
-const EZ_KEY_HELP = 128; // is ?
-const EZ_KEY_BACK = 132; // is BACK
-const EZ_KEY_NEXT = 133; // is NEXT
-const EZ_KEY_UP = 129; // is up arrow key
-const EZ_KEY_DOWN = 130; // is down arrow key
-const EZ_KEY_ENTER = 131; // is green circle enter key
+var EZ_KEY_SKIPFORWARD = 135; // is >>
+var EZ_KEY_SKIPBACKWARD = 134; // is <<
+var EZ_KEY_HELP = 128; // is ?
+var EZ_KEY_BACK = 132; // is BACK
+var EZ_KEY_NEXT = 133; // is NEXT
+var EZ_KEY_UP = 129; // is up arrow key
+var EZ_KEY_DOWN = 130; // is down arrow key
+var EZ_KEY_ENTER = 131; // is green circle enter key
 
-/* //EZ-Access KEYBOARD keycode declarations
-const EZ_KB_KEY_HELP = 191; // is ?
-const EZ_KB_KEY_BACK = 37; // is BACK
-const EZ_KB_KEY_NEXT = 39; // is NEXT
-const EZ_KB_KEY_UP = 38; // is up arrow key
-const EZ_KB_KEY_DOWN = 40; // is down arrow key
-const EZ_KB_KEY_ENTER = 13; // is green circle enter key */
-
-/* //NORMAL KEYBOARD keycode declarations
-const KB_KEY_HELP = 191; // is ?
-const KB_KEY_BACK = 37; // is BACK
-const KB_KEY_NEXT = 39; // is NEXT
-const KB_KEY_UP = 38; // is up arrow key
-const KB_KEY_DOWN = 40; // is down arrow key
-const KB_KEY_ENTER = 13; // is green circle enter key */
-
-/* AUDIO CONSTANTS finder function */
+/**
+* AUDIO CONSTANTS finder function
+* loads all audio files into cache
+*/
 function load_audio() {
-  for(var i = 0; i < sounds.length; i++) {
+  var i;
+  for (i = 0; i < sounds.length; i++) {
     sounds[i].feed = new Audio(sounds[i].src);
   }
 }
+
+/**
+ * Searches sounds array of objects for name of sound
+ * @param audio_name Name of the audio file to search in object for
+ * @return {Number} Position in sounds[].name array
+ */
 function find_audio(audio_name) {
   for(var i = 0; i < sounds.length; i++) {
-    if(sounds[i].name == audio_name) {
-      return i;
-    }
+      if (audio_name === sounds[i].name) {
+          return i;
+      }
   }
   console.log('No audio file named "'+audio_name+'" found (below error for more info).'); // Debugging
   return -1;
 }
-/* AUDIO CONSTANTS
-   These usually shouldn't be changed (cached indexes): just change
-   the URL for the audio name in the settings.json file. */
-const AUDIO_MOVE      = find_audio('move');
-const AUDIO_SELECT    = find_audio('select');
-const AUDIO_DESELECT  = find_audio('deselect');
-const AUDIO_NOACTION  = find_audio('noaction');
-const AUDIO_BUTTON    = find_audio('button');
+
+/**
+ *  AUDIO CONSTANTS
+ * These usually shouldn't be changed (cached indexes): just change
+ * the URL for the audio name in the settings.json file.
+ */
+var AUDIO_MOVE      = find_audio('move');
+var AUDIO_SELECT    = find_audio('select');
+var AUDIO_DESELECT  = find_audio('deselect');
+var AUDIO_NOACTION  = find_audio('noaction');
+var AUDIO_BUTTON    = find_audio('button');
 
 function getElementAudio() {
   for(var tmp = ['p','span','div','h1','h2','h3','h4','h5','li'], i = 0; i < tmp.length; i++) {
@@ -98,7 +94,7 @@ function getElementAudio() {
 }
 
 // Tags that are candidates for highlight
-const COMPATIBLE_TAGS = 'p,img,span,a,div,h1,h2,h3,h4,h5,figure,figcaption,ul,ol,li,input,button,textarea';
+var COMPATIBLE_TAGS = 'p,img,span,a,div,h1,h2,h3,h4,h5,figure,figcaption,ul,ol,li,input,button,textarea';
 
 // Array of tags generated on pageload initialized globally
 var selectElements;
@@ -137,7 +133,7 @@ function voice(obj,source,repeat) {
     data = obj;
   }
   else {
-    if(obj.tagName == 'INPUT' && (obj.type == 'radio' || obj.type == 'checkbox') && getlabelforinput(obj.id) !== null) {
+    if(obj.tagName == 'INPUT' && getlabelforinput(obj.id) !== null) {
       data = getlabelforinput(obj.id);
     }
     else if(obj.tagName == 'TEXTAREA') {
@@ -197,6 +193,8 @@ function voice(obj,source,repeat) {
       data += ' text field';
     } else if(obj.tagName == 'INPUT' && obj.type == 'password') {
       data += ' password input field';
+    } else if(obj.tagName == 'INPUT' && obj.type == 'range') {
+      data += ' slider at ' + obj.value + ' with range from '+obj.min+' to ' + obj.max;
     }
     if(obj.tagName == 'TEXTAREA') {
       data = 'text area contains... ' + data;
@@ -319,19 +317,58 @@ function ez_navigate_start(propagated) {
   drawSelected(selectElements[currIndex]);
   voice(selectElements[currIndex],'nav');
 }
+
 function groupSkip(move) {
-  if(selectElements[currIndex].getAttribute('data-ez-chunking') == 'group' && selectElements[currIndex].getAttribute('data-ez-subnavtype') == 'nested') {
+  if(selectElements[currIndex].getAttribute('data-ez-chunking') == 'group') {
     if(move == 'down') {
-      var oldIndex = currIndex;
-      currIndex = currIndex + indexElements(selectElements[currIndex]).length;
+      return currIndex + indexElements(selectElements[currIndex]).length;
     }
   }
   else if(move == 'up') {
     if(selectElements[currIndex].getAttribute("data-tmp-jump") !== null) {
-      var oldIndex = currIndex;
-      currIndex = parseFloat(selectElements[currIndex].getAttribute("data-tmp-jump"));
+      var newIndex = parseFloat(selectElements[currIndex].getAttribute("data-tmp-jump"));
+      if(selectElements[newIndex].getAttribute('data-ez-chunking') == 'group') {
+        return newIndex;
+      }
     }
   }
+  return false;
+}
+
+function hierarchicalStopper(move) {
+  var oldLevel = selectElements[currIndex].getAttribute('data-tmp-level');
+  var newLevel;
+  var skip;
+  if(move == 'down') {
+    skip = currIndex + indexElements(selectElements[currIndex]).length+1;
+    newLevel = selectElements[skip].getAttribute('data-tmp-level');
+  } else if(move == 'up') {
+    skip = selectElements[currIndex-1].getAttribute("data-tmp-jump");
+    if(skip === null) {
+      skip = currIndex-1;
+    } else {
+      skip = parseFloat(selectElements[currIndex-1].getAttribute("data-tmp-jump"));
+    }
+    newLevel = selectElements[skip].getAttribute('data-tmp-level');
+  }
+  if(newLevel == 0 && oldLevel == 0) { return false; }
+  if(newLevel != oldLevel) {
+    if(selectElements[findGroupParent()].getAttribute("data-ez-chunking") == 'group' && selectElements[findGroupParent()].getAttribute("data-ez-subnavtype") == 'hierarchical') {
+      sounds[AUDIO_NOACTION].feed.play();
+      voice("Press back to leave the group");
+      return true;
+    }
+  }
+  return false;
+}
+
+function findGroupParent() {
+  var oldLevel = selectElements[currIndex].getAttribute('data-tmp-level');
+  var i = currIndex;
+  while(i > 0 && parseFloat(selectElements[i].getAttribute('data-tmp-level')) >= oldLevel) {
+    i--;
+  }
+  return i;
 }
 
 function idle_loop(display) {
@@ -351,7 +388,12 @@ function ez_navigate(move) {
     if(currIndex < selectElements.length-1) {
       selectElements[currIndex].blur(); // Add blur to old element
       repeatAlert = 0;
-      groupSkip('down');
+      if(hierarchicalStopper('down')) {
+        return;
+      }
+      if(groupSkip('down') != false) {
+        currIndex = groupSkip('down');
+      }
       currIndex++;
       if(selectElements[currIndex].getAttribute('data-ez-focusable-nav') == 'false') { ez_navigate('down'); return; }
       // If the element location cannot be found; loop through.
@@ -382,9 +424,14 @@ function ez_navigate(move) {
     if(currIndex > 0) {
       selectElements[currIndex].blur(); // Add blur to old element
       repeatAlert = 0;
+      if(hierarchicalStopper('up')) {
+        return;
+      }
       currIndex--;
       if(selectElements[currIndex].getAttribute('data-ez-focusable-nav') == 'false') { ez_navigate('up'); return; }
-      groupSkip('up');
+      if(groupSkip('up') != false) {
+        currIndex = groupSkip('up');
+      }
       if(!drawSelected(selectElements[currIndex])) { ez_navigate('up'); return; }
       sounds[getElementAudio()].feed.play();
       selectElements[currIndex].focus(); // Add focus to new element
@@ -435,9 +482,7 @@ function ez_enter() {
   }
   else if(obj.tagName == 'INPUT' && (obj.type == 'submit' || obj.type == 'image') ) {
     obj.click();
-  } else if(selectElements[currIndex].getAttribute('data-ez-chunking') == 'group' && selectElements[currIndex].getAttribute('data-ez-subnavtype') == 'nested') {
-    var oldIndex = currIndex;
-    var tmpIndex = currIndex + indexElements(selectElements[currIndex]).length;
+  } else if(selectElements[currIndex].getAttribute('data-ez-chunking') == 'group') {
     ez_jump(currIndex + 1);
   }
   else {
@@ -490,7 +535,7 @@ function indexElements(world) {
   
   // Check if ez-chunking == group; if so, group 'em
   for(var i = 0; i < selectElementsTemp.length;) {
-    if(selectElementsTemp[i].getAttribute('data-ez-chunking') == 'group' && selectElementsTemp[i].getAttribute('data-ez-subnavtype') == 'nested') {
+    if(selectElementsTemp[i].getAttribute('data-ez-chunking') == 'group' && selectElementsTemp[i].getAttribute('data-ez-subnavtype') == 'nested' ||selectElementsTemp[i].getAttribute('data-ez-subnavtype') == 'hierarchical') {
       i++;
     } else if(selectElementsTemp[i].getAttribute('data-ez-chunking') == 'group') {
       var removeAmount = getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]).length;
@@ -512,13 +557,25 @@ function indexElements(world) {
 
 function load_jumppoints() {
   for(var i = 0; i < selectElements.length; i++) {
-    if(selectElements[i].getAttribute('data-ez-chunking') == 'group' && selectElements[i].getAttribute('data-ez-subnavtype') == 'nested') {
+    if(selectElements[i].getAttribute('data-ez-chunking') == 'group' && selectElements[i].getAttribute('data-ez-subnavtype') == 'nested' || selectElements[i].getAttribute('data-ez-subnavtype') == 'hierarchical') {
       if(selectElements[i].getAttribute('data-ez-focusable-point') === null) {
         selectElements[i].setAttribute('data-ez-focusable-point','false'); // Default pointer navigates INSIDE the element (not on the wrapper)
       }
+      
       var insideElements = indexElements(selectElements[i]);
+      
+      for(var j = 0; j < insideElements.length; j++) {
+        var level = insideElements[j].getAttribute('data-tmp-level');
+        if(level === null) {
+          level = 0;
+        } else {
+          level = parseFloat(level);
+          level++;
+        }
+        insideElements[j].setAttribute('data-tmp-level',level);
+      }
+      
       var endElement = insideElements.length+i;
-      console.log(selectElements[endElement]);
       if(selectElements[endElement].getAttribute('data-tmp-jump') === null) {
         selectElements[endElement].setAttribute('data-tmp-jump',i);
       }
@@ -647,7 +704,10 @@ onkeydown=onkeyup=function(e){
    http://www.dreamincode.net/code/snippet1246.htm */
 function key_event(e) {
   // 'if' keycode statements
-  
+  if(selectElements[currIndex].type == 'textarea') {
+    voice(String.fromCharCode(e.keyCode));
+  }
+  console.log(e.keyCode);
   if(e.keyCode == EZ_KEY_HELP) {
     if(tinyOpen) {
       tinyOpen = false;
@@ -679,10 +739,13 @@ function key_event(e) {
       }
     }
   }
-  else if(e.keyCode == EZ_KEY_BACK) {
+  else if(e.keyCode == 66) { //EZ_KEY_BACK
+    // TODO
+    ez_jump(findGroupParent()); return;
     if(tinyOpen) { tinyOpen = false;  TINY.box.hide(); }
     else {
       if(ez_navigateToggle) {
+        window.history.back();
       } else {
         ez_navigate_start();
       }
