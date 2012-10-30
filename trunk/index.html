@@ -15,7 +15,10 @@
     <script type="text/JavaScript" src="js/speakClient.js"></script>
     <script type="text/JavaScript" src="js/hammer.js"></script>
     <script type="text/JavaScript" src="js/tinybox.js"></script>
+    <script type="text/javascript" src="keyboard.js" charset="UTF-8"></script>
+    <link rel="stylesheet" type="text/css" href="keyboard.css">
     <script type="text/JavaScript" src="js/ezaccess.js"></script>
+    
 
 </head>
 <body data-ez-startat="#logo #start" data-ez-screenwrap data-ez-tabnav="ezaccess">
@@ -24,6 +27,8 @@
 <h1 id="start" data-ez-sayalt="What do you want? I'm not going to read this welcome!">Welcome to the test site!</h1>
 <p data-ez-focusable="false">Skip this. :*(</p>
 
+<label for="slider1">Choose a value: </label><input id="slider1" type="range" min="100" max="500" step="10" />
+<p>NESTED GROUPING:</p>
 <div data-ez-chunking="group" data-ez-subnavtype="nested" aria-labelledby="muffinlabel" style="background-color: rgba(1, 334, 2, .7);width:600px;margin:5px;padding:5px;border-radius: 15px;">
   <span id="muffinlabel" data-ez-focusable="false">What type of muffin would you like for breakfast, Johny?</span> <br>
   <label for="raspberry">Raspberry</label> <input type="checkbox" name="muffin" id="raspberry" value="red"><br>
@@ -52,15 +57,46 @@
   </div>
 </div>
 
+<hr><hr>
+
+<p>HIERARCHICAL GROUPING:</p>
+<div data-ez-chunking="group" data-ez-subnavtype="hierarchical" aria-labelledby="muffinlabel" style="background-color: rgba(1, 334, 2, .7);width:600px;margin:5px;padding:5px;border-radius: 15px;">
+  <span id="muffinlabel" data-ez-focusable="false">What type of muffin would you like for breakfast, Johny?</span> <br>
+  <label for="raspberry">Raspberry</label> <input type="checkbox" name="muffin" id="raspberry" value="red"><br>
+  <label for="cranberry">Cranberry</label> <input type="checkbox" name="muffin" id="cranberry" value="red"><br>
+  <label for="apple">Apple</label> <input type="checkbox" name="muffin" id="apple" value="red"><br>
+  <label for="cinnamon">Cinnamon</label> <input type="checkbox" name="muffin" id="cinnamon" value="cinnamon"><br>
+  <div data-ez-chunking="group" data-ez-subnavtype="hierarchical" aria-labelledby="spicylabel" style="background-color: rgba(1, 1, 255, .7);margin:10px;padding:5px;border-radius: 15px;">
+    <span id="spicylabel" data-ez-focusable="false">What spiciness do you want?</span> <br>
+    <label for="hot">Hot</label> <input type="checkbox" name="spicy" id="hot" value="hot"><br>
+      <div data-ez-chunking="group" data-ez-subnavtype="hierarchical" aria-labelledby="insetlabel" style="background-color: rgba(255, 1, 2, .7);margin:10px;padding:5px;border-radius: 15px;">
+        <span id="insetlabel" data-ez-focusable="false">More inset?!?</span> <br>
+        <label for="yes">YES</label> <input type="checkbox" data-ez-sayalt="Uhm, I think so... " name="inset" id="yes" value="yes"><br>
+        <label for="no">No.</label> <input type="checkbox" name="inset" id="no" value="no"><br>
+        <label for="awesome">This is awesome!</label> <input type="checkbox" name="inset" id="awesome" value="awesome"><br>
+      </div>
+    <label for="medium">Medium</label> <input type="checkbox" name="spicy" id="medium" value="medium"><br>
+    <label for="mild">Mild</label> <input type="checkbox" name="spicy" id="mild" value="mild"><br>
+  </div>
+  <label for="glass">Pieces of glass</label> <input type="checkbox" name="muffin" id="glass" value="glass"><br>
+  <label for="blood">Blood</label> <input type="checkbox" name="muffin" id="blood" value="blood"><br>
+  <div data-ez-chunking="group" data-ez-subnavtype="hierarchical" aria-labelledby="colorlabel" style="background-color: rgba(234, 334, 2, .7);margin:10px;padding:5px;border-radius: 15px;">
+    <span id="colorlabel">What color muffin do you want?</span> <br>
+    <label for="red">Red</label> <input type="checkbox" name="color" id="red" value="red"><br>
+    <label for="blue">Blue</label> <input type="checkbox" name="color" id="blue" value="blue"><br>
+    <label for="green">Green</label> <input type="checkbox" name="color" id="green" value="green"><br>
+  </div>
+</div>
+
 <p>Here, we will test many <b>different</b> functionalities of the EZ access browser plugin/library thing for kiosks.</p>
 <p>Each block of text will be seperately navigateable.</p>
 <p data-ez-focusable="false">Skip!</p>
 <p data-ez-focusable="false">This too!</p>
-<div data-ez-chunking="group" data-ez-sayalt-nav="You are scrolling up and down!" data-ez-sayalt-nav="You are navigating with pointing!">
+<!--<div data-ez-chunking="group" data-ez-sayalt-nav="You are scrolling up and down!" data-ez-sayalt-nav="You are navigating with pointing!">
   <p>Group</p>
   <p>these</p>
   <span>paragraph tags! :D</span>
-</div>
+</div>-->
 <div class="button" id="testclick2"><strong>Image</strong> - <em>click here</em></div>
 <br>
 <textarea rows="4" cols="50">
