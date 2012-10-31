@@ -319,17 +319,14 @@ function ez_navigate_start(propagated) {
 }
 
 function groupSkip(move) {
-  if(selectElements[currIndex].getAttribute('data-ez-chunking') == 'group') {
+  if(selectElements[currIndex].getAttribute('data-ez-chunking') == 'group' && selectElements[currIndex].getAttribute('data-ez-subnavtype') == 'nested' || selectElements[currIndex].getAttribute('data-ez-subnavtype') == 'hierarchical') {
     if(move == 'down') {
       return currIndex + indexElements(selectElements[currIndex]).length;
     }
   }
   else if(move == 'up') {
     if(selectElements[currIndex].getAttribute("data-tmp-jump") !== null) {
-      var newIndex = parseFloat(selectElements[currIndex].getAttribute("data-tmp-jump"));
-      if(selectElements[newIndex].getAttribute('data-ez-chunking') == 'group') {
-        return newIndex;
-      }
+      return parseFloat(selectElements[currIndex].getAttribute("data-tmp-jump"));
     }
   }
   return false;
@@ -482,7 +479,7 @@ function ez_enter() {
   }
   else if(obj.tagName == 'INPUT' && (obj.type == 'submit' || obj.type == 'image') ) {
     obj.click();
-  } else if(selectElements[currIndex].getAttribute('data-ez-chunking') == 'group') {
+  } else if(selectElements[currIndex].getAttribute('data-ez-chunking') == 'group' && selectElements[currIndex].getAttribute('data-ez-subnavtype') == 'nested' || selectElements[currIndex].getAttribute('data-ez-subnavtype') == 'hierarchical') {
     ez_jump(currIndex + 1);
   }
   else {
@@ -535,12 +532,13 @@ function indexElements(world) {
   
   // Check if ez-chunking == group; if so, group 'em
   for(var i = 0; i < selectElementsTemp.length;) {
-    if(selectElementsTemp[i].getAttribute('data-ez-chunking') == 'group' && selectElementsTemp[i].getAttribute('data-ez-subnavtype') == 'nested' ||selectElementsTemp[i].getAttribute('data-ez-subnavtype') == 'hierarchical') {
-      i++;
-    } else if(selectElementsTemp[i].getAttribute('data-ez-chunking') == 'group') {
+    if(selectElementsTemp[i].getAttribute('data-ez-chunking') == 'group' && selectElementsTemp[i].getAttribute('data-ez-subnavtype') == null ) {
       var removeAmount = getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]).length;
       selectElementsTemp.splice(i+1,removeAmount);
       i += removeAmount+1;
+    }
+    else if(selectElementsTemp[i].getAttribute('data-ez-chunking') == 'group' && selectElementsTemp[i].getAttribute('data-ez-subnavtype') == 'nested' || selectElementsTemp[i].getAttribute('data-ez-subnavtype') == 'hierarchical') {
+      i++;
     }
     else { i++; }
   }
@@ -707,7 +705,6 @@ function key_event(e) {
   if(selectElements[currIndex].type == 'textarea') {
     voice(String.fromCharCode(e.keyCode));
   }
-  console.log(e.keyCode);
   if(e.keyCode == EZ_KEY_HELP) {
     if(tinyOpen) {
       tinyOpen = false;
@@ -739,7 +736,7 @@ function key_event(e) {
       }
     }
   }
-  else if(e.keyCode == 66) { //EZ_KEY_BACK
+  else if(e.keyCode == EZ_KEY_BACK) {
     // TODO
     ez_jump(findGroupParent()); return;
     if(tinyOpen) { tinyOpen = false;  TINY.box.hide(); }
