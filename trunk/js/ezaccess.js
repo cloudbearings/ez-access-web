@@ -786,8 +786,10 @@ function key_event(e) {
       if(audioVolume <= 90) {
         audioVolume += 10;
         set_volume();
+        sounds[AUDIO_MOVE].feed.play();
         voice("Volume... " + audioVolume);
       } else {
+        sounds[AUDIO_NOACTION].feed.play();
         voice("Maximum volume");
       }
     }
@@ -799,8 +801,10 @@ function key_event(e) {
       if(audioVolume >= 10) {
         audioVolume -= 10;
         set_volume();
+        sounds[AUDIO_MOVE].feed.play();
         voice("Volume... " + audioVolume);
       } else {
+        sounds[AUDIO_NOACTION].feed.play();
         voice("Minimum volume");
       }
     }
