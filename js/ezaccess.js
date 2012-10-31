@@ -781,13 +781,14 @@ function key_event(e) {
   } else if(e.keyCode == EZ_KEY_SKIPFORWARD) {
     if(selectElements[currIndex].type == 'range') {
       selectElements[currIndex].value = parseFloat(selectElements[currIndex].value) + parseFloat(selectElements[currIndex].step);
+      sounds[AUDIO_MOVE].feed.play();
       voice(selectElements[currIndex].value);
     } else {
       if(audioVolume <= 90) {
         audioVolume += 10;
         set_volume();
         sounds[AUDIO_MOVE].feed.play();
-        voice("Volume... " + audioVolume);
+        voice("Volume... " + audioVolume + " percent");
       } else {
         sounds[AUDIO_NOACTION].feed.play();
         voice("Maximum volume");
@@ -796,13 +797,14 @@ function key_event(e) {
   } else if(e.keyCode == EZ_KEY_SKIPBACKWARD) {
     if(selectElements[currIndex].type == 'range') {
       selectElements[currIndex].value = parseFloat(selectElements[currIndex].value) - parseFloat(selectElements[currIndex].step);
+      sounds[AUDIO_MOVE].feed.play();
       voice(selectElements[currIndex].value);
     } else {
       if(audioVolume >= 10) {
         audioVolume -= 10;
         set_volume();
         sounds[AUDIO_MOVE].feed.play();
-        voice("Volume... " + audioVolume);
+        voice("Volume... " + audioVolume + " percent");
       } else {
         sounds[AUDIO_NOACTION].feed.play();
         voice("Minimum volume");
