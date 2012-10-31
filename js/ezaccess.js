@@ -68,6 +68,12 @@ function find_audio(audio_name) {
   return -1;
 }
 
+function set_volume() {
+  for(var i = 0; i < sounds.length; i++) {
+    sounds[i].feed.volume = audioVolume/100;
+  }
+}
+
 /**
  *  AUDIO CONSTANTS
  * These usually shouldn't be changed (cached indexes): just change
@@ -114,6 +120,12 @@ var tinyOpen = false;
 // Global idle loop timer if no user action is taken
 var idleLoop;
 
+// Volume of the audio elements (0-100)
+var audioVolume = 100;
+
+// Global text to be read before next speech synthesis; can be set anywhere
+var globalSayBefore = "";
+
 // Whether slide to read is enabled universally
 var slideToRead = true;
 
@@ -136,7 +148,7 @@ function voice(obj,source,repeat) {
     if(obj.tagName == 'INPUT' && getlabelforinput(obj.id) !== null) {
       data = getlabelforinput(obj.id);
     }
-    else if(obj.tagName == 'TEXTAREA') {
+    else if(obj.type == 'textarea' || obj.type == 'text') {
       if(obj.value == '') { data = 'nothing'; }
       else { data = obj.value; }
     } else if(obj.getAttribute('aria-labelledby') !== null) {
@@ -189,22 +201,26 @@ function voice(obj,source,repeat) {
     } else if(obj.tagName == 'INPUT' && obj.type == 'radio') {
       data += ' radio button... ';
       data += obj.checked ? 'checked' : 'unchecked';
-    } else if(obj.tagName == 'INPUT' && obj.type == 'text') {
-      data += ' text field';
     } else if(obj.tagName == 'INPUT' && obj.type == 'password') {
       data += ' password input field';
     } else if(obj.tagName == 'INPUT' && obj.type == 'range') {
       data += ' slider at ' + obj.value + ' with range from '+obj.min+' to ' + obj.max;
     }
-    if(obj.tagName == 'TEXTAREA') {
+    if(obj.type == 'textarea') {
       data = 'text area contains... ' + data;
+    } else if(obj.type == 'text') {
+      data = 'text field contains... ' + data;
     }
   }
   if(repeat == true) {
     data = "Repeating... " + data;
   }
+  if(globalSayBefore != "") {
+    data = globalSayBefore + data;
+    globalSayBefore = "";
+  }
   if(data.length > 300) { speak.play("One moment."); } // If speech generation will take a while
-  speak.play(data);
+  speak.play(data, { amplitude: audioVolume });
 }
 
 function ez_help(alert) {
@@ -354,6 +370,8 @@ function hierarchicalStopper(move) {
       sounds[AUDIO_NOACTION].feed.play();
       voice("Press back to leave the group");
       return true;
+    } else if(selectElements[findGroupParent()].getAttribute("data-ez-chunking") == 'group' && selectElements[findGroupParent()].getAttribute("data-ez-subnavtype") == 'nested') {
+      globalSayBefore = "Navigating out of group... ";
     }
   }
   return false;
@@ -397,7 +415,7 @@ function ez_navigate(move) {
       if(!drawSelected(selectElements[currIndex])) { ez_navigate('down'); return; }
       sounds[getElementAudio()].feed.play();
       selectElements[currIndex].focus(); // Add focus to new element
-      voice(selectElements[currIndex],'nav');
+      voice(selectElements[currIndex],'nav',globalSayBefore);
     } else { // Basically, keep looping through 'warnings' until user stops or if there are no more speech elements, and wrap is true, jump to bottom of screen.
       if(repeatAlert < alerts.bottom.length-1) {
         repeatAlert++;
@@ -702,7 +720,7 @@ onkeydown=onkeyup=function(e){
    http://www.dreamincode.net/code/snippet1246.htm */
 function key_event(e) {
   // 'if' keycode statements
-  if(selectElements[currIndex].type == 'textarea') {
+  if(selectElements[currIndex].type == 'textarea' || selectElements[currIndex].type == 'text') {
     voice(String.fromCharCode(e.keyCode));
   }
   if(e.keyCode == EZ_KEY_HELP) {
@@ -738,7 +756,9 @@ function key_event(e) {
   }
   else if(e.keyCode == EZ_KEY_BACK) {
     // TODO
-    ez_jump(findGroupParent()); return;
+    globalSayBefore = "Navigating out of group... ";
+    ez_jump(findGroupParent());
+    return;
     if(tinyOpen) { tinyOpen = false;  TINY.box.hide(); }
     else {
       if(ez_navigateToggle) {
@@ -757,6 +777,32 @@ function key_event(e) {
         ez_navigate_start();
       }
       return false; // Disable any browser actions
+    }
+  } else if(e.keyCode == EZ_KEY_SKIPFORWARD) {
+    if(selectElements[currIndex].type == 'range') {
+      selectElements[currIndex].value = parseFloat(selectElements[currIndex].value) + parseFloat(selectElements[currIndex].step);
+      voice(selectElements[currIndex].value);
+    } else {
+      if(audioVolume <= 90) {
+        audioVolume += 10;
+        set_volume();
+        voice("Volume... " + audioVolume);
+      } else {
+        voice("Maximum volume");
+      }
+    }
+  } else if(e.keyCode == EZ_KEY_SKIPBACKWARD) {
+    if(selectElements[currIndex].type == 'range') {
+      selectElements[currIndex].value = parseFloat(selectElements[currIndex].value) - parseFloat(selectElements[currIndex].step);
+      voice(selectElements[currIndex].value);
+    } else {
+      if(audioVolume >= 10) {
+        audioVolume -= 10;
+        set_volume();
+        voice("Volume... " + audioVolume);
+      } else {
+        voice("Minimum volume");
+      }
     }
   }
 }
