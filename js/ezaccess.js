@@ -88,7 +88,7 @@ var AUDIO_BUTTON    = find_audio('button');
 function getElementAudio() {
   for(var tmp = ['p','span','div','h1','h2','h3','h4','h5','li'], i = 0; i < tmp.length; i++) {
     // To simplify comparing to a whole lot of possibilities, use a loop
-    if(selectElements[currIndex].href != undefined || selectElements[currIndex].onclick != undefined) {
+    if(selectElements[currIndex].href != undefined || selectElements[currIndex].onclick != undefined || selectElements[currIndex].tagName == 'INPUT') {
       return AUDIO_BUTTON;
     }
     if(selectElements[currIndex].tagName == tmp[i].toUpperCase()) {
@@ -224,13 +224,9 @@ function voice(obj,source,repeat) {
 }
 
 function ez_help(alert) {
-  if(alert != "") {
-    var helptext = String(alert);
-  } else {
-    var helptext = "You have activated the ez help dialogue."; // Temporarily static for development
-  }
+  var helptext = String(alert);
+  TINY.box.show("<span style='font-size:150%'>" + helptext + "</span>",0,400,0,0);
   voice(String(helptext));
-  TINY.box.show("<span style='font-size:250%'>" + helptext + "</span>",0,0,0,1)
 }
 
 //Finds y value of given object -- for automated scrolling
@@ -383,15 +379,16 @@ function findGroupParent() {
   while(i > 0 && parseFloat(selectElements[i].getAttribute('data-tmp-level')) >= oldLevel) {
     i--;
   }
-  return i;
+  if(i == currIndex) { return false; } // No group (@ 0th level)
+  return i; // Return group element currIndex #
 }
 
 function idle_loop(display) {
   if(!display) {
-    clearInterval(idle_loop);
-    idleLoop = setInterval(function(){idle_loop(true)},alerts.idle.wait);
+    idleLoop = self.setInterval(function(){idle_loop(true)},alerts.idle.wait);
   } else {
     if(!tinyOpen && !ez_navigateToggle) {
+      idleLoop = self.clearInterval(idleLoop);
       tinyOpen = true;
       ez_help(alerts.idle.value);
     }
@@ -410,7 +407,7 @@ function ez_navigate(move) {
         currIndex = groupSkip('down');
       }
       currIndex++;
-      if(selectElements[currIndex].getAttribute('data-ez-focusable-nav') == 'false') { ez_navigate('down'); return; }
+      if(selectElements[currIndex].getAttribute('data-ez-focusable-nav') == 'false' || selectElements[currIndex].getAttribute('data-ez-focusable') == 'false') { ez_navigate('down'); return; }
       // If the element location cannot be found; loop through.
       if(!drawSelected(selectElements[currIndex])) { ez_navigate('down'); return; }
       sounds[getElementAudio()].feed.play();
@@ -443,7 +440,7 @@ function ez_navigate(move) {
         return;
       }
       currIndex--;
-      if(selectElements[currIndex].getAttribute('data-ez-focusable-nav') == 'false') { ez_navigate('up'); return; }
+      if(selectElements[currIndex].getAttribute('data-ez-focusable-nav') == 'false' || selectElements[currIndex].getAttribute('data-ez-focusable') == 'false') { ez_navigate('up'); return; }
       if(groupSkip('up') != false) {
         currIndex = groupSkip('up');
       }
@@ -541,16 +538,36 @@ function indexElements(world) {
   selectElementsTemp = getElementsByTagNames(COMPATIBLE_TAGS,world);
   
   // Check if ez-focusable to remove (+ CHILDREN)
-  for(var i = 0; i < selectElementsTemp.length;) {
+  for(var i = 0; i < selectElementsTemp.length;i++) {
     if(selectElementsTemp[i].getAttribute('data-ez-focusable') == 'false') {
-      selectElementsTemp.splice(i,getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]).length+1); // Remove entry + CHILDREN
+      var children = getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]);
+      for(var j = 0; j < children.length+1; j++) {
+        if(selectElementsTemp[i+j].getAttribute('data-ez-focusable') === null || selectElementsTemp[i+j].getAttribute('data-ez-focusable') === 'inherit') {
+          selectElementsTemp[i+j].setAttribute('data-ez-focusable','false');
+        }
+      }
     }
-    else { i++; }
+    if(selectElementsTemp[i].getAttribute('data-ez-focusable-nav') == 'false') { // Like above code for *-nav
+      var children = getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]);
+      for(var j = 0; j < children.length+1; j++) {
+        if(selectElementsTemp[i+j].getAttribute('data-ez-focusable-nav') === null || selectElementsTemp[i+j].getAttribute('data-ez-focusable-nav') === 'inherit') {
+          selectElementsTemp[i+j].setAttribute('data-ez-focusable-nav','false');
+        }
+      }
+    }
+    if(selectElementsTemp[i].getAttribute('data-ez-focusable-point') == 'false') { // Like above code for *-point
+      var children = getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]);
+      for(var j = 0; j < children.length+1; j++) {
+        if(selectElementsTemp[i+j].getAttribute('data-ez-focusable-point') === null || selectElementsTemp[i+j].getAttribute('data-ez-focusable-point') === 'inherit') {
+          selectElementsTemp[i+j].setAttribute('data-ez-focusable-point','false');
+        }
+      }
+    }
   }
   
   // Check if ez-chunking == group; if so, group 'em
   for(var i = 0; i < selectElementsTemp.length;) {
-    if(selectElementsTemp[i].getAttribute('data-ez-chunking') == 'group' && selectElementsTemp[i].getAttribute('data-ez-subnavtype') == null ) {
+    if(selectElementsTemp[i].getAttribute('data-ez-chunking') == 'group' && selectElementsTemp[i].getAttribute('data-ez-subnavtype') == null) {
       var removeAmount = getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]).length;
       selectElementsTemp.splice(i+1,removeAmount);
       i += removeAmount+1;
@@ -615,7 +632,7 @@ window.onload=function() {
   document.onkeydown = key_event;
   //document.onkeypress = key_event;
   
-  selectElements = indexElements();
+  selectElements = indexElements(document);
   
   load_jumppoints();
   
@@ -673,7 +690,7 @@ function mouseOver(e) {
       if(currIndex == i) {
         newElement = false;
       }
-      if(selectElements[i].getAttribute('data-ez-focusable-point') === null) {
+      if(selectElements[i].getAttribute('data-ez-focusable-point') === null && selectElements[i].getAttribute('data-ez-focusable') === null) {
         // If we're not supposed to navigate here by pointing
         selectElements[currIndex].blur(); // Add blur to old element
         currIndex = i;
@@ -729,7 +746,7 @@ function key_event(e) {
       TINY.box.hide();
     } else {
       tinyOpen = true;
-      ez_help();
+      ez_help("You have activated the ez help dialogue.");
     }
   }
   else if(e.keyCode == EZ_KEY_UP) {
@@ -756,16 +773,19 @@ function key_event(e) {
   }
   else if(e.keyCode == EZ_KEY_BACK) {
     // TODO
-    globalSayBefore = "Navigating out of group... ";
-    ez_jump(findGroupParent());
-    return;
-    if(tinyOpen) { tinyOpen = false;  TINY.box.hide(); }
-    else {
-      if(ez_navigateToggle) {
-        window.history.back();
-      } else {
-        ez_navigate_start();
+    var inGroup = findGroupParent();
+    if(!inGroup) {
+      if(tinyOpen) { tinyOpen = false;  TINY.box.hide(); }
+      else {
+        if(ez_navigateToggle) {
+          window.history.back();
+        } else {
+          ez_navigate_start();
+        }
       }
+    } else {
+      globalSayBefore = "Navigating out of group... ";
+      ez_jump(inGroup);
     }
   }
   else if(e.keyCode == EZ_KEY_ENTER || e.keyCode == KB_ENTER) {
