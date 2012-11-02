@@ -100,7 +100,7 @@ function getElementAudio() {
 }
 
 // Tags that are candidates for highlight
-var COMPATIBLE_TAGS = 'p,img,span,a,div,h1,h2,h3,h4,h5,figure,figcaption,ul,ol,li,input,button,textarea';
+var COMPATIBLE_TAGS = 'p,img,span,a,div,h1,h2,h3,h4,h5,figure,figcaption,ul,ol,li,input,button,textarea,select';
 
 // Array of tags generated on pageload initialized globally
 var selectElements;
@@ -803,6 +803,14 @@ function key_event(e) {
       selectElements[currIndex].value = parseFloat(selectElements[currIndex].value) + parseFloat(selectElements[currIndex].step);
       sounds[AUDIO_MOVE].feed.play();
       voice(selectElements[currIndex].value);
+    } else if(selectElements[currIndex].tagName == 'SELECT') {
+      if(selectElements[currIndex].selectedIndex < selectElements[currIndex].length-1) {
+        selectElements[currIndex].selectedIndex++;
+        sounds[AUDIO_MOVE].feed.play();
+        voice(selectElements[currIndex].value);
+      } else {
+        sounds[AUDIO_NOACTION].feed.play();
+      }
     } else {
       if(audioVolume <= 90) {
         audioVolume += 10;
@@ -819,6 +827,14 @@ function key_event(e) {
       selectElements[currIndex].value = parseFloat(selectElements[currIndex].value) - parseFloat(selectElements[currIndex].step);
       sounds[AUDIO_MOVE].feed.play();
       voice(selectElements[currIndex].value);
+    } else if(selectElements[currIndex].tagName == 'SELECT') {
+      if(selectElements[currIndex].selectedIndex > 0) {
+        selectElements[currIndex].selectedIndex--;
+        sounds[AUDIO_MOVE].feed.play();
+        voice(selectElements[currIndex].value);
+      } else {
+        sounds[AUDIO_NOACTION].feed.play();
+      }
     } else {
       if(audioVolume >= 10) {
         audioVolume -= 10;
