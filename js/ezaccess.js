@@ -641,6 +641,9 @@ window.onload=function() {
   var tempselectElement = [];
   j = 0;
   for(var i = 0; i < selectElements.length;) {
+    if(selectElements[i].getAttribute('tabindex') === "-1") {
+      selectElements.splice(i,1); // Skip if == -1
+    }
     if(selectElements[i].getAttribute('tabindex') !== null) {
       tempselectElement[j] = selectElements.splice(i,1)[0];
       j++;
