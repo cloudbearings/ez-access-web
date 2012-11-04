@@ -121,7 +121,11 @@ var tinyOpen = false;
 var idleLoop;
 
 // Volume of the audio elements (0-100)
-var audioVolume = 100;
+if(sessionStorage.getItem("EZ_Volume") !== null) {
+  var audioVolume = sessionStorage.getItem("EZ_Volume");
+} else {
+  var audioVolume = 100;
+}
 
 // Global text to be read before next speech synthesis; can be set anywhere
 var globalSayBefore = "";
@@ -381,7 +385,7 @@ function findGroupParent() {
   while(i > 0 && parseFloat(selectElements[i].getAttribute('data-tmp-level')) >= oldLevel) {
     i--;
   }
-  if(i == currIndex) { return false; } // No group (@ 0th level)
+  if(i == currIndex) { return currIndex; } // No group (@ 0th level)
   return i; // Return group element currIndex #
 }
 
@@ -633,6 +637,21 @@ window.onload=function() {
   
   selectElements = indexElements(document);
   
+  // Sorting by tabindex
+  var tempselectElement = [];
+  j = 0;
+  for(var i = 0; i < selectElements.length;) {
+    if(selectElements[i].getAttribute('tabindex') !== null) {
+      tempselectElement[j] = selectElements.splice(i,1)[0];
+      j++;
+    }
+    else { i++; }
+  }
+  tempselectElement.sort(function(a,b){
+    return a.getAttribute('tabindex')-b.getAttribute('tabindex');
+  });
+  selectElements = tempselectElement.concat(selectElements);
+  
   load_jumppoints();
   
   load_audio();
@@ -662,6 +681,9 @@ window.onload=function() {
       ez_navigate_start(true);
     }
   }
+  
+  set_volume(); // If exists from previous page
+  
 }
 
 function stopEZ() {
@@ -813,6 +835,7 @@ function key_event(e) {
     } else {
       if(audioVolume <= 90) {
         audioVolume += 10;
+        sessionStorage.setItem("EZ_Volume",audioVolume);
         set_volume();
         sounds[AUDIO_MOVE].feed.play();
         voice("Volume... " + audioVolume + " percent");
@@ -836,6 +859,7 @@ function key_event(e) {
       }
     } else {
       if(audioVolume >= 10) {
+        sessionStorage.setItem("EZ_Volume",audioVolume);
         audioVolume -= 10;
         set_volume();
         sounds[AUDIO_MOVE].feed.play();
