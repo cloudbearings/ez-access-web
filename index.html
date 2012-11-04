@@ -21,12 +21,14 @@
     
 
 </head>
-<body data-ez-screenwrap data-ez-tabnav="ezaccess"> <!-- data-ez-startat="#logo #start" -->
+<body data-ez-screenwrap data-ez-tabnav="ezaccess" data-ez-startat="#logo #start">
 <p id="logo"><img src="img/trace_logo.jpg" alt="The Trace Center logo" /></p>
 
 <h1 id="start" data-ez-sayalt="What do you want? I'm not going to read this welcome!">Welcome to the test site!</h1>
 <p data-ez-focusable="false">Skip this. :*(</p>
-
+<p tabindex="2">Then here</p>
+<p tabindex="3">Lastly, go here.</p>
+<p tabindex="1">Go here first</p>
 <label for="slider1">Choose a value: </label><input id="slider1" type="range" min="100" max="500" step="10" />
 <p>NESTED GROUPING:</p>
 <div data-ez-chunking="group" data-ez-subnavtype="nested" aria-labelledby="muffinlabel" style="background-color: rgba(1, 334, 2, .7);width:600px;margin:5px;padding:5px;border-radius: 15px;">
@@ -135,10 +137,10 @@
 At W3Schools you will find all the Web-building tutorials you need, from basic HTML to advanced XML, SQL, ASP, and PHP. 
 </textarea>
 <br>
-<a href="http://google.com" tabindex="1">Tabindex 1</a><br>
+<a href="http://google.com">Blah</a><br>
 <form name="input" action="html_form_action.asp" method="get">
-  <span data-ez-saybefore="Enter your" tabindex="3">Username [3]: </span><input type="text" name="user">
-  <input type="submit" value="Submit [2]" tabindex="2"><br>
+  <span data-ez-saybefore="Enter your">Username: </span><input type="text" name="user">
+  <input type="submit" value="Submit"><br>
 </form>
 <br>
 <form action="demo_form.asp">
