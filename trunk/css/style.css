@@ -4,7 +4,7 @@
   -o-transition: all .2s ease-in-out;
   -ms-transition: all .2s ease-in-out;
   transition: all .2s ease-in-out;
-  border:5px solid #FFFF00;
+  border:5px solid rgba(255,255,0,1);
   position:absolute;
   border-radius: 15px;
   z-index: 999;
@@ -12,6 +12,17 @@
   -moz-box-shadow: 0px 0px 15px 5px rgba(255, 255, 100, .80);
   box-shadow: 0px 0px 15px 5px rgba(255, 255, 100, .80);
   pointer-events:none; /* Make click-able through the DIV (for example, if it's on top of something with an event with kb) */
+}
+
+@-webkit-keyframes pulse {
+from { border:5px solid rgba(255,255,0,1); }
+50% { border:5px solid rgba(255,150,0,.5); }
+to { border:5px solid rgba(255,255,0,0); }
+}
+.pulse {
+-webkit-animation-name: pulse;
+-webkit-animation-duration: .1s;
+-webkit-animation-iteration-count: 3;
 }
 
 /* TINYBOX MODAL POPUP */
