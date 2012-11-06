@@ -369,6 +369,8 @@ function hierarchicalStopper(move) {
   if(newLevel == 0 && oldLevel == 0) { return false; }
   if(newLevel != oldLevel) {
     if(selectElements[findGroupParent()].getAttribute("data-ez-chunking") == 'group' && selectElements[findGroupParent()].getAttribute("data-ez-subnavtype") == 'hierarchical') {
+      document.getElementById('selected').className = 'pulse';
+      setTimeout(function(){document.getElementById('selected').className = '';},300);
       sounds[AUDIO_NOACTION].feed.play();
       voice("Press back to leave the group");
       return true;
@@ -435,6 +437,8 @@ function ez_navigate(move) {
     } else { // Basically, keep looping through 'warnings' until user stops or if there are no more speech elements, and wrap is true, jump to bottom of screen.
       if(repeatAlert < alerts.bottom.length-1) {
         repeatAlert++;
+        document.getElementById('selected').className = 'pulse';
+        setTimeout(function(){document.getElementById('selected').className = '';},300);
         sounds[AUDIO_NOACTION].feed.play();
         voice(alerts.bottom[repeatAlert].value);
       } else {
@@ -445,6 +449,8 @@ function ez_navigate(move) {
           sounds[getElementAudio()].feed.play();
           voice(selectElements[currIndex],'nav');
         } else {
+          document.getElementById('selected').className = 'pulse';
+          setTimeout(function(){document.getElementById('selected').className = '';},300);
           sounds[AUDIO_NOACTION].feed.play();
           voice(alerts.bottom[repeatAlert].value);
         }
@@ -474,6 +480,8 @@ function ez_navigate(move) {
     } else {
       if(repeatAlert < alerts.top.length-1) {
         repeatAlert++;
+        document.getElementById('selected').className = 'pulse';
+        setTimeout(function(){document.getElementById('selected').className = '';},300);
         sounds[AUDIO_NOACTION].feed.play();
         voice(alerts.top[repeatAlert].value);
       } else {
@@ -484,6 +492,8 @@ function ez_navigate(move) {
           sounds[getElementAudio()].feed.play();
           voice(selectElements[currIndex],'nav');
         } else {
+          document.getElementById('selected').className = 'pulse';
+          setTimeout(function(){document.getElementById('selected').className = '';},300);
           sounds[AUDIO_NOACTION].feed.play();
           voice(alerts.bottom[repeatAlert].value);
         }
@@ -521,7 +531,11 @@ function ez_enter() {
     ez_jump(currIndex + 2); // TODO: Skip over first element
   }
   else {
+    document.getElementById('selected').className = 'pulse';
+    setTimeout(function(){document.getElementById('selected').className = '';},300);
     sounds[AUDIO_NOACTION].feed.play();
+    document.getElementById('selected').className = 'pulse';
+    setTimeout(function(){document.getElementById('selected').className = '';},300);
     voice(obj,0,true);
   }
 }
@@ -866,6 +880,8 @@ function key_event(e) {
         sounds[AUDIO_MOVE].feed.play();
         voice(selectElements[currIndex].value + '... option ' + (selectElements[currIndex].selectedIndex+1) + ' of ' + selectElements[currIndex].length);
       } else {
+        document.getElementById('selected').className = 'pulse';
+        setTimeout(function(){document.getElementById('selected').className = '';},300);
         sounds[AUDIO_NOACTION].feed.play();
       }
     } else {
@@ -876,6 +892,8 @@ function key_event(e) {
         sounds[AUDIO_MOVE].feed.play();
         voice("Volume... " + audioVolume + " percent");
       } else {
+        document.getElementById('selected').className = 'pulse';
+        setTimeout(function(){document.getElementById('selected').className = '';},300);
         sounds[AUDIO_NOACTION].feed.play();
         voice("Maximum volume");
       }
@@ -891,6 +909,8 @@ function key_event(e) {
         sounds[AUDIO_MOVE].feed.play();
         voice(selectElements[currIndex].value + '... option ' + (selectElements[currIndex].selectedIndex+1) + ' of ' + selectElements[currIndex].length);
       } else {
+        document.getElementById('selected').className = 'pulse';
+        setTimeout(function(){document.getElementById('selected').className = '';},300);
         sounds[AUDIO_NOACTION].feed.play();
       }
     } else {
@@ -901,6 +921,8 @@ function key_event(e) {
         sounds[AUDIO_MOVE].feed.play();
         voice("Volume... " + audioVolume + " percent");
       } else {
+        document.getElementById('selected').className = 'pulse';
+        setTimeout(function(){document.getElementById('selected').className = '';},300);
         sounds[AUDIO_NOACTION].feed.play();
         voice("Minimum volume");
       }
