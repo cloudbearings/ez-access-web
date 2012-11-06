@@ -1,0 +1,28 @@
+{
+  "name": "EZ Access Browser",
+  "description": "An EZ Access Web Parser",
+  "version": "0.0.0.1",
+  "manifest_version": 2,
+  "permissions": ["tts"],
+  "background": {
+    "scripts": ["background.js"]
+  },
+ "page_action": {
+    "default_icon": "logo.png",
+    "default_title": "Disable EZ Access"
+  },
+  "content_scripts" : [
+    {
+      "run_at": "document_end",
+      "matches" : [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "css": ["style.css"],
+      "js" : ["settings.json","js/ezaccess.js","js/hammer.js","js/tinybox.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    "earcons/*"
+  ]
+}
