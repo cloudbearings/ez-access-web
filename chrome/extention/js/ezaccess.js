@@ -49,7 +49,7 @@ var EZ_KEY_ENTER = 131; // is green circle enter key
 function load_audio() {
   var i;
   for (i = 0; i < sounds.length; i++) {
-    sounds[i].feed = new Audio(sounds[i].src);
+    sounds[i].feed = new Audio(chrome.extension.getURL(sounds[i].src));
   }
 }
 
@@ -100,7 +100,7 @@ function getElementAudio() {
 }
 
 // Tags that are candidates for highlight
-var COMPATIBLE_TAGS = 'p,img,span,a,div,h1,h2,h3,h4,h5,figure,figcaption,ul,ol,li,input,button,textarea,select';
+var COMPATIBLE_TAGS = 'p,img,span,a,div,h1,h2,h3,h4,h5,figure,figcaption,ul,ol,li,input,button,textarea,select,article,aside,hgroup';
 
 // Array of tags generated on pageload initialized globally
 var selectElements;
@@ -193,7 +193,7 @@ function voice(obj,source,repeat) {
       data += ' ' + obj.getAttribute('data-ez-sayafter-nav');
     }
     if(obj.tagName == 'A') {
-      data = "link... " + data;
+      data += " link";
     }
     if(obj.tagName == 'BUTTON' || (obj.tagName == 'INPUT' && obj.type == 'button') ) {
       data += ' button';
@@ -225,8 +225,11 @@ function voice(obj,source,repeat) {
     data = globalSayBefore + data;
     globalSayBefore = "";
   }
-  if(data.length > 300) { speak.play("One moment."); } // If speech generation will take a while
-  speak.play(data, { amplitude: audioVolume });
+  if(data.length > 300) { voice("One moment"); } // If speech generation will take a while
+  //chrome.tts.speak(data, {'volume': (audioVolume/100)});
+  //chrome.tts.speak('Hello, world!');
+  var req = {"text": data};
+  chrome.extension.sendRequest(req);
 }
 
 function ez_help(alert) {
@@ -692,7 +695,7 @@ window.onload=function() {
   
   load_audio();
   
-  idle_loop(); // TODO/TEMP
+  //idle_loop(); // TODO/TEMP
   
   // ADDING SOUND DIV -- ONLY NEEDED FOR speak.js
   var div = document.createElement('div');
