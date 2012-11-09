@@ -665,7 +665,7 @@ function getlabelforinput(inputname) {
 }
 
 // On page load, load key_event() listener
-window.onload=function() {
+function load_ez() {
   document.onkeydown = key_event;
   //document.onkeypress = key_event;
   

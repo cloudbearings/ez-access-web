@@ -7,9 +7,13 @@
   "background": {
     "scripts": ["background.js"]
   },
- "page_action": {
-    "default_icon": "logo.png",
-    "default_title": "Disable EZ Access"
+  "page_action": {
+    "default_icon": {                    // optional
+      "19": "icon19.png",           // optional
+      "38": "icon38.png"            // optional
+    },
+    "default_title": "EZ Access"      // optional; shown in tooltip
+    //"default_popup": "popup.html"        // optional
   },
   "content_scripts" : [
     {
@@ -19,7 +23,7 @@
         "https://*/*"
       ],
       "css": ["style.css"],
-      "js" : ["settings.json","js/ezaccess.js","js/hammer.js","js/tinybox.js"]
+      "js" : ["enable.js","settings.json","js/ezaccess.js","js/hammer.js","js/tinybox.js"]
     }
   ],
   "web_accessible_resources": [
