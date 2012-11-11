@@ -13,12 +13,12 @@
     "scripts": ["background.js"]
   },
   "page_action": {
-    "default_icon": {                    // optional
-      "19": "icon19.png",           // optional
-      "38": "icon38.png"            // optional
+    "default_icon": {
+      "19": "icon19.png",
+      "38": "icon38.png"
     },
-    "default_title": "EZ Access"      // optional; shown in tooltip
-    //"default_popup": "popup.html"        // optional
+    "default_title": "EZ Access",
+    "default_popup": "popup.html"
   },
   "content_scripts" : [
     {
@@ -31,6 +31,7 @@
     }
   ],
   "web_accessible_resources": [
-    "earcons/*"
+    "earcons/*",
+    "trace_logo.jpg"
   ]
 }
