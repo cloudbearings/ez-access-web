@@ -617,7 +617,7 @@ function indexElements(world) {
   
   // Check and remove elements with children (excluding grouped stuff). MUST BE LAST THING DONE
   for(var i = 0; i < selectElementsTemp.length;) {
-    if(getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]).length > 0 && selectElementsTemp[i].getAttribute('data-ez-chunking') != 'group' && selectElementsTemp[i].getAttribute('data-ez-chunking') != 'block') {
+    if(getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]).length > 0 && selectElementsTemp[i].getAttribute('data-ez-chunking') != 'group' && selectElementsTemp[i].getAttribute('data-ez-chunking') != 'block' && !(selectElementsTemp[i].getAttribute('data-ez-focusable') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-point') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-nav') == 'true')) {
       selectElementsTemp.splice(i,1); // Remove entry
     }
     else { i++; }
