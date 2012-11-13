@@ -22,8 +22,8 @@
 <p tabindex="1">Go here first</p>
 <label for="slider1">Choose a value: </label><input id="slider1" type="range" min="100" max="500" step="10" />
 <p>NESTED GROUPING:</p>
-<div data-ez-chunking="group" data-ez-subnavtype="nested" aria-labelledby="muffinlabel" style="background-color: rgba(1, 334, 2, .7);width:600px;margin:5px;padding:5px;border-radius: 15px;">
-  <span id="muffinlabel" data-ez-focusable="false">What type of muffin would you like for breakfast, Johny?</span> <br>
+<div data-ez-chunking="group" data-ez-subnavtype="nested" style="background-color: rgba(1, 334, 2, .7);width:600px;margin:5px;padding:5px;border-radius: 15px;">
+  <!--<span id="muffinlabel" data-ez-focusable="false">What type of muffin would you like for breakfast, Johny?</span> <br>-->
   <label for="raspberry">Raspberry</label> <input type="checkbox" name="muffin" id="raspberry" value="red"><br>
   <label for="cranberry">Cranberry</label> <input type="checkbox" name="muffin" id="cranberry" value="red"><br>
   <label for="apple">Apple</label> <input type="checkbox" name="muffin" id="apple" value="red"><br>
@@ -59,10 +59,10 @@
 <hr><hr>
 
 <p>HIERARCHICAL GROUPING:</p>
-<div data-ez-chunking="group" data-ez-subnavtype="hierarchical" aria-labelledby="muffinlabel" style="background-color: rgba(1, 334, 2, .7);width:600px;margin:5px;padding:5px;border-radius: 15px;">
+<div data-ez-chunking="group" aria-flowto="cranberryme" data-ez-subnavtype="hierarchical" aria-labelledby="muffinlabel" style="background-color: rgba(1, 334, 2, .7);width:600px;margin:5px;padding:5px;border-radius: 15px;">
   <span id="muffinlabel" data-ez-focusable="false">What type of muffin would you like for breakfast, Johny?</span> <br>
   <label for="raspberry">Raspberry</label> <input type="checkbox" name="muffin" id="raspberry" value="red"><br>
-  <label for="cranberry">Cranberry</label> <input type="checkbox" name="muffin" id="cranberry" value="red"><br>
+  <label for="cranberry">Cranberry</label> <input type="checkbox" name="muffin" id="cranberryme" value="red"><br>
   <label for="apple">Apple</label> <input type="checkbox" name="muffin" id="apple" value="red"><br>
   <label for="cinnamon">Cinnamon</label> <input type="checkbox" name="muffin" id="cinnamon" value="cinnamon"><br>
   <div data-ez-chunking="group" data-ez-subnavtype="hierarchical" aria-labelledby="spicylabel" style="background-color: rgba(1, 1, 255, .7);margin:10px;padding:5px;border-radius: 15px;">
