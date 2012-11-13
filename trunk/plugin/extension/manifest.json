@@ -12,6 +12,7 @@
   "background": {
     "scripts": ["background.js"]
   },
+  "options_page": "options.html",
   "page_action": {
     "default_icon": {
       "19": "icon19.png",
