@@ -415,6 +415,19 @@ function getCurrIndexById(id) {
   return -1;
 }
 
+// Like ez_navigate("down"), but for when navigating to first element inside a group
+function ez_navigate_in_group() {
+  if(selectElements[currIndex].getAttribute('aria-flowto') !== null) {
+    ez_jump(getCurrIndexById(selectElements[currIndex].getAttribute('aria-flowto').split(' ')[0]));
+    return;
+  }
+  currIndex++;
+  if(selectElements[currIndex].getAttribute('data-ez-focusable-nav') == 'false' || selectElements[currIndex].getAttribute('data-ez-focusable') == 'false') { ez_navigate_in_group(); return; }
+  if(!drawSelected(selectElements[currIndex])) { ez_navigate('down'); return; }
+  sounds[getElementAudio()].feed.play();
+  selectElements[currIndex].focus(); // Add focus to new element
+  voice(selectElements[currIndex],'nav',globalSayBefore);
+}
 function ez_navigate(move) {
   if(move == 'down') {
     if(currIndex < selectElements.length-1) {
@@ -531,7 +544,8 @@ function ez_enter() {
   else if(obj.tagName == 'INPUT' && (obj.type == 'submit' || obj.type == 'image') ) {
     obj.click();
   } else if(selectElements[currIndex].getAttribute('data-ez-chunking') == 'group' && selectElements[currIndex].getAttribute('data-ez-subnavtype') == 'nested' || selectElements[currIndex].getAttribute('data-ez-subnavtype') == 'hierarchical') {
-    ez_jump(currIndex + 2); // TODO: Skip over first element
+    ez_navigate_in_group();
+    console.log("yesdss");
   }
   else {
     document.getElementById('selected').className = 'pulse';
