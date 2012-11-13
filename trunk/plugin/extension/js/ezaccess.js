@@ -417,8 +417,8 @@ function getCurrIndexById(id) {
 
 // Like ez_navigate("down"), but for when navigating to first element inside a group
 function ez_navigate_in_group() {
-  if(selectElements[currIndex].getAttribute('aria-flowto') !== null) {
-    ez_jump(getCurrIndexById(selectElements[currIndex].getAttribute('aria-flowto').split(' ')[0]));
+  if(selectElements[currIndex].getAttribute('data-ez-groupdefault') !== null) {
+    ez_jump(getCurrIndexById(selectElements[currIndex].getAttribute('data-ez-groupdefault').split(' ')[0]));
     return;
   }
   currIndex++;
@@ -520,7 +520,7 @@ function ez_navigate(move) {
 
 function ez_jump(location) {
   selectElements[currIndex].blur();
-  currIndex = location;
+  currIndex = parseFloat(location);
   drawSelected(selectElements[currIndex])
   sounds[getElementAudio()].feed.play();
   selectElements[currIndex].focus();
@@ -545,7 +545,6 @@ function ez_enter() {
     obj.click();
   } else if(selectElements[currIndex].getAttribute('data-ez-chunking') == 'group' && selectElements[currIndex].getAttribute('data-ez-subnavtype') == 'nested' || selectElements[currIndex].getAttribute('data-ez-subnavtype') == 'hierarchical') {
     ez_navigate_in_group();
-    console.log("yesdss");
   }
   else {
     document.getElementById('selected').className = 'pulse';
@@ -916,6 +915,7 @@ function key_event(e) {
       }
     }
   } else if(e.keyCode == EZ_KEY_SKIPBACKWARD) {
+	console.log(currIndex);
     if(selectElements[currIndex].type == 'range') {
       selectElements[currIndex].value = parseFloat(selectElements[currIndex].value) - parseFloat(selectElements[currIndex].step);
       sounds[AUDIO_MOVE].feed.play();
