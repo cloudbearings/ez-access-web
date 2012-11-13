@@ -1,0 +1,67 @@
+<html>
+<head><title>My Test Extension Options</title>
+	<style>
+	h1{
+		font-family: Gill Sans, Verdana;
+		font-size: 11px;
+		line-height: 14px;
+		text-transform: uppercase;
+		letter-spacing: 2px;
+		font-weight: bold;
+	}
+	h2{
+		font-family: times, Times New Roman, times-roman, georgia, serif;
+		color: #444;
+		margin: 0;
+		padding: 0px 0px 6px 0px;
+		font-size: 51px;
+		line-height: 44px;
+		letter-spacing: -2px;
+		font-weight: bold;
+	}
+	#wrapper {
+		padding: 10px;
+		border-radius: 15px;
+		background-color: #F2FFE1;
+		width: 400px;
+		font-family: Gill Sans, Verdana;
+		font-size:0.8em;
+	}
+	hr {
+		border: 0;
+		height: 1px;
+		background-image: -webkit-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)); 
+		background-image:    -moz-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)); 
+		background-image:     -ms-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)); 
+		background-image:      -o-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)); 
+	}
+	</style>
+</head>
+<script src="options.js"></script>
+
+<body>
+<div id="wrapper">
+<h1>EZ Access v1.0</h1>
+<h2>Settings</h2>
+<hr>
+<br>
+Enable EZ Access on:
+<form>
+<input type="radio" name="ez-where" value="some" checked="checked">Pages designed for EZ Access<br>
+<input type="radio" name="ez-where" value="all">All pages (may cause problems with the page + unexpected behavior)
+</form>
+Highlight Color:
+<select id="color">
+ <option value="red">red</option>
+ <option value="green">green</option>
+ <option value="blue">blue</option>
+ <option value="yellow">yellow</option>
+</select>
+<br>
+<br>
+<hr>
+<div id="status"></div>
+<button id="save">Save</button> <button id="reset">Reset</button>
+</div>
+</body>
+</html>
