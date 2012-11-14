@@ -795,6 +795,41 @@ function mouseOver(e) {
   }
 }
 
+// Smooth Scrolling
+// http://www.itnewb.com/tutorial/Creating-the-Smooth-Scroll-Effect-with-JavaScript
+function currentYPosition() {
+    // Firefox, Chrome, Opera, Safari
+    if (self.pageYOffset) return self.pageYOffset;
+    // Internet Explorer 6 - standards mode
+    if (document.documentElement && document.documentElement.scrollTop)
+        return document.documentElement.scrollTop;
+    // Internet Explorer 6, 7 and 8
+    if (document.body.scrollTop) return document.body.scrollTop;
+    return 0;
+}
+function smoothScroll(stopY) {
+    var startY = currentYPosition();
+    var distance = stopY > startY ? stopY - startY : startY - stopY;
+    if (distance < 100) {
+        scrollTo(0, stopY); return;
+    }
+    var speed = Math.round(distance / 100);
+    if (speed >= 20) speed = 20;
+    var step = Math.round(distance / 200);
+    var leapY = stopY > startY ? startY + step : startY - step;
+    var timer = 0;
+    if (stopY > startY) {
+        for ( var i=startY; i<stopY; i+=step ) {
+            setTimeout("window.scrollTo(0, "+leapY+")", timer * speed);
+            leapY += step; if (leapY > stopY) leapY = stopY; timer++;
+        } return;
+    }
+    for ( var i=startY; i>stopY; i-=step ) {
+        setTimeout("window.scrollTo(0, "+leapY+")", timer * speed);
+        leapY -= step; if (leapY < stopY) leapY = stopY; timer++;
+    }
+}
+
 map={} // Have to do this weird thing in order to detect two keys at same time (e.g., shift+tab)
 onkeydown=onkeyup=function(e){
     e=e||event//to deal with IE
@@ -802,8 +837,9 @@ onkeydown=onkeyup=function(e){
     if (map[KB_TAB] && map[KB_SHIFT] && tabNav != 'none'){ //SHIFT+TAB
       if(tinyOpen) { tinyOpen = false;  TINY.box.hide(); }
       if(ez_navigateToggle) {
-        window.scroll(0,findPos(selectElements[currIndex]));
         ez_navigate('up');
+        smoothScroll(findPos(selectElements[currIndex]));
+        //window.scroll(0,findPos(selectElements[currIndex]));
       } else {
         ez_navigate_start();
       }
@@ -811,8 +847,9 @@ onkeydown=onkeyup=function(e){
     } else if(map[KB_TAB] && tabNav != 'none'){//TAB
       if(tinyOpen) { tinyOpen = false;  TINY.box.hide(); }
       if(ez_navigateToggle) {
-        window.scroll(0,findPos(selectElements[currIndex]));
         ez_navigate('down');
+        smoothScroll(findPos(selectElements[currIndex]));
+        //window.scroll(0,findPos(selectElements[currIndex]));
       } else {
         ez_navigate_start();
       }
