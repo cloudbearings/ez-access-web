@@ -190,7 +190,7 @@ function voice(obj,source,repeat) {
       data += ' ' + obj.getAttribute('data-ez-sayafter-point');
     }
     else if(obj.getAttribute('data-ez-sayafter') !== null) {
-      data += ' ' + obj.getAttribute('data-ez-sayafter-nav');
+      data += ' ' + obj.getAttribute('data-ez-sayafter');
     }
     if(obj.tagName == 'A') {
       data += " link";
