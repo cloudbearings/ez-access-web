@@ -807,6 +807,7 @@ function currentYPosition() {
     if (document.body.scrollTop) return document.body.scrollTop;
     return 0;
 }
+
 function smoothScroll(stopY) {
     var startY = currentYPosition();
     var distance = stopY > startY ? stopY - startY : startY - stopY;
