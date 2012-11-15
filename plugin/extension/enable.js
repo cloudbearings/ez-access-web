@@ -5,7 +5,20 @@
  */
 
 // Test the text of the body element against our regular expression.
-window.onload=function() {
+function addLoadEvent(func) {
+	var oldonload = window.onload;
+	if (typeof window.onload != 'function') {
+		window.onload = func;
+	} else {
+		window.onload = function() {
+			if (oldonload) {
+				oldonload();
+			}
+			func();
+		}
+	}
+}
+var checkingIfEz = function() {
   if (document.body.getAttribute('data-ez') !== null) {
     // The regular expression produced a match, so notify the background page.
     load_ez();
@@ -14,3 +27,4 @@ window.onload=function() {
     // No match was found.
   }
 }
+addLoadEvent(checkingIfEz);
