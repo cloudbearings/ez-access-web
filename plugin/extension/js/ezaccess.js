@@ -896,7 +896,7 @@ function key_event(e) {
       }
     }
   }
-  else if(e.keyCode == EZ_KEY_BACK) {
+  else if(e.keyCode == EZ_KEY_BACK || e.keyCode == 66) { // 'b' == 66
     // TODO
     var inGroup = findGroupParent();
     if(inGroup == currIndex) {
