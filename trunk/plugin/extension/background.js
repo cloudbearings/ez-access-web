@@ -5,6 +5,8 @@ chrome.extension.onRequest.addListener(
 			sendResponse({ezNavigate: localStorage.ezNavigate});
 		} else if(request.tts !== undefined) {
 			chrome.tts.speak(request.tts);
+		} else if(request.ezShow == "true") {
+			chrome.pageAction.show(sender.tab.id);
 		} else {
 			sendResponse({}); // snub them.
 		}
@@ -16,7 +18,7 @@ chrome.extension.onRequest.addListener(
 
 // Called when a message is passed.  We assume that the content script
 // wants to show the page action.
-function onRequest(request, sender, sendResponse) {
+/*function onRequest(request, sender, sendResponse) {
   // Show the page action for the tab that the sender (content script)
   // was on.
   chrome.pageAction.show(sender.tab.id);
@@ -26,4 +28,4 @@ function onRequest(request, sender, sendResponse) {
 };
 
 // Listen for the content script to send a message to the background page.
-chrome.extension.onRequest.addListener(onRequest);
+chrome.extension.onRequest.addListener(onRequest);*/

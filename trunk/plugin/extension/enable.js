@@ -22,7 +22,7 @@ var checkingIfEz = function() {
   if (ezNavigate == 'all' || document.body.getAttribute('data-ez') !== null) {
     // The regular expression produced a match, so notify the background page.
     load_ez();
-    chrome.extension.sendRequest({}, function(response) {});
+    chrome.extension.sendRequest({ezShow: "true"}, function(response) {});
   } else {
     // No match was found.
   }
