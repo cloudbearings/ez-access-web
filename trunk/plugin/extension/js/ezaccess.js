@@ -24,7 +24,7 @@
    Scripts:   A few scripts are used in this program. If not identified, they have been released
               to the public domain:
                   1. hammer.js - Provides multitouch support
-                  2. speak.js  - Provides speech generation
+                  2. speak.js  - Provides speech generation (not for plugin version)
                   3. TinyBox   - Modal window script for help
 */
 // Tab keycodes
@@ -228,7 +228,7 @@ function voice(obj,source,repeat) {
   if(data.length > 300) { voice("One moment"); } // If speech generation will take a while
   //chrome.tts.speak(data, {'volume': (audioVolume/100)});
   //chrome.tts.speak('Hello, world!');
-  var req = {"text": data};
+  var req = {"tts": data};
   chrome.extension.sendRequest(req);
 }
 

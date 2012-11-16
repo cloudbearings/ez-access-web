@@ -1,9 +1,3 @@
-/*
- * Copyright (c) 2010 The Chromium Authors. All rights reserved.  Use of this
- * source code is governed by a BSD-style license that can be found in the
- * LICENSE file.
- */
-
 // Test the text of the body element against our regular expression.
 function addLoadEvent(func) {
 	var oldonload = window.onload;
@@ -18,8 +12,14 @@ function addLoadEvent(func) {
 		}
 	}
 }
+
+var ezNavigate;
+chrome.extension.sendRequest({localstorage: "ezNavigate"}, function(response) {
+	ezNavigate = response.ezNavigate;
+});
+
 var checkingIfEz = function() {
-  if (document.body.getAttribute('data-ez') !== null) {
+  if (ezNavigate == 'all' || document.body.getAttribute('data-ez') !== null) {
     // The regular expression produced a match, so notify the background page.
     load_ez();
     chrome.extension.sendRequest({}, function(response) {});

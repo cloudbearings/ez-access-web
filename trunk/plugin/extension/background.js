@@ -1,5 +1,13 @@
-chrome.extension.onRequest.addListener(function(request) {
-  chrome.tts.speak(request.text);
+// SETTINGS STORAGE
+chrome.extension.onRequest.addListener(
+	function(request, sender, sendResponse) {
+		if (request.localstorage == "ezNavigate") {
+			sendResponse({ezNavigate: localStorage.ezNavigate});
+		} else if(request.tts !== undefined) {
+			chrome.tts.speak(request.tts);
+		} else {
+			sendResponse({}); // snub them.
+		}
 });
 
 // Copyright (c) 2012 The Chromium Authors. All rights reserved.
