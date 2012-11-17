@@ -12,7 +12,6 @@ unaffiliated 3rd party websites. Finally, examples (pictures) of kiosks and othe
 
   * http://harding.ae
   * http://harding.ae/ezblog
-  * http://harding.ae/
   * http://harding.ae/ez/stresstest/
   * http://harding.ae/ez/stresstest/kiosk.html
 
