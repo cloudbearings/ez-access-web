@@ -27,6 +27,7 @@ By default, the following tags are supported:
 {{{p, img, span, a, div, h1, h2, h3, h4, h5, figure, figcaption, ul, ol, li, input, button, textarea, select, article, aside, hgroup}}}
 
 || *Name* || *Code* || *Description* || *Support* ||
+|| EZ Access supported || {{{data-ez}}} || When included, the EZ Access plugin detects the page as EZ Access-compatible. || <font color="green">Fully supported</font> ||
 || Chunking || {{{data-ez-chunking}}}<br>*Values: *Please see [dataEzChunking] || Specifies the behavior and grouping of elements with the EZ highlight and speech output. || <font color="orange">Partially supported</font> ||
 || Focusable || {{{data-ez-focusable}}}<br>none, {{{-point}}} or {{{-nav}}} || Specifies if the element and its content is focusable or not. || <font color="green">Fully supported</font> ||
 || Sub-navigation || {{{data-ez-subnavtype}}}<br>*Values: *Please see [dataEzSubnavtype]<br>*Depends on other attribute(s)* || Specifies parent and child element navigation behavior for elements that are part of the same group, table row, or table column|| <font color="orange">Partially supported</font> ||
@@ -37,6 +38,9 @@ By default, the following tags are supported:
 || Say after || {{{data-ez-sayafter}}}<br>none, {{{-point}}} or {{{-nav}}} || Specifies text that is provided in the speech output after what is displayed. || <font color="green">Fully supported</font> ||
 || Touch and read || {{{data-ez-touchandread}}} || Specifies if EZ Access mode or Touch-and-Read is turned on when a particular element is touched. || <font color="red">Not supported</font> ||
 || Slide to read || {{{data-ez-slidetoread}}} || Specifies whether the Slide-to-read functionality is turned on or off for an element (or contained elements as inherited). || <font color="red">Not supported</font> ||
+|| Tab index || {{{tabindex}}} any number || Follows specifications [http://reference.sitepoint.com/html/a/tabindex here]. Negative numbers have same behavior as {{{data-ez-focusable}}}. || <font color="green">Fully supported</font> ||
+|| Aria flowto || {{{aria-flowto}}} any id || Only one element id. When navigating and press down, the highlight jumps to that id. If you press up from the id jumped to, you will go back to the original. || <font color="green">Fully supported</font> ||
+
 
 
 Note: data-ez-help-{{{*}}} is not supported yet.
