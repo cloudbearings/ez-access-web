@@ -14,8 +14,11 @@ function addLoadEvent(func) {
 }
 
 var ezNavigate;
-chrome.extension.sendRequest({localstorage: "ezNavigate"}, function(response) {
+var EzCustomColor;
+chrome.extension.sendRequest({localstorage: "ezNavigate", 
+							  localstorage: "ezHighlightColor" }, function(response) {
 	ezNavigate = response.ezNavigate;
+	EzCustomColor = response.ezHighlightColor;
 });
 var ezSessionDisable = sessionStorage["ezSessionDisable"];
 var checkingIfEz = function() {

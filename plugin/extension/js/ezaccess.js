@@ -100,6 +100,9 @@ function getElementAudio() {
   return AUDIO_MOVE;
 }
 
+// Selector ID to use on the page
+var ezSelectorId = 'ezselected';
+
 // Tags that are candidates for highlight
 var COMPATIBLE_TAGS = 'p,img,span,a,div,h1,h2,h3,h4,h5,figure,figcaption,ul,ol,li,input,button,textarea,select,article,aside,hgroup';
 
@@ -295,16 +298,19 @@ function drawSelected(obj) {
     // If there is a problem finding the element position
     return false;
   }
-  var old = document.getElementById('selected');
+  var old = document.getElementById(ezSelectorId);
   if(old === null) {
     var div = document.createElement('div');
-    div.id = 'selected';
+    var rgb = "rgba("+hexToRgb(EzCustomColor).r+","+hexToRgb(EzCustomColor).g+","+hexToRgb(EzCustomColor).b+",";
+    div.style.border = "5px solid "+rgb+"1)";
+    div.style['boxShadow'] = "0px 0px 15px 5px "+rgb+".80)";
+    div.id = ezSelectorId;
     if (document.body.firstChild) {
       document.body.insertBefore(div, document.body.firstChild);
     } else {
       document.body.appendChild(div);
     }
-    old = document.getElementById('selected'); // Redefine the new selected div
+    old = document.getElementById(ezSelectorId); // Redefine the new selected div
   }
   old.style.visibility = "visible";
   old.style.left = pos.x-10+'px';
@@ -373,8 +379,8 @@ function hierarchicalStopper(move) {
   if(newLevel == 0 && oldLevel == 0) { return false; }
   if(newLevel != oldLevel) {
     if(selectElements[findGroupParent()].getAttribute("data-ez-chunking") == 'group' && selectElements[findGroupParent()].getAttribute("data-ez-subnavtype") == 'hierarchical') {
-      document.getElementById('selected').className = 'pulse';
-      setTimeout(function(){document.getElementById('selected').className = '';},300);
+      document.getElementById(ezSelectorId).className = 'pulse';
+      setTimeout(function(){document.getElementById(ezSelectorId).className = '';},300);
       sounds[AUDIO_NOACTION].feed.play();
       voice("Press back to leave the group");
       return true;
@@ -454,8 +460,8 @@ function ez_navigate(move) {
     } else { // Basically, keep looping through 'warnings' until user stops or if there are no more speech elements, and wrap is true, jump to bottom of screen.
       if(repeatAlert < alerts.bottom.length-1) {
         repeatAlert++;
-        document.getElementById('selected').className = 'pulse';
-        setTimeout(function(){document.getElementById('selected').className = '';},300);
+        document.getElementById(ezSelectorId).className = 'pulse';
+        setTimeout(function(){document.getElementById(ezSelectorId).className = '';},300);
         sounds[AUDIO_NOACTION].feed.play();
         voice(alerts.bottom[repeatAlert].value);
       } else {
@@ -466,8 +472,8 @@ function ez_navigate(move) {
           sounds[getElementAudio()].feed.play();
           voice(selectElements[currIndex],'nav');
         } else {
-          document.getElementById('selected').className = 'pulse';
-          setTimeout(function(){document.getElementById('selected').className = '';},300);
+          document.getElementById(ezSelectorId).className = 'pulse';
+          setTimeout(function(){document.getElementById(ezSelectorId).className = '';},300);
           sounds[AUDIO_NOACTION].feed.play();
           voice(alerts.bottom[repeatAlert].value);
         }
@@ -497,8 +503,8 @@ function ez_navigate(move) {
     } else {
       if(repeatAlert < alerts.top.length-1) {
         repeatAlert++;
-        document.getElementById('selected').className = 'pulse';
-        setTimeout(function(){document.getElementById('selected').className = '';},300);
+        document.getElementById(ezSelectorId).className = 'pulse';
+        setTimeout(function(){document.getElementById(ezSelectorId).className = '';},300);
         sounds[AUDIO_NOACTION].feed.play();
         voice(alerts.top[repeatAlert].value);
       } else {
@@ -509,8 +515,8 @@ function ez_navigate(move) {
           sounds[getElementAudio()].feed.play();
           voice(selectElements[currIndex],'nav');
         } else {
-          document.getElementById('selected').className = 'pulse';
-          setTimeout(function(){document.getElementById('selected').className = '';},300);
+          document.getElementById(ezSelectorId).className = 'pulse';
+          setTimeout(function(){document.getElementById(ezSelectorId).className = '';},300);
           sounds[AUDIO_NOACTION].feed.play();
           voice(alerts.bottom[repeatAlert].value);
         }
@@ -548,11 +554,11 @@ function ez_enter() {
     ez_navigate_in_group();
   }
   else {
-    document.getElementById('selected').className = 'pulse';
-    setTimeout(function(){document.getElementById('selected').className = '';},300);
+    document.getElementById(ezSelectorId).className = 'pulse';
+    setTimeout(function(){document.getElementById(ezSelectorId).className = '';},300);
     sounds[AUDIO_NOACTION].feed.play();
-    document.getElementById('selected').className = 'pulse';
-    setTimeout(function(){document.getElementById('selected').className = '';},300);
+    document.getElementById(ezSelectorId).className = 'pulse';
+    setTimeout(function(){document.getElementById(ezSelectorId).className = '';},300);
     voice(obj,0,true);
   }
 }
@@ -678,8 +684,18 @@ function getlabelforinput(inputname) {
     return null;
 }
 
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
+}
+
 // On page load, load key_event() listener
 function load_ez() {
+
   document.onkeydown = key_event;
   //document.onkeypress = key_event;
   
@@ -710,16 +726,6 @@ function load_ez() {
   load_audio();
   
   //idle_loop(); // TODO/TEMP
-  
-  // ADDING SOUND DIV -- ONLY NEEDED FOR speak.js
-  var div = document.createElement('div');
-  div.id = 'audio';
-  div.setAttribute('data-ez-focusable','false');
-  if (document.body.firstChild) {
-    document.body.insertBefore(div, document.body.firstChild);
-  } else {
-    document.body.appendChild(div);
-  }
   
   // Multitouch gesture dragging
   if(slideToRead) { // If not allowed, to not initialize
@@ -759,7 +765,7 @@ function stopEZ() {
   currIndex = 0;
   voice("");
   sessionStorage.setItem("EZ_Toggle", "0");
-  var old = document.getElementById("selected");
+  var old = document.getElementById("ezselected");
   if (old !== null) {
     old.style.visibility = "hidden";
     old.style.left = 0+"px";
@@ -935,8 +941,8 @@ function key_event(e) {
         sounds[AUDIO_MOVE].feed.play();
         voice(selectElements[currIndex].value + '... option ' + (selectElements[currIndex].selectedIndex+1) + ' of ' + selectElements[currIndex].length);
       } else {
-        document.getElementById('selected').className = 'pulse';
-        setTimeout(function(){document.getElementById('selected').className = '';},300);
+        document.getElementById(ezSelectorId).className = 'pulse';
+        setTimeout(function(){document.getElementById(ezSelectorId).className = '';},300);
         sounds[AUDIO_NOACTION].feed.play();
       }
     } else {
@@ -947,8 +953,8 @@ function key_event(e) {
         sounds[AUDIO_MOVE].feed.play();
         voice("Volume... " + audioVolume + " percent");
       } else {
-        document.getElementById('selected').className = 'pulse';
-        setTimeout(function(){document.getElementById('selected').className = '';},300);
+        document.getElementById(ezSelectorId).className = 'pulse';
+        setTimeout(function(){document.getElementById(ezSelectorId).className = '';},300);
         sounds[AUDIO_NOACTION].feed.play();
         voice("Maximum volume");
       }
@@ -965,8 +971,8 @@ function key_event(e) {
         sounds[AUDIO_MOVE].feed.play();
         voice(selectElements[currIndex].value + '... option ' + (selectElements[currIndex].selectedIndex+1) + ' of ' + selectElements[currIndex].length);
       } else {
-        document.getElementById('selected').className = 'pulse';
-        setTimeout(function(){document.getElementById('selected').className = '';},300);
+        document.getElementById(ezSelectorId).className = 'pulse';
+        setTimeout(function(){document.getElementById(ezSelectorId).className = '';},300);
         sounds[AUDIO_NOACTION].feed.play();
       }
     } else {
@@ -977,8 +983,8 @@ function key_event(e) {
         sounds[AUDIO_MOVE].feed.play();
         voice("Volume... " + audioVolume + " percent");
       } else {
-        document.getElementById('selected').className = 'pulse';
-        setTimeout(function(){document.getElementById('selected').className = '';},300);
+        document.getElementById(ezSelectorId).className = 'pulse';
+        setTimeout(function(){document.getElementById(ezSelectorId).className = '';},300);
         sounds[AUDIO_NOACTION].feed.play();
         voice("Minimum volume");
       }
