@@ -1,0 +1,105 @@
+#summary Various examples to help you get started using EZ Access.
+
+= Introduction =
+
+Here you get walked through creating a page with basic EZ Access support, along with examples of situations where you would want to use specific attributes.
+
+
+= Examples =
+
+== A basic webpage ==
+
+Consider the following code:
+{{{
+<html>
+  <body>
+    <h1>Hello, world!</h1>
+    <img src="http://code.google.com/p/ez-access-web/logo?cct=1353176623" alt="A picture of me">
+    <br>
+    <p>Lorem ipsum dolor sit <a href="http://google.com">amet</a>, 
+    consectetur adipisicing elit, sed do eiusmod tempor incididunt 
+    ut labore et <b>dolore magna aliqua</b>. Ut enim ad minim veniam, 
+    <a href="http://google.com">quis</a> nostrud exercitation 
+    ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+  </body>
+</html>
+}}}
+Note the image's {{{alt}}} attribute. This will be recognized and read by EZ Access by default, and it's good practice to use on webpages in any case.
+
+The first thing we need to do is add the {{{data-ez}}} attribute to the body tag. This will let EZ Access know that this page is EZ Access compatible, and will let EZ Access parse the webpage (and also add the EZ Access icon next to the page URL in the plugin).
+{{{
+<html>
+  <body data-ez>
+    <h1>Hello, world!</h1>
+    <img src="http://code.google.com/p/ez-access-web/logo?cct=1353176623" alt="A picture of me">
+    <br>
+    <p>Lorem ipsum dolor sit <a href="http://google.com">amet</a>, 
+    consectetur adipisicing elit, sed do eiusmod tempor incididunt 
+    ut labore et <b>dolore magna aliqua</b>. Ut enim ad minim veniam, 
+    <a href="http://google.com">quis</a> nostrud exercitation 
+    ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+  </body>
+</html>
+}}}
+EZ Access only cares if the {{{data-ez}}} tag is present, but if you're using XHTML you can instead write {{{data-ez="data-ez"}}}.
+
+Great! Now, the browser has the EZ Access indicator:
+
+[http://ez-access-web.googlecode.com/files/ez_plugin_status.png]
+
+Next, recall that EZ Access always has the highlight enabled by default for the highest-child elements. On this page, we have the {{{<h1></h1>}}} followed by the {{{<img>}}}, and finally the three {{{<a></a>}}} links.
+
+Also recall that although the bold {{{<b>dolore magna aliqua</b>}}} element is also the highest child,
+it is ignored by EZ Access (by default). If we wanted to make the highlight navigate to it, we could just surround 
+it with some {{{<span>}}} tags, like such: {{{<span><b>dolore magna aliqua</b></span>}}}.
+
+However, the paragraph is not highlighted, because it has selectable children! We have a 
+few options on how to fix this. First, we could simply include the {{{data-ez-focusable}}} 
+attribute, like so: {{{<p data-ez-focusable="true">}}}. This will make the order of selectable 
+elements be:
+ #  {{{<h1>Hello, world!</h1>}}}
+ #  {{{<img src="http://code.google.com/p/ez-access-web/logo?cct=1353176623" alt="A picture of me">}}}
+ #  {{{<p data-ez-focusable="true">[the WHOLE paragraph]</p>}}}
+ #  {{{<a href="http://google.com">amet</a>}}}
+ #  {{{<span><b>dolore magna aliqua</b></b>}}}
+ #  {{{<a href="http://google.com">quis</a>}}}
+
+The other (more preferable) option is to use a group. A group can be a little complicated, so bear with me.
+
+First, we add the attribute {{{data-ez-chunking="group"}}} to the {{{<p>}}} tag.
+This will make EVERYTHING within the paragraph be grouped, and therefore unselectable.
+The order of elements selectable would be like this:
+ #  {{{<h1>Hello, world!</h1>}}}
+ #  {{{<img src="http://code.google.com/p/ez-access-web/logo?cct=1353176623" alt="A picture of me">}}}
+ #  {{{<p data-ez-focusable="true">[the WHOLE paragraph]</p>}}}
+
+However, we can add the {{{data-ez-subnavtype}}} attribute to the {{{<p>}}} tag,
+to get a group that we can press enter to get into and navigate to the inner elements.
+You can either add the value {{{hierarchical}}}, which will make the highlight stop
+at the end/beginning of the group when inside of the group, or the {{{nested}}} value 
+to allow the user to exit the group by simply continuing down/up. The user will be 
+prompted that they're exiting the group.
+
+For this, I feel like using a {{{hierarchical}}} group navigation type. The {{{<p>}}} tag 
+would then look like this:
+{{{<p data-ez-chunking="group" data-ez-subnavtype="hierarchical">}}}.
+That's all there is to it! Our final HTML looks like:
+{{{
+<html>
+  <body data-ez>
+    <h1>Hello, world!</h1>
+    <img src="http://code.google.com/p/ez-access-web/logo?cct=1353176623" alt="A picture of me">
+    <br>
+    <p data-ez-chunking="group" data-ez-subnavtype="hierarchical">
+    Lorem ipsum dolor sit <a href="http://google.com">amet</a>, 
+    consectetur adipisicing elit, sed do eiusmod tempor incididunt 
+    ut labore et <b>dolore magna aliqua</b>. Ut enim ad minim veniam, 
+    <a href="http://google.com">quis</a> nostrud exercitation 
+    ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+  </body>
+</html>
+}}}
+
+Further, more complicated examples in the works. For now, you can see the 
+[ezWebsites list of websites] that use EZ Access and check out their source
+code.
