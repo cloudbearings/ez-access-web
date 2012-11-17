@@ -9,6 +9,7 @@ The following attributes are from the official [http://code.google.com/p/ez-acce
 
 === {{{<body>}}} tag attributes ===
 || *Name* || *Code* || *Description* || *Support* ||
+|| EZ Access supported || {{{data-ez}}} || When included, the EZ Access plugin detects the page as EZ Access-compatible. || <font color="green">Fully supported</font> ||
 || Screenwrap toggle || {{{data-ez-screenwrap}}} || If tag present, specifies if the EZ navigation highlight exhibits a wrapping behavior at the top and bottom of the page. || <font color="green">Fully supported</font> ||
 || Start at || {{{data-ez-startat="IDREF IDREF"}}} || [dataEzStartat] || <font color="green">Fully supported</font> ||
 || Allow re-order || {{{data-ez-allowreorder}}} || Specifies if the page is to be navigated in the DOM order only or if it is to be navigated in a re-ordered fashion as specified by the {{{tabindex}}} and {{{aria-flowto}}} attributes. || <font color="red">Not supported</font> ||
@@ -27,7 +28,6 @@ By default, the following tags are supported:
 {{{p, img, span, a, div, h1, h2, h3, h4, h5, figure, figcaption, ul, ol, li, input, button, textarea, select, article, aside, hgroup}}}
 
 || *Name* || *Code* || *Description* || *Support* ||
-|| EZ Access supported || {{{data-ez}}} || When included, the EZ Access plugin detects the page as EZ Access-compatible. || <font color="green">Fully supported</font> ||
 || Chunking || {{{data-ez-chunking}}}<br>*Values: *Please see [dataEzChunking] || Specifies the behavior and grouping of elements with the EZ highlight and speech output. || <font color="orange">Partially supported</font> ||
 || Focusable || {{{data-ez-focusable}}}<br>none, {{{-point}}} or {{{-nav}}} || Specifies if the element and its content is focusable or not. || <font color="green">Fully supported</font> ||
 || Sub-navigation || {{{data-ez-subnavtype}}}<br>*Values: *Please see [dataEzSubnavtype]<br>*Depends on other attribute(s)* || Specifies parent and child element navigation behavior for elements that are part of the same group, table row, or table column|| <font color="orange">Partially supported</font> ||
