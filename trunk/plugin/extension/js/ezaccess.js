@@ -27,6 +27,7 @@
                   2. speak.js  - Provides speech generation (not for plugin version)
                   3. TinyBox   - Modal window script for help
 */
+
 // Tab keycodes
 var KB_TAB = 9;
 var KB_SHIFT = 16;
