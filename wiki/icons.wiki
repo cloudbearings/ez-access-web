@@ -9,5 +9,5 @@ If your website is EZ Access compatible, you can add the following banners/icons
 = Images =
 
 Here are the images. Remember to add the *alt* and *data-ez-focusable="false"* attributes to your <img> tag for best accessibility. You may use the URL linked to the image hosted here, or you can host the image yourself.
-|| 88x31 Button || <img src="http://ez-access-web.googlecode.com/files/ezaccess.png"> || [http://code.google.com/p/ez-access-web/downloads/detail?name=ezaccess.png .png 2.27 kB] ||
-|| 184x184 Icon || <img src="http://ez-access-web.googlecode.com/files/ez_logo_blue.gif" height="90px"> || [http://ez-access-web.googlecode.com/files/ez_logo_blue.gif .gif 2.26 kB] ||
+|| 88x31 Button || <img src="http://ez-access-web.googlecode.com/files/ezaccess.png"> || [http://code.google.com/p/ez-access-web/downloads/detail?name=ezaccess.png .png 2.27 kB] || {{{<img src="http://ez-access-web.googlecode.com/files/ezaccess.png" alt="This website is EZ Access Compatible" data-ez-focusable="false">}}} ||
+|| 184x184 Icon || <img src="http://ez-access-web.googlecode.com/files/ez_logo_blue.gif" height="90px"> || [http://ez-access-web.googlecode.com/files/ez_logo_blue.gif .gif 2.26 kB] || {{{<img src="http://ez-access-web.googlecode.com/files/ez_logo_blue.gif" alt="This website is EZ Access Compatible" data-ez-focusable="false">}}} ||
