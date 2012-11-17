@@ -1,0 +1,5 @@
+#summary One-sentence summary of this page.
+
+= Introduction =
+
+Specifies where on the page the EZ Highlight starts on a page when the user activates it when first pressing EZ UP or DOWN and where it starts when the EZ Highlight was on just prior to the current page. Space separated. If one ID is present, the IDREF of the element where the EZ Highlight starts both when the EZ Highlight is activated on this page and when the EZ Highlight was already on just before the user got to this page. If two, the first IDREF applies to the case where the EZ Highlight is turned on when on this page. The second IDREF applies to the case where the user was already in EZ Access mode and the EZ Highlight was on just before the user got to this page.
