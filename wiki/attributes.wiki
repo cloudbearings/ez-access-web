@@ -17,6 +17,26 @@ The following attributes are from the official [http://code.google.com/p/ez-acce
 || EZ Access starting mode || {{{data-ez-startingmode}}}<br>*Values:* default, ezon, ezoff || Specifies if EZ Access mode is on when the user opens the page. || <font color="red">Not supported</font> ||
 || Slide to read on/off || {{{data-ez-slidetoread}}}<br>*Values:* on, off || Default is on. Specifies that the slide-to-read functionality is turned on or off for a page. || <font color="green">Fully supported</font> ||
 
-Note: data-ez-help-'*' is not supported yet at all.
+Note: data-ez-help-{{{*}}} is not supported yet.
 
-ss
+=== Content element tags ===
+Please note that content element tags are the tags specified in the comma-separated string called {{{COMPATIBLE_TAGS}}} declared at the top of the ezaccess.js file.
+
+By default, the following tags are supported:
+
+{{{p, img, span, a, div, h1, h2, h3, h4, h5, figure, figcaption, ul, ol, li, input, button, textarea, select, article, aside, hgroup}}}
+
+|| *Name* || *Code* || *Description* || *Support* ||
+|| Chunking || {{{data-ez-chunking}}}<br>*Values: *Please see [dataEzChunking] || Specifies the behavior and grouping of elements with the EZ highlight and speech output. || <font color="orange">Partially supported</font> ||
+|| Focusable || {{{data-ez-focusable}}}<br>none, {{{-point}}} or {{{-nav}}} || Specifies if the element and its content is focusable or not. || <font color="green">Fully supported</font> ||
+|| Sub-navigation || {{{data-ez-subnavtype}}}<br>*Values: *Please see [dataEzSubnavtype]<br>*Depends on other attribute(s)* || Specifies parent and child element navigation behavior for elements that are part of the same group, table row, or table column|| <font color="orange">Partially supported</font> ||
+|| Hierarchical wrap || {{{data-ez-hierarchicalwrap}}} || Only for elements with the attribute {{{data-ez-subnavtype="hierarchical"}}} — specifies if the EZ navigation highlight exhibits a wrapping behavior at the top and bottom of the hierarchical chunk or group. || <font color="red">Not supported</font> ||
+|| Auto advance || {{{data-ez-autoadvance}}} || Specifies the behavior and movement of the EZ Highlight. It can be applied to div tags within the document. || <font color="red">Not supported</font> ||
+|| Say alternative || {{{data-ez-sayalt}}}<br>none, {{{-point}}} or {{{-nav}}} || Specifies text that is provided in the speech output instead of that displayed on the screen. || <font color="green">Fully supported</font> ||
+|| Say before || {{{data-ez-saybefore}}}<br>none, {{{-point}}} or {{{-nav}}} || Specifies text that is provided in the speech output before what is displayed. || <font color="green">Fully supported</font> ||
+|| Say after || {{{data-ez-sayafter}}}<br>none, {{{-point}}} or {{{-nav}}} || Specifies text that is provided in the speech output after what is displayed. || <font color="green">Fully supported</font> ||
+|| Touch and read || {{{data-ez-touchandread}}} || Specifies if EZ Access mode or Touch-and-Read is turned on when a particular element is touched. || <font color="red">Not supported</font> ||
+|| Slide to read || {{{data-ez-slidetoread}}} || Specifies whether the Slide-to-read functionality is turned on or off for an element (or contained elements as inherited). || <font color="red">Not supported</font> ||
+
+
+Note: data-ez-help-{{{*}}} is not supported yet.
