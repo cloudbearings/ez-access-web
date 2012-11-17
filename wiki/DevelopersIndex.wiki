@@ -9,5 +9,6 @@ To start, familiarize yourself with the basic concept, good practices and tips f
 
 Add your content here.  Format your content with:
   * [designAccessible Accessible page design tips]
-  * [concept What and how EZ Access does what it does]
-  * [attributes Attributes parsed by EZ Access and how]
+  * [concept How it works]
+  * [gettingStarted Getting started & examples]
+  * [attributes Attributes reference]
