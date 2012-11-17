@@ -1,0 +1,10 @@
+#summary Have any questions? Ask them here.
+
+= Introduction =
+
+This page was made for an open discussion between developers, website designers, users and other involved parties. Simply edit the wiki with your question below, or instead add a comment on the wiki page at the very bottom. Thank you for your time for your feedback!
+
+
+= Questions =
+
+ *  Ask here. Start a new question with a "*" symbol.
