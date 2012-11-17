@@ -1,30 +1,21 @@
-var defaultHighlight = "red";
 var defaultNavigate = "some";
 
 document.addEventListener('DOMContentLoaded', function () {
   loadOptions();
   document.getElementById("save").onclick=function(){ saveOptions(); };
   document.getElementById("reset").onclick=function(){ eraseOptions(); };
-  //document.getElementById("save").addEventListener('click',saveOptions());
-  //document.getElementById("reset").addEventListener('click',eraseOptions());
 });
 
 function loadOptions() {
-	var favColor = localStorage["ezHighlightColor"];
+	var ezHighlightColor = localStorage["ezHighlightColor"];
+	var colorSelector = document.getElementById('highlightColor');
 	
 	// valid colors are red, blue, green and yellow
-	if (favColor == undefined || (favColor != "red" && favColor != "blue" && favColor != "green" && favColor != "yellow")) {
-		favColor = defaultHighlight;
+	if (ezHighlightColor == undefined) {
+		ezHighlightColor = colorSelector.value;
 	}
-
-	var select = document.getElementById("color");
-	for (var i = 0; i < select.children.length; i++) {
-		var child = select.children[i];
-			if (child.value == favColor) {
-			child.selected = "true";
-			break;
-		}
-	}
+	
+	colorSelector.value = ezHighlightColor;
 	
 	var navigate = localStorage["ezNavigate"];
 	var navSome = document.getElementById('some');
@@ -42,9 +33,8 @@ function loadOptions() {
 }
 
 function saveOptions() {
-	var select = document.getElementById("color");
-	var color = select.children[select.selectedIndex].value;
-	localStorage["ezHighlightColor"] = color;
+	var colorSelector = document.getElementById('highlightColor');
+	localStorage["ezHighlightColor"] = colorSelector.value;
 	
 	var navSome = document.getElementById('some');
 	var navAll = document.getElementById('all');
