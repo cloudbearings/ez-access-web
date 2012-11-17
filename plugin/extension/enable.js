@@ -40,6 +40,7 @@ chrome.extension.onRequest.addListener(
 			sessionStorage["ezSessionDisable"] = "true";
 			stopEZ();
 			sendResponse({});
+			window.location.reload();
 		} else if(request.ezSessionDisable == "false") {
 			sessionStorage["ezSessionDisable"] = "false";
 			load_ez();
