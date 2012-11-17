@@ -13,6 +13,7 @@ function loadOptions() {
 	// valid colors are red, blue, green and yellow
 	if (ezHighlightColor == undefined) {
 		ezHighlightColor = colorSelector.value;
+		localStorage["ezHighlightColor"] = ezHighlightColor;
 	}
 	
 	colorSelector.value = ezHighlightColor;
