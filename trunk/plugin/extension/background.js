@@ -1,3 +1,8 @@
+// If not initialized
+if(localStorage.ezHighlightColor === undefined) {
+	localStorage.ezHighlightColor = "#0000FF";
+}
+
 // SETTINGS STORAGE
 chrome.extension.onRequest.addListener(
 	function(request, sender, sendResponse) {
