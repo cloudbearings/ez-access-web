@@ -16,3 +16,7 @@ The following attributes are from the official [http://code.google.com/p/ez-acce
 || Auto Repeat || {{{data-ez-autorepeat}}} || Specifies the auto-repeat behavior of the EZ Access buttons and keyboard keys. || <font color="red">Not supported</font> ||
 || EZ Access starting mode || {{{data-ez-startingmode}}}<br>*Values:* default, ezon, ezoff || Specifies if EZ Access mode is on when the user opens the page. || <font color="red">Not supported</font> ||
 || Slide to read on/off || {{{data-ez-slidetoread}}}<br>*Values:* on, off || Default is on. Specifies that the slide-to-read functionality is turned on or off for a page. || <font color="green">Fully supported</font> ||
+
+Note: data-ez-help-'*' is not supported yet at all.
+
+ss
