@@ -14,11 +14,6 @@
   pointer-events:none; /* Make click-able through the DIV (for example, if it's on top of something with an event with kb) */
 }
 
-@-webkit-keyframes pulse {
-from { border:5px solid rgba(255,255,0,1); }
-50% { border:5px solid rgba(255,150,0,.5); }
-to { border:5px solid rgba(255,255,0,0); }
-}
 .pulse {
 -webkit-animation-name: pulse;
 -webkit-animation-duration: .1s;

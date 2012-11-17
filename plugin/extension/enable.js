@@ -12,7 +12,6 @@ function addLoadEvent(func) {
 		}
 	}
 }
-
 var ezNavigate;
 var EzCustomColor;
 chrome.extension.sendRequest({localstorage: "ezNavigate", 

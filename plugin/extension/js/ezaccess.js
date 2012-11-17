@@ -301,7 +301,19 @@ function drawSelected(obj) {
   var old = document.getElementById(ezSelectorId);
   if(old === null) {
     var div = document.createElement('div');
-    var rgb = "rgba("+hexToRgb(EzCustomColor).r+","+hexToRgb(EzCustomColor).g+","+hexToRgb(EzCustomColor).b+",";
+	var rgb = "rgba("+hexToRgb(EzCustomColor).r+","+hexToRgb(EzCustomColor).g+","+hexToRgb(EzCustomColor).b+",";
+    var rgbinverse = "rgba("+(255-hexToRgb(EzCustomColor).r)+","+(255-hexToRgb(EzCustomColor).g)+","+(255-hexToRgb(EzCustomColor).b)+",";
+	// Load the CSS pulsing Stuff
+	var cssAnimation = document.createElement('style');
+	cssAnimation.type = 'text/css';
+	var rules = document.createTextNode('@-webkit-keyframes pulse {'+
+	'from { border:5px solid '+rgb+'1); }'+
+	'50% { border:5px solid '+rgbinverse+'0.5); }'+
+	'to { border:5px solid '+rgb+'0); }'+
+	'}');
+	cssAnimation.appendChild(rules);
+	document.getElementsByTagName("head")[0].appendChild(cssAnimation);
+    
     div.style.border = "5px solid "+rgb+"1)";
     div.style['boxShadow'] = "0px 0px 15px 5px "+rgb+".80)";
     div.id = ezSelectorId;
@@ -694,8 +706,8 @@ function hexToRgb(hex) {
 }
 
 // On page load, load key_event() listener
-function load_ez() {
-
+function load_ez() {	
+	
   document.onkeydown = key_event;
   //document.onkeypress = key_event;
   
