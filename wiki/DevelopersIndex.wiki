@@ -1,0 +1,13 @@
+#summary Welcome! EZ Access is a tool designed to make your kiosk or web user's experience better for those with low vision or blindness. Your visitors will be very happy knowing that options exist to assist them in accessing your website.
+
+= Introduction =
+
+To start, familiarize yourself with the basic concept, good practices and tips for accessible content development, and custom data-ez-'*' attributes you can add to your website to tailor the page's EZ Access navigation.
+
+
+= Specific pages =
+
+Add your content here.  Format your content with:
+  * [designAccessible Accessible page design tips]
+  * [concept What and how EZ Access does what it does]
+  * [attributes Attributes parsed by EZ Access and how]
