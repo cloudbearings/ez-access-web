@@ -90,7 +90,6 @@ function getElementAudio() {
   for(var tmp = ['p','span','div','h1','h2','h3','h4','h5','li'], i = 0; i < tmp.length; i++) {
     // To simplify comparing to a whole lot of possibilities, use a loop
     if(getClick(selectElements[currIndex]) !== undefined || selectElements[currIndex].tagName == 'INPUT') {
-      console.log(getClick(selectElements[currIndex]));
       return AUDIO_BUTTON;
     }
     if(selectElements[currIndex].tagName == tmp[i].toUpperCase()) {
@@ -987,7 +986,6 @@ function key_event(e) {
       }
     }
   } else if(e.keyCode == EZ_KEY_SKIPBACKWARD) {
-	console.log(currIndex);
     if(selectElements[currIndex].type == 'range') {
       selectElements[currIndex].value = parseFloat(selectElements[currIndex].value) - parseFloat(selectElements[currIndex].step);
       sounds[AUDIO_MOVE].feed.play();
