@@ -89,7 +89,8 @@ var AUDIO_BUTTON    = find_audio('button');
 function getElementAudio() {
   for(var tmp = ['p','span','div','h1','h2','h3','h4','h5','li'], i = 0; i < tmp.length; i++) {
     // To simplify comparing to a whole lot of possibilities, use a loop
-    if(selectElements[currIndex].href != undefined || selectElements[currIndex].onclick != undefined || selectElements[currIndex].tagName == 'INPUT') {
+    if(getClick(selectElements[currIndex]) !== undefined || selectElements[currIndex].tagName == 'INPUT') {
+      console.log(getClick(selectElements[currIndex]));
       return AUDIO_BUTTON;
     }
     if(selectElements[currIndex].tagName == tmp[i].toUpperCase()) {
@@ -546,9 +547,21 @@ function ez_jump(location) {
   voice(selectElements[currIndex],'nav');
 }
 
+function getClick(obj) {
+	while(obj !== null) {
+		if(typeof obj.href == "string") {
+			return obj;
+		} else if(typeof obj.onclick == "string") {
+			return obj;
+		}
+		obj = obj.parentNode;
+	}
+	return undefined;
+}
+
 function ez_enter() {
   var obj = selectElements[currIndex];
-  if(obj.href != undefined || obj.onclick != undefined) {
+  if(getClick(obj) !== undefined) {
     obj.click();
   }
   else if(obj.tagName == 'INPUT' && (obj.type == 'radio' || obj.type == 'checkbox') ) {
