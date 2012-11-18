@@ -12,13 +12,16 @@ function addLoadEvent(func) {
 		}
 	}
 }
+
 var ezNavigate;
 var EzCustomColor;
-chrome.extension.sendRequest({localstorage: "ezNavigate", 
-							  localstorage: "ezHighlightColor" }, function(response) {
+chrome.extension.sendRequest({localstorage: "ezNavigate" }, function(response) {
 	ezNavigate = response.ezNavigate;
+});
+chrome.extension.sendRequest({localstorage: "ezHighlightColor" }, function(response) {
 	EzCustomColor = response.ezHighlightColor;
 });
+
 var ezSessionDisable = sessionStorage["ezSessionDisable"];
 var checkingIfEz = function() {
   if(ezSessionDisable == "true") {
@@ -32,7 +35,6 @@ var checkingIfEz = function() {
   }
 }
 addLoadEvent(checkingIfEz);
-
 
 
 // Storing whether to disable for this session

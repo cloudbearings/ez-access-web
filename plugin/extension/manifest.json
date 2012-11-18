@@ -25,7 +25,7 @@
     {
       "run_at": "document_end",
       "matches" : [
-        "http://*/*"
+        "*://*/*"
       ],
       "css": ["style.css"],
       "js" : ["enable.js","settings.json","js/ezaccess.js","js/hammer.js","js/tinybox.js"]
