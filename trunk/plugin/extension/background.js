@@ -2,6 +2,9 @@
 if(localStorage.ezHighlightColor === undefined) {
 	localStorage.ezHighlightColor = "#0000FF";
 }
+if(localStorage.ezNavigate === undefined) {
+	localStorage.ezNavigate = "some";
+}
 
 // SETTINGS STORAGE
 chrome.extension.onRequest.addListener(
