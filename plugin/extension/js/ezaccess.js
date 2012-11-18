@@ -711,6 +711,9 @@ function load_ez() {
   document.onkeydown = key_event;
   //document.onkeypress = key_event;
   
+  map={} // Have to do this weird thing in order to detect two keys at same time (e.g., shift+tab)
+  onkeydown=onkeyup=multikey_event;
+  
   selectElements = indexElements(document);
   
   // Sorting by tabindex
@@ -850,8 +853,7 @@ function smoothScroll(stopY) {
     }
 }
 
-map={} // Have to do this weird thing in order to detect two keys at same time (e.g., shift+tab)
-onkeydown=onkeyup=function(e){
+function multikey_event(e){
     e=e||event//to deal with IE
     map[e.keyCode]=e.type=='keydown'?true:false
     if (map[KB_TAB] && map[KB_SHIFT] && tabNav != 'none'){ //SHIFT+TAB
