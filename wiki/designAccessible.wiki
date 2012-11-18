@@ -1,3 +1,5 @@
 #summary An introduction to the accessible content designer's mindset.
 
 = Coming Soon =
+
+= :hover is Evil =
