@@ -285,6 +285,7 @@ function getElementsByTagNames(list,obj) {
 }
 
 // Event listener if window is resized the selected box will be redrawn
+// TODO: Make not overwrite anything else
 window.onresize = function() {
   if(ez_navigateToggle) { drawSelected(selectElements[currIndex]); }
 }
@@ -457,6 +458,7 @@ function ez_navigate_in_group() {
   voice(selectElements[currIndex],'nav',globalSayBefore);
 }
 
+// Finds the first or last focusable element of selectElements; returns index
 function findFocusable(location) {
 	if(location == 'last') { // TODO: Need for neg tabindex?
 		for(var i = selectElements.length-1; i > 0;) {
@@ -621,36 +623,7 @@ function ez_enter() {
 }
 
 //Index elements on the page.
-function indexElements(world) {
-  // "Universal" body tag stuff
-  if(document.body.getAttribute('data-ez-screenwrap') !== null) {
-    screenWrap = true;
-  }
-  
-  // Isn't implemented yet
-  if(document.body.getAttribute('data-ez-allowreorder') !== null) {
-    allowReorder = true;
-  }
-  
-  // Not actually implemented yet (just default is)
-  if(document.body.getAttribute('data-ez-tabnav') == 'standard') {
-    tabNav = 'standard';
-  } else if (document.body.getAttribute('data-ez-tabnav') == 'hybrid') {
-    tabNav = 'hybrid';
-  } else if (document.body.getAttribute('data-ez-tabnav') == 'none') {
-    tabNav = 'none';
-  }
-  
-  if(document.body.getAttribute('data-ez-slidetoread') == 'off') {
-    slideToRead = false;
-  }
-  
-  if(document.body.getAttribute('data-ez-startingmode') == 'ezon') {
-    ez_navigate_start();
-  } else if(document.body.getAttribute('data-ez-startingmode') == 'off') {
-    // EZ Turned off on page load no matter yet (but ATM don't have that feature)
-  }
-  
+function indexElements(world) {  
   // INITIAL INDEXING OF PAGE ELEMENTS
   selectElementsTemp = getElementsByTagNames(COMPATIBLE_TAGS,world);
   // Check if ez-focusable to remove (+ CHILDREN)
@@ -785,6 +758,41 @@ function load_ez() {
   
   load_audio();
   
+    // "Universal" body tag stuff
+  if(document.body.getAttribute('data-ez-screenwrap') !== null) {
+    screenWrap = true;
+  }
+  
+  // Isn't implemented yet
+  if(document.body.getAttribute('data-ez-allowreorder') !== null) {
+    allowReorder = true;
+  }
+  
+  // Not actually implemented yet (just default is)
+  if(document.body.getAttribute('data-ez-tabnav') == 'standard') {
+    tabNav = 'standard';
+  } else if (document.body.getAttribute('data-ez-tabnav') == 'hybrid') {
+    tabNav = 'hybrid';
+  } else if (document.body.getAttribute('data-ez-tabnav') == 'none') {
+    tabNav = 'none';
+  }
+  
+  if(document.body.getAttribute('data-ez-slidetoread') == 'off') {
+    slideToRead = false;
+  }
+  if(document.body.getAttribute('data-ez-startingmode') == 'ezon') {
+	// On chrome, will not draw until a small amount of time passes for some reason
+    setTimeout(function(){
+	  ez_navigate_start();
+	  drawSelected(selectElements[currIndex]);
+	},10);
+  } else if (parseInt(sessionStorage.getItem("EZ_Toggle") ) == true && document.body.getAttribute('data-ez-startingmode') != 'ezoff') {
+    setTimeout(function(){
+      ez_navigate_start(true);
+      drawSelected(selectElements[currIndex]);
+    },10);
+  }
+
   //idle_loop(); // TODO/TEMP
   
   // Multitouch gesture dragging
@@ -796,9 +804,6 @@ function load_ez() {
     hammer.ontap = function(ev) {
       stopEZ();
     };
-    if (parseInt(sessionStorage.getItem("EZ_Toggle") ) == true) {
-      ez_navigate_start(true);
-    }
   }
   
   set_volume(); // If exists from previous page
