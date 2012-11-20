@@ -496,11 +496,7 @@ function ez_navigate(move) {
         currIndex = groupSkip('down');
       }
       currIndex++;
-      if(selectElements[currIndex].getAttribute('data-ez-focusable-nav') == 'false' || selectElements[currIndex].getAttribute('data-ez-focusable') == 'false') {
-		console.log(currIndex);
-		ez_navigate('down');
-		return;
-	  }
+      if(selectElements[currIndex].getAttribute('data-ez-focusable-nav') == 'false' || selectElements[currIndex].getAttribute('data-ez-focusable') == 'false') { ez_navigate('down'); return; }
       // If the element location cannot be found; loop through.
       if(!drawSelected(selectElements[currIndex])) { ez_navigate('down'); return; }
       sounds[getElementAudio()].feed.play();
