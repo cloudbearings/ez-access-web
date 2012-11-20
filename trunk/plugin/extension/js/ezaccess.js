@@ -456,9 +456,33 @@ function ez_navigate_in_group() {
   selectElements[currIndex].focus(); // Add focus to new element
   voice(selectElements[currIndex],'nav',globalSayBefore);
 }
+
+function findFocusable(location) {
+	if(location == 'last') { // TODO: Need for neg tabindex?
+		for(var i = selectElements.length-1; i > 0;) {
+			if(selectElements[i].getAttribute('data-ez-focusable-nav') == 'false' || selectElements[i].getAttribute('data-ez-focusable') == 'false') {
+				i--;
+			} else {
+				return i;
+			}
+		}
+		return 0;
+	} else if(location == 'first') {
+		for(var i = 0; i < selectElements.length-1;) {
+			if(selectElements[i].getAttribute('data-ez-focusable-nav') == 'false' || selectElements[i].getAttribute('data-ez-focusable') == 'false') {
+				i++;
+			} else {
+				return i;
+			}
+		}
+		return selectElements.length-1;
+	}
+	return null;
+}
+
 function ez_navigate(move) {
   if(move == 'down') {
-    if(currIndex < selectElements.length-1) {
+    if(currIndex < findFocusable('last')) {
       selectElements[currIndex].blur(); // Add blur to old element
       repeatAlert = 0;
       if(selectElements[currIndex].getAttribute('aria-flowto') !== null) {
@@ -472,7 +496,11 @@ function ez_navigate(move) {
         currIndex = groupSkip('down');
       }
       currIndex++;
-      if(selectElements[currIndex].getAttribute('data-ez-focusable-nav') == 'false' || selectElements[currIndex].getAttribute('data-ez-focusable') == 'false') { ez_navigate('down'); return; }
+      if(selectElements[currIndex].getAttribute('data-ez-focusable-nav') == 'false' || selectElements[currIndex].getAttribute('data-ez-focusable') == 'false') {
+		console.log(currIndex);
+		ez_navigate('down');
+		return;
+	  }
       // If the element location cannot be found; loop through.
       if(!drawSelected(selectElements[currIndex])) { ez_navigate('down'); return; }
       sounds[getElementAudio()].feed.play();
@@ -502,7 +530,7 @@ function ez_navigate(move) {
     }
   }
   else if(move == 'up') {
-    if(currIndex > 0) {
+    if(currIndex > findFocusable('first')) {
       selectElements[currIndex].blur(); // Add blur to old element
       repeatAlert = 0;
       if(selectElements[currIndex].getAttribute('data-tmp-flowfrom') !== null) {
