@@ -12,15 +12,16 @@ function addLoadEvent(func) {
 		}
 	}
 }
-
-var ezNavigate;
 var EzCustomColor;
-chrome.extension.sendRequest({localstorage: "ezNavigate" }, function(response) {
-	ezNavigate = response.ezNavigate;
-});
 chrome.extension.sendRequest({localstorage: "ezHighlightColor" }, function(response) {
 	EzCustomColor = response.ezHighlightColor;
 });
+var ezNavigate;
+
+chrome.extension.sendRequest({localstorage: "ezNavigate" }, function(response) {
+	ezNavigate = response.ezNavigate;
+});
+
 
 var ezSessionDisable = sessionStorage["ezSessionDisable"];
 var checkingIfEz = function() {
