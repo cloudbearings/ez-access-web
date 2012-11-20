@@ -511,7 +511,7 @@ function ez_navigate(move) {
         voice(alerts.bottom[repeatAlert].value);
       } else {
         if(screenWrap) {
-          currIndex = 0;
+          currIndex = findFocusable('first');
           repeatAlert = 0;
           if(!drawSelected(selectElements[currIndex])) { ez_navigate('down'); return; }
           sounds[getElementAudio()].feed.play();
@@ -554,7 +554,7 @@ function ez_navigate(move) {
         voice(alerts.top[repeatAlert].value);
       } else {
         if(screenWrap) {
-          currIndex = selectElements.length-1;
+          currIndex = findFocusable('last');
           repeatAlert = 0;
           if(!drawSelected(selectElements[currIndex])) { ez_navigate('up'); return; }
           sounds[getElementAudio()].feed.play();
