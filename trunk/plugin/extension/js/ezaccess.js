@@ -289,6 +289,15 @@ window.onresize = function() {
   if(ez_navigateToggle) { drawSelected(selectElements[currIndex]); }
 }
 
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
+}
+
 // Draws selected box around DOM object referenced to
 function drawSelected(obj) {
   //var tmp = obj.style.display;  // INLINE BLOCK OUTLINE FIXER
@@ -620,7 +629,6 @@ function indexElements(world) {
   
   // INITIAL INDEXING OF PAGE ELEMENTS
   selectElementsTemp = getElementsByTagNames(COMPATIBLE_TAGS,world);
-  
   // Check if ez-focusable to remove (+ CHILDREN)
   for(var i = 0; i < selectElementsTemp.length;i++) {
     if(selectElementsTemp[i].getAttribute('data-ez-focusable') == 'false') {
@@ -659,9 +667,19 @@ function indexElements(world) {
     else { i++; }
   }
   
+  // Check and remove elements with children if tabindex (excluding grouped stuff).
+  for(var i = 0; i < selectElementsTemp.length;) {
+    if(selectElementsTemp[i].getAttribute('tabindex') !== null && getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]).length > 0 && !(selectElementsTemp[i].getAttribute('data-ez-focusable') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-point') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-nav') == 'true')) {
+      var removeAmount = getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]).length;
+      selectElementsTemp.splice(i+1,removeAmount);
+      i += removeAmount+1;
+    }
+    else { i++; }
+  }
+  
   // Check and remove elements with children (excluding grouped stuff). MUST BE LAST THING DONE
   for(var i = 0; i < selectElementsTemp.length;) {
-    if(getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]).length > 0 && selectElementsTemp[i].getAttribute('data-ez-chunking') != 'group' && selectElementsTemp[i].getAttribute('data-ez-chunking') != 'block' && !(selectElementsTemp[i].getAttribute('data-ez-focusable') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-point') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-nav') == 'true')) {
+    if(selectElementsTemp[i].getAttribute('tabindex') === null && getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]).length > 0 && selectElementsTemp[i].getAttribute('data-ez-chunking') != 'group' && selectElementsTemp[i].getAttribute('data-ez-chunking') != 'block' && !(selectElementsTemp[i].getAttribute('data-ez-focusable') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-point') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-nav') == 'true')) {
       selectElementsTemp.splice(i,1); // Remove entry
     }
     else { i++; }
@@ -706,15 +724,6 @@ function getlabelforinput(inputname) {
       }
     }
     return null;
-}
-
-function hexToRgb(hex) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-    } : null;
 }
 
 // On page load, load key_event() listener
