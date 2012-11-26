@@ -13,7 +13,12 @@ function loadOptions() {
 			}
 		});
 	});
-	
+	chrome.tabs.getSelected(null, function(tab) {
+		chrome.tabs.sendRequest(tab.id, {'volume': 'getter'}, function(response) {
+			document.getElementById('slide').value = response.volume;
+			document.getElementById('volumeamt').innerHTML = response.volume;
+		});
+	});
 	var highlightDisable = document.getElementById("highlightDisable");
 	highlightDisable.onclick=function(){ doHighlightDisable(); };
 }
