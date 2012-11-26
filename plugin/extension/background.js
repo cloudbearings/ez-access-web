@@ -14,7 +14,7 @@ chrome.extension.onRequest.addListener(
 		} else if(request.localstorage == "ezHighlightColor") {
 			sendResponse({ezHighlightColor: localStorage.ezHighlightColor});
 		} else if(request.tts !== undefined) {
-			chrome.tts.speak(request.tts);
+			chrome.tts.speak(request.tts, {'volume': parseFloat(request.volume)});
 		} else if(request.ezShow == "true") {
 			chrome.pageAction.show(sender.tab.id);
 		} else {
