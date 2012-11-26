@@ -126,7 +126,7 @@ var idleLoop;
 
 // Volume of the audio elements (0-100)
 if(sessionStorage.getItem("EZ_Volume") !== null) {
-  var audioVolume = sessionStorage.getItem("EZ_Volume");
+  var audioVolume = parseInt(sessionStorage.getItem("EZ_Volume"));
 } else {
   var audioVolume = 100;
 }
@@ -230,9 +230,8 @@ function voice(obj,source,repeat) {
     globalSayBefore = "";
   }
   if(data.length > 300) { voice("One moment"); } // If speech generation will take a while
-  //chrome.tts.speak(data, {'volume': (audioVolume/100)});
-  //chrome.tts.speak('Hello, world!');
-  var req = {"tts": data};
+  var req = {"tts": data,
+			 "volume": String(audioVolume/100)};
   chrome.extension.sendRequest(req);
 }
 
@@ -425,7 +424,9 @@ function findGroupParent() {
 
 function idle_loop(display) {
   if(!display) {
-    idleLoop = self.setInterval(function(){idle_loop(true)},alerts.idle.wait);
+	if(alerts.idle.wait != -1) {
+		idleLoop = self.setInterval(function(){idle_loop(true)},alerts.idle.wait);
+	}
   } else {
     if(!tinyOpen && !ez_navigateToggle) {
       idleLoop = self.clearInterval(idleLoop);
@@ -758,6 +759,8 @@ function load_ez() {
   
   load_audio();
   
+  set_volume(); // If exists from previous page
+  
     // "Universal" body tag stuff
   if(document.body.getAttribute('data-ez-screenwrap') !== null) {
     screenWrap = true;
@@ -805,8 +808,6 @@ function load_ez() {
       stopEZ();
     };
   }
-  
-  set_volume(); // If exists from previous page
   
 }
 
