@@ -61,5 +61,7 @@ chrome.extension.onRequest.addListener(
 		} else if(request.ezHighlightDisable == "true") {
 			stopEZ();
 			sendResponse({});
+		} else if(request.volume == 'getter') {
+			sendResponse({volume: audioVolume});
 		}
 });
