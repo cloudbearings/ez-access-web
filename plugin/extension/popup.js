@@ -21,6 +21,17 @@ function loadOptions() {
 	});
 	var highlightDisable = document.getElementById("highlightDisable");
 	highlightDisable.onclick=function(){ doHighlightDisable(); };
+	document.getElementById('slide').onchange = function(){
+		doChangeVolume();
+		document.getElementById('volumeamt').innerHTML = document.getElementById('slide').value;
+	};
+}
+
+function doChangeVolume() {
+	chrome.tabs.getSelected(null, function(tab) {
+		chrome.tabs.sendRequest(tab.id, {ezVolume:String(document.getElementById('slide').value)}, function(response) {
+		});
+	});
 }
 
 function doHighlightDisable(){

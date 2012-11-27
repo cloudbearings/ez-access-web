@@ -1,8 +1,8 @@
 {
   "name": "EZ Access Browser",
   "description": "An EZ Access Web Parser",
-  "version": "0.9.5.1",
-  "manifest_version": 7,
+  "version": "0.9.6.0",
+  "manifest_version": 8,
   "icons": { 
     "16":"icon-16.png", 
     "48":"icon-48.png", 
