@@ -12,7 +12,7 @@ The following attributes are from the official [http://code.google.com/p/ez-acce
 || EZ Access supported || {{{data-ez}}} || When included, the EZ Access plugin detects the page as EZ Access-compatible. || <font color="green">Fully supported</font> ||
 || Screenwrap toggle || {{{data-ez-screenwrap}}} || If tag present, specifies if the EZ navigation highlight exhibits a wrapping behavior at the top and bottom of the page. || <font color="green">Fully supported</font> ||
 || Start at || {{{data-ez-startat="IDREF IDREF"}}} || [dataEzStartat] || <font color="green">Fully supported</font> ||
-|| Allow re-order || {{{data-ez-allowreorder}}} || Specifies if the page is to be navigated in the DOM order only or if it is to be navigated in a re-ordered fashion as specified by the {{{tabindex}}} and {{{aria-flowto}}} attributes. || <font color="red">Not supported</font> ||
+|| Allow re-order || {{{data-ez-allowreorder}}} || Specifies if the page is to be navigated in the DOM order only or if it is to be navigated in a re-ordered fashion as specified by the {{{tabindex}}} and {{{aria-flowto}}} attributes. || <font color="green">Fully supported</font> ||
 || [dataEzTabnav Tab Navigation] || {{{data-ez-tabnav}}} || Specifies how Tab and Shift+Tab navigate on the screen. || <font color="orange">Partially supported</font><br>[dataEzTabnav More information] ||
 || Auto Repeat || {{{data-ez-autorepeat}}} || Specifies the auto-repeat behavior of the EZ Access buttons and keyboard keys. || <font color="red">Not supported</font> ||
 || EZ Access starting mode || {{{data-ez-startingmode}}}<br>*Values:* default, ezon, ezoff || Specifies if EZ Access mode is on when the user opens the page. || <font color="green">Fully supported</font> ||
