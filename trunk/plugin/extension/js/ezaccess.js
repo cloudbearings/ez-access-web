@@ -118,6 +118,9 @@ var ez_navigateToggle = false;
 // Wrap elements on the screen
 var screenWrap = false;
 
+// Determines key autorepeat preperty or not
+var autoRepeat = 'off';
+
 // Keep track if the TINY modal is open or not
 var tinyOpen = false;
 
@@ -733,12 +736,50 @@ function load_ez() {
   if(document.body.getAttribute('data-ez-allowreorder') !== null) {
     allowReorder = true;
   }
+  
+	if(document.body.getAttribute('data-ez-autorepeat') === 'keyboard') {
+    autoRepeat = 'keyboard';
+  } else if(document.body.getAttribute('data-ez-autorepeat') === 'on') {
+		autoRepeat = 'on';
+	}
 	
-  document.onkeydown = key_event;
+	var lastEvent;
+	var heldKeys = {};
+  map={} // Have to do this weird thing in order to detect two keys at same time (e.g., shift+tab)
+	onkeydown = function(event) {
+		if(autoRepeat == 'keyboard') {
+			var return1 = multikey_event(event);
+		} else if(autoRepeat == 'on') {
+			var return1 = multikey_event(event);
+			var return2 = key_event(event);
+		}
+		if (lastEvent && lastEvent.keyCode == event.keyCode) {
+			return false;
+		}
+		lastEvent = event;
+		heldKeys[event.keyCode] = true;
+		if(autoRepeat == 'off') {
+			var return1 = multikey_event(event);
+			var return2 = key_event(event);
+		} else if(autoRepeat == 'keyboard') {
+			var return2 = key_event(event);
+		}
+		if(return1 && return2) {
+			return;
+		} else {
+			return false;
+		}
+	};
+	onkeyup = function(event) {
+		multikey_event(event);
+		lastEvent = null;
+		delete heldKeys[event.keyCode];
+		return false;
+	};
+
   //document.onkeypress = key_event;
   
-  map={} // Have to do this weird thing in order to detect two keys at same time (e.g., shift+tab)
-  onkeydown=onkeyup=multikey_event;
+  //onkeydown=onkeyup=multikey_event;
   
   selectElements = indexElements(document);
   
@@ -934,6 +975,7 @@ function multikey_event(e){
       }
       return false;
     }
+    return true;
 }
 
 /* Referred to by window.onload anonymous function.
@@ -1060,6 +1102,7 @@ function key_event(e) {
       }
     }
   }
+  return true;
 }
 
 
