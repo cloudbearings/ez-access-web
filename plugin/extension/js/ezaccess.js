@@ -461,7 +461,7 @@ function ez_navigate_in_group() {
 
 // Finds the first or last focusable element of selectElements; returns index
 function findFocusable(location) {
-	if(location == 'last') { // TODO: Need for neg tabindex?
+	if(location == 'last') {
 		for(var i = selectElements.length-1; i > 0;) {
 			if(selectElements[i].getAttribute('data-ez-focusable-nav') == 'false' || selectElements[i].getAttribute('data-ez-focusable') == 'false') {
 				i--;
@@ -488,7 +488,7 @@ function ez_navigate(move) {
     if(currIndex < findFocusable('last')) {
       selectElements[currIndex].blur(); // Add blur to old element
       repeatAlert = 0;
-      if(selectElements[currIndex].getAttribute('aria-flowto') !== null) {
+      if(allowReorder && selectElements[currIndex].getAttribute('aria-flowto') !== null) {
         ez_jump(getCurrIndexById(selectElements[currIndex].getAttribute('aria-flowto').split(' ')[0]));
         return;
       }
@@ -666,18 +666,20 @@ function indexElements(world) {
   }
   
   // Check and remove elements with children if tabindex (excluding grouped stuff).
-  for(var i = 0; i < selectElementsTemp.length;) {
-    if(selectElementsTemp[i].getAttribute('tabindex') !== null && getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]).length > 0 && !(selectElementsTemp[i].getAttribute('data-ez-focusable') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-point') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-nav') == 'true')) {
-      var removeAmount = getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]).length;
-      selectElementsTemp.splice(i+1,removeAmount);
-      i += removeAmount+1;
-    }
-    else { i++; }
+  if(allowReorder) {
+		for(var i = 0; i < selectElementsTemp.length;) {
+			if(selectElementsTemp[i].getAttribute('tabindex') !== null && getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]).length > 0 && !(selectElementsTemp[i].getAttribute('data-ez-focusable') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-point') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-nav') == 'true')) {
+				var removeAmount = getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]).length;
+				selectElementsTemp.splice(i+1,removeAmount);
+				i += removeAmount+1;
+			}
+			else { i++; }
+		}
   }
   
   // Check and remove elements with children (excluding grouped stuff). MUST BE LAST THING DONE
   for(var i = 0; i < selectElementsTemp.length;) {
-    if(selectElementsTemp[i].getAttribute('tabindex') === null && getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]).length > 0 && selectElementsTemp[i].getAttribute('data-ez-chunking') != 'group' && selectElementsTemp[i].getAttribute('data-ez-chunking') != 'block' && !(selectElementsTemp[i].getAttribute('data-ez-focusable') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-point') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-nav') == 'true')) {
+    if((!allowReorder || selectElementsTemp[i].getAttribute('tabindex') === null) && getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]).length > 0 && selectElementsTemp[i].getAttribute('data-ez-chunking') != 'group' && selectElementsTemp[i].getAttribute('data-ez-chunking') != 'block' && !(selectElementsTemp[i].getAttribute('data-ez-focusable') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-point') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-nav') == 'true')) {
       selectElementsTemp.splice(i,1); // Remove entry
     }
     else { i++; }
@@ -725,7 +727,12 @@ function getlabelforinput(inputname) {
 }
 
 // On page load, load key_event() listener
-function load_ez() {	
+function load_ez() {
+
+	
+  if(document.body.getAttribute('data-ez-allowreorder') !== null) {
+    allowReorder = true;
+  }
 	
   document.onkeydown = key_event;
   //document.onkeypress = key_event;
@@ -735,27 +742,31 @@ function load_ez() {
   
   selectElements = indexElements(document);
   
-  // Sorting by tabindex
-  var tempselectElement = [];
-  j = 0;
-  for(var i = 0; i < selectElements.length;) {
-    if(parseFloat(selectElements[i].getAttribute('tabindex')) < 0) {
-      selectElements.splice(i,1); // Skip if < 0
-    }
-    else if(selectElements[i].getAttribute('tabindex') !== null) {
-      tempselectElement[j] = selectElements.splice(i,1)[0];
-      j++;
-    }
-    else { i++; }
+  if(allowReorder) {
+	  // Sorting by tabindex
+	  var tempselectElement = [];
+	  j = 0;
+	  for(var i = 0; i < selectElements.length;) {
+			if(parseFloat(selectElements[i].getAttribute('tabindex')) < 0) {
+				selectElements.splice(i,1); // Skip if < 0
+			}
+			else if(selectElements[i].getAttribute('tabindex') !== null) {
+				tempselectElement[j] = selectElements.splice(i,1)[0];
+				j++;
+			}
+			else { i++; }
+		}
+	  tempselectElement.sort(function(a,b){
+			return a.getAttribute('tabindex')-b.getAttribute('tabindex');
+	  });
+	  selectElements = tempselectElement.concat(selectElements);
   }
-  tempselectElement.sort(function(a,b){
-    return a.getAttribute('tabindex')-b.getAttribute('tabindex');
-  });
-  selectElements = tempselectElement.concat(selectElements);
   
   load_jumppoints();
   
-  load_flowfrom();
+  if(allowReorder) {
+		load_flowfrom();
+  }
   
   load_audio();
   
@@ -764,11 +775,6 @@ function load_ez() {
     // "Universal" body tag stuff
   if(document.body.getAttribute('data-ez-screenwrap') !== null) {
     screenWrap = true;
-  }
-  
-  // Isn't implemented yet
-  if(document.body.getAttribute('data-ez-allowreorder') !== null) {
-    allowReorder = true;
   }
   
   // Not actually implemented yet (just default is)
@@ -813,7 +819,7 @@ function load_ez() {
 
 function load_flowfrom() {
   for(var i = 0; i < selectElements.length; i++) {
-    if(selectElements[i].getAttribute('aria-flowto') !== null) {
+    if(allowReorder && selectElements[i].getAttribute('aria-flowto') !== null) {
       var flowId = selectElements[i].getAttribute('aria-flowto').split(' ')[0]; // In case multiple exist, grab first
       for(var j = 0; j < selectElements.length; j++) {
         if(selectElements[j].id == flowId) {
