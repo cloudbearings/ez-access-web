@@ -14,7 +14,7 @@ The following attributes are from the official [http://code.google.com/p/ez-acce
 || Start at || {{{data-ez-startat="IDREF IDREF"}}} || [dataEzStartat] || <font color="green">Fully supported</font> ||
 || Allow re-order || {{{data-ez-allowreorder}}} || Specifies if the page is to be navigated in the DOM order only or if it is to be navigated in a re-ordered fashion as specified by the {{{tabindex}}} and {{{aria-flowto}}} attributes. || <font color="green">Fully supported</font> ||
 || [dataEzTabnav Tab Navigation] || {{{data-ez-tabnav}}} || Specifies how Tab and Shift+Tab navigate on the screen. || <font color="orange">Partially supported</font><br>[dataEzTabnav More information] ||
-|| Auto Repeat || {{{data-ez-autorepeat}}} || Specifies the auto-repeat behavior of the EZ Access buttons and keyboard keys: default 'off', other options are 'keyboard' for repeat only on keyboard, or 'on' for OS default autorepeat on everything. || <font color="green">Supported -- 'modal' option not to be supported</font> ||
+|| Auto Repeat || {{{data-ez-autorepeat}}} || Specifies the auto-repeat behavior of the EZ Access buttons and keyboard keys: default 'off', other options are 'keyboard' for repeat only on keyboard, or 'on' for OS default autorepeat on everything. || <font color="green">Supported</font> ('modal' option not to be supported) ||
 || EZ Access starting mode || {{{data-ez-startingmode}}}<br>*Values:* default, ezon, ezoff || Specifies if EZ Access mode is on when the user opens the page. || <font color="green">Fully supported</font> ||
 || Slide to read on/off || {{{data-ez-slidetoread}}}<br>*Values:* on, off || Default is on. Specifies that the slide-to-read functionality is turned on or off for a page. || <font color="green">Fully supported</font> ||
 
