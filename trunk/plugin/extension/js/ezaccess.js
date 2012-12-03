@@ -487,6 +487,7 @@ function findFocusable(location) {
 }
 
 function ez_navigate(move) {
+	index_ez();
   if(move == 'down') {
     if(currIndex < findFocusable('last')) {
       selectElements[currIndex].blur(); // Add blur to old element
@@ -729,11 +730,41 @@ function getlabelforinput(inputname) {
     return null;
 }
 
+function index_ez() {
+  parseOrphanedText(getElementsByTagNames('p'));
+  
+  selectElements = indexElements(document);
+  
+  if(allowReorder) {
+	  // Sorting by tabindex
+	  var tempselectElement = [];
+	  j = 0;
+	  for(var i = 0; i < selectElements.length;) {
+			if(parseFloat(selectElements[i].getAttribute('tabindex')) < 0) {
+				selectElements.splice(i,1); // Skip if < 0
+			}
+			else if(selectElements[i].getAttribute('tabindex') !== null) {
+				tempselectElement[j] = selectElements.splice(i,1)[0];
+				j++;
+			}
+			else { i++; }
+		}
+	  tempselectElement.sort(function(a,b){
+			return a.getAttribute('tabindex')-b.getAttribute('tabindex');
+	  });
+	  selectElements = tempselectElement.concat(selectElements);
+  }
+  
+  load_jumppoints();
+  
+  if(allowReorder) {
+		load_flowfrom();
+  }
+}
+
 // On page load, load key_event() listener
 function load_ez() {
-
-	
-  if(document.body.getAttribute('data-ez-allowreorder') !== null) {
+	  if(document.body.getAttribute('data-ez-allowreorder') !== null) {
     allowReorder = true;
   }
   
@@ -742,7 +773,7 @@ function load_ez() {
   } else if(document.body.getAttribute('data-ez-autorepeat') === 'on') {
 		autoRepeat = 'on';
 	}
-	
+
 	var lastEvent;
 	var heldKeys = {};
   map={} // Have to do this weird thing in order to detect two keys at same time (e.g., shift+tab)
@@ -777,38 +808,8 @@ function load_ez() {
 		return false;
 	};
 
-  //document.onkeypress = key_event;
-  
-  //onkeydown=onkeyup=multikey_event;
-  
-  selectElements = indexElements(document);
-  
-  if(allowReorder) {
-	  // Sorting by tabindex
-	  var tempselectElement = [];
-	  j = 0;
-	  for(var i = 0; i < selectElements.length;) {
-			if(parseFloat(selectElements[i].getAttribute('tabindex')) < 0) {
-				selectElements.splice(i,1); // Skip if < 0
-			}
-			else if(selectElements[i].getAttribute('tabindex') !== null) {
-				tempselectElement[j] = selectElements.splice(i,1)[0];
-				j++;
-			}
-			else { i++; }
-		}
-	  tempselectElement.sort(function(a,b){
-			return a.getAttribute('tabindex')-b.getAttribute('tabindex');
-	  });
-	  selectElements = tempselectElement.concat(selectElements);
-  }
-  
-  load_jumppoints();
-  
-  if(allowReorder) {
-		load_flowfrom();
-  }
-  
+	index_ez();	
+	
   load_audio();
   
   set_volume(); // If exists from previous page
@@ -846,9 +847,10 @@ function load_ez() {
   //idle_loop(); // TODO/TEMP
   
   // Multitouch gesture dragging
-  if(slideToRead) { // If not allowed, to not initialize
+  if(slideToRead) { // If not allowed, do not initialize
     var hammer = new Hammer(document.body);
     hammer.ondrag = function(ev) {
+			index_ez();
       mouseOver(document.elementFromPoint(parseFloat(ev.position.x)-parseFloat(window.scrollX), parseFloat(ev.position.y)-parseFloat(window.scrollY)));
     };
     hammer.ontap = function(ev) {
@@ -856,6 +858,26 @@ function load_ez() {
     };
   }
   
+}
+
+function parseOrphanedText(paragraphTags) {
+	for(var i = 0; i < paragraphTags.length; i++) {
+		var para = paragraphTags[i];
+		var arr = [];
+		for (var j = 0; j < para.childNodes.length; j++) {
+				var elem = para.childNodes[j];
+				if (elem.nodeType === 3 && elem.length > 3) { // > 3 to prevent whitespaces
+						var newElem = document.createElement('span');
+						newElem.innerHTML = elem.nodeValue;
+						elem.parentNode.insertBefore(newElem, elem.nextSibling);
+						para.removeChild(elem);
+						arr.push(newElem);
+				}
+				else {
+						arr.push(elem)
+				}
+		}
+	}
 }
 
 function load_flowfrom() {
