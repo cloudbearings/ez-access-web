@@ -313,6 +313,7 @@ function drawSelected(obj) {
   var old = document.getElementById(ezSelectorId);
   if(old === null) {
     var div = document.createElement('div');
+    div.setAttribute("data-ez-focusable","false");
 	var rgb = "rgba("+hexToRgb(EzCustomColor).r+","+hexToRgb(EzCustomColor).g+","+hexToRgb(EzCustomColor).b+",";
     var rgbinverse = "rgba("+(255-hexToRgb(EzCustomColor).r)+","+(255-hexToRgb(EzCustomColor).g)+","+(255-hexToRgb(EzCustomColor).b)+",";
 	// Load the CSS pulsing Stuff
@@ -366,7 +367,7 @@ function ez_navigate_start(propagated) {
   if(!propagated) {
     sounds[getElementAudio()].feed.play();
   }
-  drawSelected(selectElements[currIndex]);
+	drawSelected(selectElements[currIndex]);
   voice(selectElements[currIndex],'nav');
 }
 
@@ -487,7 +488,15 @@ function findFocusable(location) {
 }
 
 function ez_navigate(move) {
+	var currElement = selectElements[currIndex];
 	index_ez();
+	currIndex = 0;
+	for(var i = 0; i < selectElements.length; i++) {
+		if(selectElements[i] == currElement) {
+			currIndex = i;
+		}
+	}
+	
   if(move == 'down') {
     if(currIndex < findFocusable('last')) {
       selectElements[currIndex].blur(); // Add blur to old element
@@ -691,6 +700,13 @@ function indexElements(world) {
   return selectElementsTemp;
 }
 
+function clear_jumppoints() {
+	for(var i = 0; i < selectElements.length; i++) {
+		selectElements[i].removeAttribute("data-tmp-level");
+		selectElements[i].removeAttribute("data-tmp-jump");
+	}
+}
+
 function load_jumppoints() {
   for(var i = 0; i < selectElements.length; i++) {
     if(selectElements[i].getAttribute('data-ez-chunking') == 'group' && selectElements[i].getAttribute('data-ez-subnavtype') == 'nested' || selectElements[i].getAttribute('data-ez-subnavtype') == 'hierarchical') {
@@ -755,6 +771,7 @@ function index_ez() {
 	  selectElements = tempselectElement.concat(selectElements);
   }
   
+  clear_jumppoints();
   load_jumppoints();
   
   if(allowReorder) {
@@ -850,7 +867,14 @@ function load_ez() {
   if(slideToRead) { // If not allowed, do not initialize
     var hammer = new Hammer(document.body);
     hammer.ondrag = function(ev) {
-			index_ez();
+				var currElement = selectElements[currIndex];
+				index_ez();
+				currIndex = 0;
+				for(var i = 0; i < selectElements.length; i++) {
+					if(selectElements[i] == currElement) {
+						currIndex = i;
+					}
+				}
       mouseOver(document.elementFromPoint(parseFloat(ev.position.x)-parseFloat(window.scrollX), parseFloat(ev.position.y)-parseFloat(window.scrollY)));
     };
     hammer.ontap = function(ev) {
@@ -900,7 +924,7 @@ function stopEZ() {
   currIndex = 0;
   voice("");
   sessionStorage.setItem("EZ_Toggle", "0");
-  var old = document.getElementById("ezselected");
+  var old = document.getElementById(ezSelectorId);
   if (old !== null) {
     old.style.visibility = "hidden";
     old.style.left = 0+"px";
