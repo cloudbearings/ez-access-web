@@ -494,6 +494,7 @@ function ez_navigate(move) {
 	for(var i = 0; i < selectElements.length; i++) {
 		if(selectElements[i] == currElement) {
 			currIndex = i;
+			break;
 		}
 	}
 	
