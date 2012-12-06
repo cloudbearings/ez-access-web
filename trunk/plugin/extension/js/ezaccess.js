@@ -115,6 +115,11 @@ var currIndex = 0;
 // Whether EZ navigation mode is activated or not
 var ez_navigateToggle = false;
 
+// If autoadvance is enabled or not
+// Also autoadvance timer is global to disable from other functions
+var autoAdvance = 0;
+var autoAdvTimer;
+
 // Wrap elements on the screen
 var screenWrap = false;
 
@@ -364,6 +369,7 @@ function ez_navigate_start(propagated) {
       } // Else, default initial currIndex = 0 (from beginning)
     }
   }
+  auto_advance_set(); // Find if autoadvancing element
   if(!propagated) {
     sounds[getElementAudio()].feed.play();
   }
@@ -467,7 +473,11 @@ function ez_navigate_in_group() {
 function findFocusable(location) {
 	if(location == 'last') {
 		for(var i = selectElements.length-1; i > 0;) {
+			var pos = getElementAbsolutePos(selectElements[i]);
 			if(selectElements[i].getAttribute('data-ez-focusable-nav') == 'false' || selectElements[i].getAttribute('data-ez-focusable') == 'false') {
+				i--;
+			} else if(!pos || selectElements[i].offsetWidth == 0 || selectElements[i].offsetWidth == 0) {
+				// If there is a problem finding the element position
 				i--;
 			} else {
 				return i;
@@ -476,8 +486,12 @@ function findFocusable(location) {
 		return 0;
 	} else if(location == 'first') {
 		for(var i = 0; i < selectElements.length-1;) {
+			var pos = getElementAbsolutePos(selectElements[i]);
 			if(selectElements[i].getAttribute('data-ez-focusable-nav') == 'false' || selectElements[i].getAttribute('data-ez-focusable') == 'false') {
 				i++;
+			} else if(!pos || selectElements[i].offsetWidth == 0 || selectElements[i].offsetWidth == 0) {
+				// If there is a problem finding the element position
+				i--;
 			} else {
 				return i;
 			}
@@ -516,6 +530,7 @@ function ez_navigate(move) {
       if(selectElements[currIndex].getAttribute('data-ez-focusable-nav') == 'false' || selectElements[currIndex].getAttribute('data-ez-focusable') == 'false') { ez_navigate('down'); return; }
       // If the element location cannot be found; loop through.
       if(!drawSelected(selectElements[currIndex])) { ez_navigate('down'); return; }
+			auto_advance_set(); // Find if autoadvancing element
       sounds[getElementAudio()].feed.play();
       selectElements[currIndex].focus(); // Add focus to new element
       voice(selectElements[currIndex],'nav',globalSayBefore);
@@ -559,6 +574,7 @@ function ez_navigate(move) {
         currIndex = groupSkip('up');
       }
       if(!drawSelected(selectElements[currIndex])) { ez_navigate('up'); return; }
+			auto_advance_set(); // Find if autoadvancing element
       sounds[getElementAudio()].feed.play();
       selectElements[currIndex].focus(); // Add focus to new element
       voice(selectElements[currIndex],'nav');
@@ -585,6 +601,49 @@ function ez_navigate(move) {
       }
     }
   }
+}
+
+function find_parent_attr(obj,attr) {
+	if(obj == null) { return undefined; }
+	while(obj.nodeType !== 9) {
+		if(obj.getAttribute(attr) !== null) {
+			return obj.getAttribute(attr);
+		}
+		obj = obj.parentNode;
+	}
+	return undefined;
+}
+
+function auto_advance_set() {
+	// If this is a new element to start autoadvancing, set the timer
+	if(find_parent_attr(selectElements[currIndex],'data-ez-autoadvance') !== undefined) {
+		if(find_parent_attr(selectElements[currIndex-1],'data-ez-autoadvance') === undefined) {
+			autoAdvance = find_parent_attr(selectElements[currIndex],'data-ez-autoadvance');
+			autoAdvance = parseInt(autoAdvance);
+			if(autoAdvance < 100) {
+				console.log("Please choose a autoadvance pause of 100 ms or greater.");
+				autoAdvance = 100;
+			}
+			auto_advance_decide();
+		}
+	}
+}
+
+function auto_advance_decide() {
+	window.clearInterval(autoAdvTimer);
+	if(autoAdvance !== 0) {
+		autoAdvTimer = setInterval(function(){
+			ez_navigate('down');
+			if(currIndex >= findFocusable('last')) {
+				autoAdvance = 0;
+				window.clearInterval(autoAdvTimer);
+			}
+			if(find_parent_attr(selectElements[currIndex],'data-ez-autoadvance') === undefined) {
+				autoAdvance = 0;
+				window.clearInterval(autoAdvTimer);
+			}
+		},autoAdvance);
+	}
 }
 
 function ez_jump(location) {
@@ -796,6 +855,8 @@ function load_ez() {
 	var heldKeys = {};
   map={} // Have to do this weird thing in order to detect two keys at same time (e.g., shift+tab)
 	onkeydown = function(event) {
+		autoAdvance = 0; // Stop any autoadvancing timers
+		window.clearInterval(autoAdvTimer);
 		if(autoRepeat == 'keyboard') {
 			var return1 = multikey_event(event);
 		} else if(autoRepeat == 'on') {

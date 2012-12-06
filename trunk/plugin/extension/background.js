@@ -14,7 +14,20 @@ chrome.extension.onRequest.addListener(
 		} else if(request.localstorage == "ezHighlightColor") {
 			sendResponse({ezHighlightColor: localStorage.ezHighlightColor});
 		} else if(request.tts !== undefined) {
-			chrome.tts.speak(request.tts, {'volume': parseFloat(request.volume)});
+			var tabid;
+			chrome.tabs.getSelected(null, function(tab) {
+				tabid = tab.id;
+			});
+			chrome.tts.speak(request.tts, {
+				'volume': parseFloat(request.volume), 
+				requiredEventTypes: ['end'],
+				onEvent: function(event) {
+					if(event.type === 'end') {
+						chrome.tabs.sendRequest(tabid, {ezTtsState:'done'}, function(response) {
+						});
+					}
+				}
+			});
 		} else if(request.ezShow == "true") {
 			chrome.pageAction.show(sender.tab.id);
 		} else {

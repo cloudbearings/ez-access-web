@@ -61,6 +61,8 @@ chrome.extension.onRequest.addListener(
 		} else if(request.ezHighlightDisable == "true") {
 			stopEZ();
 			sendResponse({});
+		} else if(request.ezTtsState == "done") {
+			auto_advance_decide();
 		} else if(request.ezVolume !== undefined) {
 			audioVolume = parseFloat(request.ezVolume);
 			sessionStorage.setItem("EZ_Volume",audioVolume);
