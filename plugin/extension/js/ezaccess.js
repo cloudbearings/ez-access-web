@@ -952,7 +952,20 @@ function parseOrphanedText(paragraphTags) {
 		var arr = [];
 		for (var j = 0; j < para.childNodes.length; j++) {
 				var elem = para.childNodes[j];
-				if (elem.nodeType === 3 && elem.length > 3) { // > 3 to prevent whitespaces
+				var nextElem = para.childNodes[j+1];
+				var prevElem = para.childNodes[j-1];
+				var parse = false;
+				for(var m = 0; m < COMPATIBLE_TAGS.split(',').length; m++) {
+					if(nextElem !== undefined && nextElem.tagName === COMPATIBLE_TAGS.split(',')[m].toUpperCase()) {
+						parse = true;
+						break;
+					}
+					if(prevElem !== undefined && prevElem.tagName === COMPATIBLE_TAGS.split(',')[m].toUpperCase()) {
+						parse = true;
+						break;
+					}
+				}
+				if (elem.nodeType === 3 && elem.length > 3 && parse) { // > 3 to prevent whitespaces
 						var newElem = document.createElement('span');
 						newElem.innerHTML = elem.nodeValue;
 						elem.parentNode.insertBefore(newElem, elem.nextSibling);
