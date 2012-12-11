@@ -120,6 +120,9 @@ var ez_navigateToggle = false;
 var autoAdvance = 0;
 var autoAdvTimer;
 
+// Return element (for example, when in dropdown)
+var returnElement = null;
+
 // Wrap elements on the screen
 var screenWrap = false;
 
@@ -351,6 +354,36 @@ function drawSelected(obj) {
   return true;
 }
 
+function popupSelector(obj) {
+	var html = '<div data-ez-chunking="group" data-ez-subnavtype="hierarchical"><h1 id="popupSelector">Dropdown:</h1><br>';
+	for(var i = 0; i < obj.length; i++) {
+		html += '<button type="button" onClick="popupSet(\''+obj[i].value+'\')">'+obj[i].innerText+'</button><br>';
+	}
+	html+="</div>";
+	TINY.box.show(html,0,400,0,0);
+	returnElement = selectElements[currIndex];
+	index_ez();
+	var interval = setInterval(function(){
+		ez_jump(getCurrIndexById("popupSelector"));
+		clearInterval(interval);
+	},200);
+}
+
+function popupSet(value) {
+	if(value !== undefined) {
+		returnElement.value = value;
+	}
+	TINY.box.hide();
+	if(returnElement !== null) {
+		// TODO
+		index_ez();
+		ez_jump(getCurrIndexByEl(returnElement));
+		returnElement = null;
+	} else {
+		ez_jump(0);
+	}
+}
+
 function ez_navigate_start(propagated) {
   ez_navigateToggle = true;
   sessionStorage.setItem("EZ_Toggle", "1");
@@ -453,6 +486,15 @@ function getCurrIndexById(id) {
     }
   }
   return -1;
+}
+
+function getCurrIndexByEl(e) {
+	for(var i = 0; i < selectElements.length; i++) {
+		if(selectElements[i] == e) {
+			return i;
+		}
+	}
+	return -1;
 }
 
 // Like ez_navigate("down"), but for when navigating to first element inside a group
@@ -671,8 +713,9 @@ function ez_enter() {
   var obj = selectElements[currIndex];
   if(getClick(obj) !== undefined) {
     obj.click();
-  }
-  else if(obj.tagName == 'INPUT' && (obj.type == 'radio' || obj.type == 'checkbox') ) {
+	} else if(obj.tagName == 'SELECT') {
+		popupSelector(selectElements[currIndex]);
+  } else if(obj.tagName == 'INPUT' && (obj.type == 'radio' || obj.type == 'checkbox') ) {
     obj.click();
     if(obj.checked) {
       sounds[AUDIO_SELECT].feed.play();
@@ -697,7 +740,7 @@ function ez_enter() {
 }
 
 //Index elements on the page.
-function indexElements(world) {  
+function indexElements(world) {
   // INITIAL INDEXING OF PAGE ELEMENTS
   selectElementsTemp = getElementsByTagNames(COMPATIBLE_TAGS,world);
   // Check if ez-focusable to remove (+ CHILDREN)
@@ -1138,17 +1181,15 @@ function key_event(e) {
     }
   }
   else if(e.keyCode == EZ_KEY_BACK || e.keyCode == 66) { // 'b' == 66
-    // TODO
     var inGroup = findGroupParent();
-    if(inGroup == currIndex) {
-      if(tinyOpen) { tinyOpen = false;  TINY.box.hide(); }
-      else {
-        if(ez_navigateToggle) {
-          window.history.back();
-        } else {
-          ez_navigate_start();
-        }
-      }
+    if(document.getElementById("tinybox").style.display !== "none") {
+			popupSet();
+		} else if(inGroup == currIndex) {
+			if(ez_navigateToggle) {
+				window.history.back();
+			} else {
+				ez_navigate_start();
+			}
     } else {
       globalSayBefore = "Navigating out of group... ";
       ez_jump(inGroup);
