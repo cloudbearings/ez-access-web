@@ -16,23 +16,24 @@ var EzCustomColor;
 chrome.extension.sendRequest({localstorage: "ezHighlightColor" }, function(response) {
 	EzCustomColor = response.ezHighlightColor;
 });
-var ezNavigate;
-
-chrome.extension.sendRequest({localstorage: "ezNavigate" }, function(response) {
-	ezNavigate = response.ezNavigate;
-});
-
 
 var ezSessionDisable = sessionStorage["ezSessionDisable"];
 var checkingIfEz = function() {
   if(ezSessionDisable == "true") {
 	chrome.extension.sendRequest({ezShow: "true"}, function(response) {});
-  } else if (ezNavigate == 'all' || document.body.getAttribute('data-ez') !== null) {
+  } else if (document.body.getAttribute('data-ez') !== null) {
     // The regular expression produced a match, so notify the background page.
     load_ez();
     chrome.extension.sendRequest({ezShow: "true"}, function(response) {});
-  } else {
+	} else {
     // No match was found.
+		chrome.extension.sendRequest({localstorage: "ezNavigate" }, function(response) {
+			ezNavigate = response.ezNavigate;
+			if(ezNavigate == 'all') {
+				load_ez();
+				chrome.extension.sendRequest({ezShow: "true"}, function(response) {});
+			}
+		});
   }
 }
 addLoadEvent(checkingIfEz);
