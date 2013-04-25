@@ -368,6 +368,16 @@ function ez_navigate_start(propagated) {
         break;
       } // Else, default initial currIndex = 0 (from beginning)
     }
+  } else {
+		if(propagated) {
+			if(document.URL.indexOf("#") != -1) {
+					var jumpTo = document.URL.substring(document.URL.indexOf("#")+1);
+					var idLocation = getCurrIndexById(jumpTo);
+					if(idLocation != -1) {
+						currIndex = idLocation;
+					}
+			}
+		}
   }
   auto_advance_set(); // Find if autoadvancing element
   if(!propagated) {
@@ -449,6 +459,15 @@ function idle_loop(display) {
 function getCurrIndexById(id) {
   for(var i = 0; i < selectElements.length; i++) {
     if(selectElements[i].id == id) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+function getCurrIndexByName(name) {
+	for(var i = 0; i < selectElements.length; i++) {
+    if(selectElements[i].getAttribute('name') == name) {
       return i;
     }
   }
@@ -669,7 +688,27 @@ function getClick(obj) {
 
 function ez_enter() {
   var obj = selectElements[currIndex];
-  if(getClick(obj) !== undefined) {
+  if(obj.tagName == "A") {
+		if(obj.href.indexOf("#") != -1) {
+			var hrefBase = obj.href.substring(0,obj.href.indexOf("#"));
+			var pageBase = window.location.href.substring(0,window.location.href.indexOf("#"));
+			if(hrefBase == "" || hrefBase == pageBase) { // If from same URL base
+				var jumpTo = obj.href.substring(obj.href.indexOf("#")+1);
+				var idLocation = getCurrIndexById(jumpTo);
+				var nameLocation = getCurrIndexByName(jumpTo);
+				if(idLocation != -1) {
+					ez_jump(idLocation);
+					obj.click();
+					return;
+				} else if(nameLocation != -1) {
+					ez_jump(nameLocation);
+					obj.click();
+					return;
+				}
+			}
+		}
+	}
+	if(getClick(obj) !== undefined) {
     obj.click();
   }
   else if(obj.tagName == 'INPUT' && (obj.type == 'radio' || obj.type == 'checkbox') ) {
