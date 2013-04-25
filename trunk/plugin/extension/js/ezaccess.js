@@ -104,7 +104,7 @@ function getElementAudio() {
 var ezSelectorId = 'ezselected';
 
 // Tags that are candidates for highlight
-var COMPATIBLE_TAGS = 'p,img,span,a,div,h1,h2,h3,h4,h5,figure,figcaption,ul,ol,li,input,button,textarea,select,article,aside,hgroup';
+var COMPATIBLE_TAGS = 'p,img,a,div,h1,h2,h3,h4,h5,figure,figcaption,ul,ol,li,input,button,textarea,select,article,aside,hgroup,legend,dt,dd';
 
 // Array of tags generated on pageload initialized globally
 var selectElements;
