@@ -276,6 +276,21 @@ function getElementsByTagNames(list,obj) {
 			resultArray.push(tags[j]);
 		}
 	}
+	var nodeList_parsed = document.querySelectorAll("[data-ez-parse]")
+	
+	var force_parsed=[], l=nodeList_parsed.length>>>0; // Convert to array
+	for( ; l--; force_parsed[l]=nodeList_parsed[l] );
+	
+	for(var i = 0; i < force_parsed.length;) {
+		if(!isDescendant(obj, force_parsed[i])) {
+			force_parsed.splice(i, 1);
+		} else {
+			i++;
+		}
+	}
+	
+	resultArray = resultArray.concat(force_parsed);
+	
 	var testNode = resultArray[0];
 	if (!testNode) return [];
 	if (testNode.sourceIndex) {
@@ -283,12 +298,24 @@ function getElementsByTagNames(list,obj) {
 				return a.sourceIndex - b.sourceIndex;
 		});
 	}
-	else if (testNode.compareDocumentPosition) { // Older brower compat.
+	else if (testNode.compareDocumentPosition) {
 		resultArray.sort(function (a,b) {
 				return 3 - (a.compareDocumentPosition(b) & 6);
 		});
 	}
+	
 	return resultArray;
+}
+
+function isDescendant(parent, child) {
+     var node = child.parentNode;
+     while (node != null) {
+         if (node == parent) {
+             return true;
+         }
+         node = node.parentNode;
+     }
+     return false;
 }
 
 // Event listener if window is resized the selected box will be redrawn
@@ -1006,6 +1033,7 @@ function parseOrphanedText(paragraphTags) {
 				}
 				if (elem.nodeType === 3 && elem.length > 3 && parse) { // > 3 to prevent whitespaces
 						var newElem = document.createElement('span');
+						newElem.setAttribute("data-ez-parse");
 						newElem.innerHTML = elem.nodeValue;
 						elem.parentNode.insertBefore(newElem, elem.nextSibling);
 						para.removeChild(elem);
