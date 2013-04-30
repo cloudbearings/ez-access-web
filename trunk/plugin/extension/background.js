@@ -14,16 +14,15 @@ chrome.extension.onRequest.addListener(
 		} else if(request.localstorage == "ezHighlightColor") {
 			sendResponse({ezHighlightColor: localStorage.ezHighlightColor});
 		} else if(request.tts !== undefined) {
-			var tabid;
 			chrome.tabs.getSelected(null, function(tab) {
-				tabid = tab.id;
+				sessionStorage.setItem("tabid", tab.id);
 			});
 			chrome.tts.speak(request.tts, {
 				'volume': parseFloat(request.volume), 
 				requiredEventTypes: ['end'],
 				onEvent: function(event) {
 					if(event.type === 'end') {
-						chrome.tabs.sendRequest(tabid, {ezTtsState:'done'}, function(response) {
+						chrome.tabs.sendRequest(parseFloat(sessionStorage.getItem("tabid")), {ezTtsState:'done'}, function(response) {
 						});
 					}
 				}
@@ -34,3 +33,9 @@ chrome.extension.onRequest.addListener(
 			sendResponse({}); // snub them.
 		}
 });
+
+	chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
+		if(parseFloat(sessionStorage.getItem("tabid")) == tabId) {
+			chrome.tts.stop();
+		}
+	});
