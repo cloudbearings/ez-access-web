@@ -183,7 +183,11 @@ function voice_object(obj, source, dontGetImplicitLabel) {
 	// obj is a DOM object; parse accordingly
 	
 	var speech = "";
-	var label = get_label(obj, false);
+	if(obj.getAttribute("aria-label")) {
+		var label = obj.getAttribute("aria-label");
+	} else {
+		var label = get_label(obj, false);
+	}
 	
 	// Check if an input type
 	if(obj.tagName == 'INPUT') {
@@ -321,7 +325,11 @@ function voice_object(obj, source, dontGetImplicitLabel) {
   speech = say_replace(obj, speech, source);
   
   if(label !== null) {
-		speech = voice_object(label, source) + speech;
+		if(typeof(label) == "object") {
+			speech = voice_object(label, source) + speech;
+		} else {
+			speech = label + " " + speech;
+		}
 	}
 	
 	return speech;
@@ -855,7 +863,11 @@ function ez_enter() {
   if(obj.tagName == "A") {
 		if(obj.href.indexOf("#") != -1) {
 			var hrefBase = obj.href.substring(0,obj.href.indexOf("#"));
-			var pageBase = window.location.href.substring(0,window.location.href.indexOf("#"));
+			if(window.location.href.indexOf("#") != -1) {
+				var pageBase = window.location.href.substring(0,window.location.href.indexOf("#"));
+			} else {
+				var pageBase = window.location.href;
+			}
 			if(hrefBase == "" || hrefBase == pageBase) { // If from same URL base
 				var jumpTo = obj.href.substring(obj.href.indexOf("#")+1);
 				var idLocation = getCurrIndexById(jumpTo);
@@ -874,8 +886,7 @@ function ez_enter() {
 	}
 	if(getClick(obj) !== undefined) {
     obj.click();
-  }
-  else if(obj.tagName == 'INPUT' && (obj.type == 'radio' || obj.type == 'checkbox') ) {
+  } else if(obj.tagName == 'INPUT' && (obj.type == 'radio' || obj.type == 'checkbox') ) {
     obj.click();
     if(obj.checked) {
       sounds[AUDIO_SELECT].feed.play();
@@ -1170,15 +1181,10 @@ function parseOrphanedText(paragraphTags) {
 				var nextElem = para.childNodes[j+1];
 				var prevElem = para.childNodes[j-1];
 				var parse = false;
-				for(var m = 0; m < COMPATIBLE_TAGS.split(',').length; m++) {
-					if(nextElem !== undefined && nextElem.tagName === COMPATIBLE_TAGS.split(',')[m].toUpperCase()) {
-						parse = true;
-						break;
-					}
-					if(prevElem !== undefined && prevElem.tagName === COMPATIBLE_TAGS.split(',')[m].toUpperCase()) {
-						parse = true;
-						break;
-					}
+				if(nextElem !== undefined) { // && nextElem.tagName === COMPATIBLE_TAGS.split(',')[m].toUpperCase()
+					parse = true;
+				} else if(prevElem !== undefined) { // && prevElem.tagName === COMPATIBLE_TAGS.split(',')[m].toUpperCase()
+					parse = true;
 				}
 				if (elem.nodeType === 3 && elem.length > 3 && parse) { // > 3 to prevent whitespaces
 						var newElem = document.createElement('span');
