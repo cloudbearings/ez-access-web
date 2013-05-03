@@ -156,92 +156,229 @@ var repeatAlert = 0;
 
 // Provide easy place to change method of speech synthesis
 function voice(obj,source,repeat) {
-  var data;
+  var speech = "";
   if(typeof(obj)=='string') {
-    data = obj;
+    speech = obj;
   }
   else {
-    if(obj.tagName == 'INPUT' && getlabelforinput(obj.id) !== null) {
-      data = getlabelforinput(obj.id);
-    }
-    else if(obj.type == 'textarea' || obj.type == 'text') {
-      if(obj.value == '') { data = 'nothing'; }
-      else { data = obj.value; }
-    } else if(obj.getAttribute('aria-labelledby') !== null) {
-      data = document.getElementById(obj.getAttribute('aria-labelledby').split(" ")[0]).textContent;
-    } else if(obj.tagName == 'SELECT') {
-      data = 'Dropdown with ' + obj.length + ' options, selected is ' + obj.value + '... option ' + (obj.selectedIndex+1);
-    }
-    else if(obj.tagName != "IMG") {
-      data = obj.textContent;
-    } else {
-      data = obj.alt;
-    }
-    if(source == 'nav' && obj.getAttribute('data-ez-sayalt-nav') !== null) {
-      data = obj.getAttribute('data-ez-sayalt-nav');
-    }
-    else if(source == 'point' && obj.getAttribute('data-ez-sayalt-point') !== null) {
-      data = obj.getAttribute('data-ez-sayalt-point');
-    }
-    else if(obj.getAttribute('data-ez-sayalt') !== null) {
-      data = obj.getAttribute('data-ez-sayalt');
-    }
-    if(source == 'nav' && obj.getAttribute('data-ez-saybefore-nav') !== null) {
-      data = obj.getAttribute('data-ez-saybefore-nav') + ' ' + data;
-    }
-    else if(source == 'point' && obj.getAttribute('data-ez-saybefore-point') !== null) {
-      data = obj.getAttribute('data-ez-saybefore-point') + ' ' + data;
-    }
-    else if(obj.getAttribute('data-ez-saybefore') !== null) {
-      data = obj.getAttribute('data-ez-saybefore') + ' ' + data;
-    }
-    if(source == 'nav' && obj.getAttribute('data-ez-sayafter-nav') !== null) {
-      data += ' ' + obj.getAttribute('data-ez-sayafter-nav');
-    }
-    else if(source == 'point' && obj.getAttribute('data-ez-sayafter-point') !== null) {
-      data += ' ' + obj.getAttribute('data-ez-sayafter-point');
-    }
-    else if(obj.getAttribute('data-ez-sayafter') !== null) {
-      data += ' ' + obj.getAttribute('data-ez-sayafter');
-    }
-    if(obj.tagName == 'A') {
-      data += " link";
-    }
-    if(obj.tagName == 'BUTTON' || (obj.tagName == 'INPUT' && obj.type == 'button') ) {
-      data += ' button';
-    } else if(obj.tagName == 'INPUT' && obj.type == 'submit' || obj.type == 'image') { // Image acts like submit btn
-      data += ' submit button';
-    } else if(obj.tagName == 'INPUT' && obj.type == 'reset') {
-      data += ' reset button';
-    } else if(obj.tagName == 'INPUT' && obj.type == 'checkbox') {
-      data += ' check box button... ';
-      data += obj.checked ? 'checked' : 'unchecked';
-    } else if(obj.tagName == 'INPUT' && obj.type == 'radio') {
-      data += ' radio button... ';
-      data += obj.checked ? 'checked' : 'unchecked';
-    } else if(obj.tagName == 'INPUT' && obj.type == 'password') {
-      data += ' password input field';
-    } else if(obj.tagName == 'INPUT' && obj.type == 'range') {
-      data += ' slider at ' + obj.value + ' with range from '+obj.min+' to ' + obj.max;
-    }
-    if(obj.type == 'textarea') {
-      data = 'text area contains... ' + data;
-    } else if(obj.type == 'text') {
-      data = 'text field contains... ' + data;
-    }
-  }
+		speech = voice_object(obj, source);
+	}
+  
+  // Global speech appendages
   if(repeat == true) {
-    data = "Repeating... " + data;
+    speech = "Repeating... " + speech;
   }
   if(globalSayBefore != "") {
-    data = globalSayBefore + data;
+    speech = globalSayBefore + speech;
     globalSayBefore = "";
   }
-  if(data.length > 300) { voice("One moment"); } // If speech generation will take a while
-  var req = {"tts": data,
+  if(speech.length > 300) { voice("One moment"); } // If speech generation will take a while
+  
+  var req = {"tts": speech,
 			 "volume": String(audioVolume/100)};
   chrome.extension.sendRequest(req);
 }
+
+function voice_object(obj, source, dontGetImplicitLabel) {
+	// obj is a DOM object; parse accordingly
+	
+	var speech = "";
+	var label = get_label(obj, false);
+	
+	// Check if an input type
+	if(obj.tagName == 'INPUT') {
+		if(obj.type == 'submit') {
+			if(obj.value) {
+				speech = obj.value;
+			} else {
+				speech = "Submit";
+			}
+			speech += " Button";
+		} else if(obj.type == 'reset') {
+			if(obj.value) {
+				speech = obj.value;
+			} else {
+				speech = "Reset";
+			}
+			speech += " Button";
+		} else if(obj.type == 'button') {
+			if(obj.value) {
+				speech = obj.value;
+			}
+			speech += " Button";
+		} else if(obj.type == 'image') {
+			if(obj.title) {
+				speech = obj.title;
+			} else {
+				speech = "Image";
+			}
+		} else if(obj.type == 'radio') {
+			if(label === null) {
+				speech = "Radio Button";
+			}
+			speech += obj.checked ? ' is checked' : ' is unchecked';
+		} else if(obj.type == 'checkbox') {
+			if(label === null) {
+				speech = "Checkbox";
+			}
+			speech += obj.checked ? ' is checked' : ' is unchecked';
+		} else if(obj.type == 'range') {
+      if(label === null) {
+				speech = "Slider";
+			}
+      speech += ' at ' + obj.value + ' with range from '+obj.min+' to ' + obj.max;
+    } else if(obj.type == 'password') {
+      if(label === null) {
+				speech = "Password field";
+			}
+      speech += ' contains ' + obj.value.length + ' characters';
+    } else if(obj.type == 'text') {
+      if(label === null) {
+				speech = "Text field";
+			}
+			if(obj.value) {
+				speech += " contains " + obj.value;
+			} else {
+				speech += " is blank.";
+			}
+    } else if(obj.type == 'email') {
+      if(label === null) {
+				speech = "E-mail field";
+			}
+			if(obj.value) {
+				speech += " contains " + obj.value;
+			} else {
+				speech += " is blank.";
+			}
+    } else if(obj.type == 'search') {
+      if(label === null) {
+				speech = "Search field";
+			}
+			if(obj.value) {
+				speech += " contains " + obj.value;
+			} else {
+				speech += " is blank.";
+			}
+    } else if(obj.type == 'url') {
+      if(label === null) {
+				speech = "Web address field";
+			}
+			if(obj.value) {
+				speech += " contains " + obj.value;
+			} else {
+				speech += " is blank.";
+			}
+    } else if(obj.type == 'tel') {
+      if(label === null) {
+				speech = "Telephone field";
+			}
+			if(obj.value) {
+				speech += " contains " + obj.value;
+			} else {
+				speech += " is blank.";
+			}
+    } else if(obj.type == 'range') {
+      if(label === null) {
+				speech = "Slider";
+			}
+			speech += ' is at ' + obj.value + ' ranging from '+obj.min+' to ' + obj.max;
+    } else if(obj.type == 'number') {
+      if(label === null) {
+				speech = "Number field";
+			}
+			if(obj.value) {
+				speech += " contains " + obj.value;
+			} else {
+				speech += " is blank.";
+			}
+    }
+  } else if(obj.tagName == "BUTTON") {
+		speech = get_inner_alt(obj, source) + " Button";
+	} else if(obj.tagName == "IMG") {
+		if(obj.alt) {
+			speech = obj.alt;
+		} else {
+			speech = "Image";
+		}
+	} else if(obj.tagName == "A") {
+		speech = get_inner_alt(obj, source) + " Link";
+	} else if(obj.tagName == "SELECT") {
+		speech = 'Dropdown with ' + obj.length + ' options, selected is ' + voice_object(obj.options[obj.selectedIndex], source) + '... option ' + (obj.selectedIndex+1);
+	} else if(obj.tagName == "TEXTAREA") {
+		if(label === null) {
+			speech = "Text area";
+		}
+		if(obj.value) {
+			speech += " contains " + obj.value;
+		} else {
+			speech += " is blank.";
+		}
+	} else {
+		speech = get_inner_alt(obj, source);
+	}
+  
+  // Replace override custom EZ Access
+  speech = say_replace(obj, speech, source);
+  
+  if(label !== null) {
+		speech = voice_object(label, source) + speech;
+	}
+	
+	return speech;
+}
+
+function get_inner_alt(obj, source) {
+	var speech = "";
+	for(var i = 0; i < obj.childNodes.length; i++) {
+		if(obj.childNodes[i].nodeType == 3) {
+			speech += obj.childNodes[i].nodeValue;
+		} else if(obj.childNodes[i].nodeType == 1 && obj.tagName !== 'LABEL') {
+			speech += voice_object(obj.childNodes[i], source);
+		}
+	}
+	return speech;
+}
+
+// Sayalt
+function say_replace(obj, speech, source) {
+	
+	// data-ez-sayalt
+	if(source == 'nav' && obj.getAttribute('data-ez-sayalt-nav')) {
+		speech = obj.getAttribute('data-ez-sayalt-nav');
+	}
+	else if(source == 'point' && obj.getAttribute('data-ez-sayalt-point')) {
+		speech = obj.getAttribute('data-ez-sayalt-point');
+	}
+	else if(obj.getAttribute('data-ez-sayalt')) {
+		speech = obj.getAttribute('data-ez-sayalt');
+	}
+	// data-ez-saybefore
+	if(source == 'nav' && obj.getAttribute('data-ez-saybefore-nav')) {
+		speech = obj.getAttribute('data-ez-saybefore-nav') + ' ' + speech;
+	}
+	else if(source == 'point' && obj.getAttribute('data-ez-saybefore-point')) {
+		speech = obj.getAttribute('data-ez-saybefore-point') + ' ' + speech;
+	}
+	else if(obj.getAttribute('data-ez-saybefore')) {
+		speech = obj.getAttribute('data-ez-saybefore') + ' ' + speech;
+	}
+	
+	// data-ez-sayafter
+	if(source == 'nav' && obj.getAttribute('data-ez-sayafter-nav')) {
+		speech += ' ' + obj.getAttribute('data-ez-sayafter-nav');
+	}
+	else if(source == 'point' && obj.getAttribute('data-ez-sayafter-point')) {
+		speech += ' ' + obj.getAttribute('data-ez-sayafter-point');
+	}
+	else if(obj.getAttribute('data-ez-sayafter')) {
+		speech += ' ' + obj.getAttribute('data-ez-sayafter');
+	}
+	
+	return speech;
+	
+}
+
+
 
 function ez_help(alert) {
   var helptext = String(alert);
@@ -861,15 +998,27 @@ function load_jumppoints() {
   }
 }
 
-// For getting 'for' contents of a form button (we have to iterate and look for it)
-function getlabelforinput(inputname) {
-    var labelElements = document.getElementsByTagName("label");
-    for (var i = 0; i < labelElements.length; i++) {
-      if (labelElements[i].getAttribute("for") == inputname) {
-        return labelElements[i].textContent;
-      }
-    }
-    return null;
+// For getting label of any object
+function get_label(obj, dontGetImplicitLabel) {
+	if(obj.tagName == "LABEL") return null;
+	var labelElements = document.getElementsByTagName("label");
+	if(obj.id) {
+		for (var i = 0; i < labelElements.length; i++) {
+			if (labelElements[i].getAttribute("for") == obj.id) {
+				return labelElements[i];
+			}
+		}
+	}
+	if(!dontGetImplicitLabel) {
+		var parentLabel = obj;
+		while(parentLabel !== null) {
+			if(parentLabel.tagName == "LABEL") {
+				return parentLabel;
+			}
+			parentLabel = parentLabel.parentNode;
+		}
+	}
+	return null;
 }
 
 function index_ez() {
@@ -1170,9 +1319,6 @@ function multikey_event(e){
    http://www.dreamincode.net/code/snippet1246.htm */
 function key_event(e) {
   // 'if' keycode statements
-  if(selectElements[currIndex].type == 'textarea' || selectElements[currIndex].type == 'text') {
-    voice(String.fromCharCode(e.keyCode));
-  }
   if(e.keyCode == EZ_KEY_HELP) {
     if(tinyOpen) {
       tinyOpen = false;
@@ -1289,6 +1435,9 @@ function key_event(e) {
         voice("Minimum volume");
       }
     }
+  } else if(selectElements[currIndex].type == 'textarea' || selectElements[currIndex].type == 'text') {
+    var key = String.fromCharCode(e.keyCode);
+    if(!key.match(/[^A-Za-z0-9\-_]/)) voice(key);
   }
   return true;
 }
