@@ -191,7 +191,16 @@ function voice_object(obj, source, dontGetImplicitLabel) {
 	
 	// Check if an input type
 	if(obj.tagName == 'INPUT') {
-		if(obj.type == 'submit') {
+		if(obj.getAttribute('readonly') || obj.getAttribute('disabled')) {
+			if(!label) {
+				speech = "Disabled field ";
+			}
+			if(obj.value) {
+				speech += "is " + obj.value;
+			} else {
+				speech += "is blank.";
+			}
+		} else if(obj.type == 'submit') {
 			if(obj.value) {
 				speech = obj.value;
 			} else {
@@ -217,79 +226,57 @@ function voice_object(obj, source, dontGetImplicitLabel) {
 				speech = "Image";
 			}
 		} else if(obj.type == 'radio') {
-			if(label === null) {
-				speech = "Radio Button";
-			}
+			speech = "Radio Button";
 			speech += obj.checked ? ' is checked' : ' is unchecked';
 		} else if(obj.type == 'checkbox') {
-			if(label === null) {
-				speech = "Checkbox";
-			}
+			speech = "Checkbox";
 			speech += obj.checked ? ' is checked' : ' is unchecked';
 		} else if(obj.type == 'range') {
-      if(label === null) {
-				speech = "Slider";
-			}
+			speech = "Slider";
       speech += ' at ' + obj.value + ' with range from '+obj.min+' to ' + obj.max;
     } else if(obj.type == 'password') {
-      if(label === null) {
-				speech = "Password field";
-			}
+			speech = "Password field";
       speech += ' contains ' + obj.value.length + ' characters';
     } else if(obj.type == 'text') {
-      if(label === null) {
-				speech = "Text field";
-			}
+			speech = "Text field";
 			if(obj.value) {
 				speech += " contains " + obj.value;
 			} else {
 				speech += " is blank.";
 			}
     } else if(obj.type == 'email') {
-      if(label === null) {
-				speech = "E-mail field";
-			}
+			speech = "E-mail field";
 			if(obj.value) {
 				speech += " contains " + obj.value;
 			} else {
 				speech += " is blank.";
 			}
     } else if(obj.type == 'search') {
-      if(label === null) {
-				speech = "Search field";
-			}
+			speech = "Search field";
 			if(obj.value) {
 				speech += " contains " + obj.value;
 			} else {
 				speech += " is blank.";
 			}
     } else if(obj.type == 'url') {
-      if(label === null) {
-				speech = "Web address field";
-			}
+			speech = "Web address field";
 			if(obj.value) {
 				speech += " contains " + obj.value;
 			} else {
 				speech += " is blank.";
 			}
     } else if(obj.type == 'tel') {
-      if(label === null) {
-				speech = "Telephone field";
-			}
+			speech = "Telephone field";
 			if(obj.value) {
 				speech += " contains " + obj.value;
 			} else {
 				speech += " is blank.";
 			}
     } else if(obj.type == 'range') {
-      if(label === null) {
-				speech = "Slider";
-			}
+			speech = "Slider";
 			speech += ' is at ' + obj.value + ' ranging from '+obj.min+' to ' + obj.max;
     } else if(obj.type == 'number') {
-      if(label === null) {
-				speech = "Number field";
-			}
+			speech = "Number field";
 			if(obj.value) {
 				speech += " contains " + obj.value;
 			} else {
@@ -307,11 +294,23 @@ function voice_object(obj, source, dontGetImplicitLabel) {
 	} else if(obj.tagName == "A") {
 		speech = get_inner_alt(obj, source) + " Link";
 	} else if(obj.tagName == "SELECT") {
-		speech = 'Dropdown with ' + obj.length + ' options, selected is ' + voice_object(obj.options[obj.selectedIndex], source) + '... option ' + (obj.selectedIndex+1);
-	} else if(obj.tagName == "TEXTAREA") {
-		if(label === null) {
-			speech = "Text area";
+		if(obj.getAttribute('multiple') || (obj.getAttribute('size') && obj.getAttribute('size') > 1)) {
+			speech = "Multiple selections, selected are ";
+			var total = 0;
+			for(var i = 0; i < obj.length; i++) {
+				if(obj.options[i].selected) {
+					speech += obj.options[i].value + "option " + (i+1) + ", ";
+					total++;
+				}
+			}
+			if(total == 0) {
+				speech += "none";
+			}
+		} else {
+			speech = 'Dropdown, selected is ' + obj.options[obj.selectedIndex].value + '... option ' + (obj.selectedIndex+1) + ' of ' + obj.length + ' options';
 		}
+	} else if(obj.tagName == "TEXTAREA") {
+		speech = "Text area";
 		if(obj.value) {
 			speech += " contains " + obj.value;
 		} else {
