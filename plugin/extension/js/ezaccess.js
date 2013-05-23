@@ -294,20 +294,27 @@ function voice_object(obj, source, dontGetImplicitLabel) {
 	} else if(obj.tagName == "A") {
 		speech = get_inner_alt(obj, source) + " Link";
 	} else if(obj.tagName == "SELECT") {
-		if(obj.getAttribute('multiple') || (obj.getAttribute('size') && obj.getAttribute('size') > 1)) {
-			speech = "Multiple selections, selected are ";
+		if(obj.getAttribute('multiple')) {
+			speech = "Multiple selections menu ";
 			var total = 0;
+			var options = "";
 			for(var i = 0; i < obj.length; i++) {
 				if(obj.options[i].selected) {
-					speech += obj.options[i].value + "option " + (i+1) + ", ";
+					options += obj.options[i].value + "option " + (i+1) + ", ";
 					total++;
 				}
 			}
 			if(total == 0) {
-				speech += "none";
+				speech += "selected are " + options;
+			} else {
+				speech += "is blank";
 			}
 		} else {
-			speech = 'Dropdown, selected is ' + obj.options[obj.selectedIndex].value + '... option ' + (obj.selectedIndex+1) + ' of ' + obj.length + ' options';
+			if(obj.selectedIndex != -1) {
+				speech = 'Menu is ' + obj.options[obj.selectedIndex].value;
+			} else {
+				speech = 'Menu is blank.';
+			}
 		}
 	} else if(obj.tagName == "TEXTAREA") {
 		speech = "Text area";
