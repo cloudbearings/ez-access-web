@@ -526,34 +526,34 @@ function get_inner_alt(obj, source) {
 function say_replace(obj, speech, source) {
 	
 	// data-ez-sayalt
-	if(source == 'nav' && obj.getAttribute('data-ez-sayalt-nav')) {
+	if(source == 'nav' && obj.hasAttribute('data-ez-sayalt-nav')) {
 		speech = obj.getAttribute('data-ez-sayalt-nav');
 	}
-	else if(source == 'point' && obj.getAttribute('data-ez-sayalt-point')) {
+	else if(source == 'point' && obj.hasAttribute('data-ez-sayalt-point')) {
 		speech = obj.getAttribute('data-ez-sayalt-point');
 	}
-	else if(obj.getAttribute('data-ez-sayalt')) {
+	else if(obj.hasAttribute('data-ez-sayalt')) {
 		speech = obj.getAttribute('data-ez-sayalt');
 	}
 	// data-ez-saybefore
-	if(source == 'nav' && obj.getAttribute('data-ez-saybefore-nav')) {
+	if(source == 'nav' && obj.hasAttribute('data-ez-saybefore-nav')) {
 		speech = obj.getAttribute('data-ez-saybefore-nav') + ' ' + speech;
 	}
-	else if(source == 'point' && obj.getAttribute('data-ez-saybefore-point')) {
+	else if(source == 'point' && obj.hasAttribute('data-ez-saybefore-point')) {
 		speech = obj.getAttribute('data-ez-saybefore-point') + ' ' + speech;
 	}
-	else if(obj.getAttribute('data-ez-saybefore')) {
+	else if(obj.hasAttribute('data-ez-saybefore')) {
 		speech = obj.getAttribute('data-ez-saybefore') + ' ' + speech;
 	}
 	
 	// data-ez-sayafter
-	if(source == 'nav' && obj.getAttribute('data-ez-sayafter-nav')) {
+	if(source == 'nav' && obj.hasAttribute('data-ez-sayafter-nav')) {
 		speech += ' ' + obj.getAttribute('data-ez-sayafter-nav');
 	}
-	else if(source == 'point' && obj.getAttribute('data-ez-sayafter-point')) {
+	else if(source == 'point' && obj.hasAttribute('data-ez-sayafter-point')) {
 		speech += ' ' + obj.getAttribute('data-ez-sayafter-point');
 	}
-	else if(obj.getAttribute('data-ez-sayafter')) {
+	else if(obj.hasAttribute('data-ez-sayafter')) {
 		speech += ' ' + obj.getAttribute('data-ez-sayafter');
 	}
 	
@@ -704,7 +704,7 @@ function drawSelected(obj) {
 function ez_navigate_start(propagated) {
   ez_navigateToggle = true;
   sessionStorage.setItem("EZ_Toggle", "1");
-  if(document.body.getAttribute('data-ez-startat') !== null) {
+  if(document.body.hasAttribute('data-ez-startat')) {
     if(propagated) {
       // Of "#<id> #<id>" of second element
       var startid = document.body.getAttribute('data-ez-startat').split(" ")[1].slice(1);
@@ -744,7 +744,7 @@ function groupSkip(move) {
     }
   }
   else if(move == 'up') {
-    if(selectElements[currIndex].getAttribute("data-tmp-jump") !== null) {
+    if(selectElements[currIndex].hasAttribute("data-tmp-jump")) {
       return parseFloat(selectElements[currIndex].getAttribute("data-tmp-jump"));
     }
   }
@@ -826,7 +826,7 @@ function getCurrIndexByName(name) {
 
 // Like ez_navigate("down"), but for when navigating to first element inside a group
 function ez_navigate_in_group() {
-  if(selectElements[currIndex].getAttribute('data-ez-groupdefault') !== null) {
+  if(selectElements[currIndex].hasAttribute('data-ez-groupdefault')) {
     ez_jump(getCurrIndexById(selectElements[currIndex].getAttribute('data-ez-groupdefault').split(' ')[0]));
     return;
   }
@@ -885,7 +885,7 @@ function ez_navigate(move) {
     if(currIndex < findFocusable('last')) {
       selectElements[currIndex].blur(); // Add blur to old element
       repeatAlert = 0;
-      if(allowReorder && selectElements[currIndex].getAttribute('aria-flowto') !== null) {
+      if(allowReorder && selectElements[currIndex].hasAttribute('aria-flowto')) {
         ez_jump(getCurrIndexById(selectElements[currIndex].getAttribute('aria-flowto').split(' ')[0]));
         return;
       }
@@ -930,7 +930,7 @@ function ez_navigate(move) {
     if(currIndex > findFocusable('first')) {
       selectElements[currIndex].blur(); // Add blur to old element
       repeatAlert = 0;
-      if(selectElements[currIndex].getAttribute('data-tmp-flowfrom') !== null) {
+      if(selectElements[currIndex].hasAttribute('data-tmp-flowfrom')) {
         ez_jump(selectElements[currIndex].getAttribute('data-tmp-flowfrom'));
         return;
       }
@@ -975,7 +975,7 @@ function ez_navigate(move) {
 function find_parent_attr(obj,attr) {
 	if(obj == null) { return undefined; }
 	while(obj.nodeType !== 9) {
-		if(obj.getAttribute(attr) !== null) {
+		if(obj.hasAttribute(attr)) {
 			return obj.getAttribute(attr);
 		}
 		obj = obj.parentNode;
@@ -1098,7 +1098,7 @@ function indexElements(world) {
     if(selectElementsTemp[i].getAttribute('data-ez-focusable') == 'false') {
       var children = getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]);
       for(var j = 0; j < children.length+1; j++) {
-        if(selectElementsTemp[i+j].getAttribute('data-ez-focusable') === null || selectElementsTemp[i+j].getAttribute('data-ez-focusable') === 'inherit') {
+        if(!selectElementsTemp[i+j].hasAttribute('data-ez-focusable') || selectElementsTemp[i+j].getAttribute('data-ez-focusable') === 'inherit') {
           selectElementsTemp[i+j].setAttribute('data-ez-focusable','false');
         }
       }
@@ -1106,7 +1106,7 @@ function indexElements(world) {
     if(selectElementsTemp[i].getAttribute('data-ez-focusable-nav') == 'false') { // Like above code for *-nav
       var children = getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]);
       for(var j = 0; j < children.length+1; j++) {
-        if(selectElementsTemp[i+j].getAttribute('data-ez-focusable-nav') === null || selectElementsTemp[i+j].getAttribute('data-ez-focusable-nav') === 'inherit') {
+        if(!selectElementsTemp[i+j].hasAttribute('data-ez-focusable-nav') || selectElementsTemp[i+j].getAttribute('data-ez-focusable-nav') === 'inherit') {
           selectElementsTemp[i+j].setAttribute('data-ez-focusable-nav','false');
         }
       }
@@ -1114,7 +1114,7 @@ function indexElements(world) {
     if(selectElementsTemp[i].getAttribute('data-ez-focusable-point') == 'false') { // Like above code for *-point
       var children = getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]);
       for(var j = 0; j < children.length+1; j++) {
-        if(selectElementsTemp[i+j].getAttribute('data-ez-focusable-point') === null || selectElementsTemp[i+j].getAttribute('data-ez-focusable-point') === 'inherit') {
+        if(!selectElementsTemp[i+j].hasAttribute('data-ez-focusable-point') || selectElementsTemp[i+j].getAttribute('data-ez-focusable-point') === 'inherit') {
           selectElementsTemp[i+j].setAttribute('data-ez-focusable-point','false');
         }
       }
@@ -1123,7 +1123,7 @@ function indexElements(world) {
   
   // Check if ez-chunking == group; if so, group 'em
   for(var i = 0; i < selectElementsTemp.length;) {
-    if(selectElementsTemp[i].getAttribute('data-ez-chunking') == 'group' && selectElementsTemp[i].getAttribute('data-ez-subnavtype') == null) {
+    if(selectElementsTemp[i].getAttribute('data-ez-chunking') == 'group' && !selectElementsTemp[i].hasAttribute('data-ez-subnavtype')) {
       var removeAmount = getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]).length;
       selectElementsTemp.splice(i+1,removeAmount);
       i += removeAmount+1;
@@ -1134,7 +1134,7 @@ function indexElements(world) {
   // Check and remove elements with children if tabindex (excluding grouped stuff).
   if(allowReorder) {
 		for(var i = 0; i < selectElementsTemp.length;) {
-			if(selectElementsTemp[i].getAttribute('tabindex') !== null && getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]).length > 0 && !(selectElementsTemp[i].getAttribute('data-ez-focusable') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-point') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-nav') == 'true')) {
+			if(selectElementsTemp[i].hasAttribute('tabindex') && getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]).length > 0 && !(selectElementsTemp[i].getAttribute('data-ez-focusable') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-point') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-nav') == 'true')) {
 				var removeAmount = getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]).length;
 				selectElementsTemp.splice(i+1,removeAmount);
 				i += removeAmount+1;
@@ -1145,7 +1145,7 @@ function indexElements(world) {
   
   // Check and remove elements with children (excluding grouped stuff). MUST BE LAST THING DONE
   for(var i = 0; i < selectElementsTemp.length;) {
-    if((!allowReorder || selectElementsTemp[i].getAttribute('tabindex') === null) && getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]).length > 0 && selectElementsTemp[i].getAttribute('data-ez-chunking') != 'group' && selectElementsTemp[i].getAttribute('data-ez-chunking') != 'block' && !(selectElementsTemp[i].getAttribute('data-ez-focusable') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-point') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-nav') == 'true')) {
+    if((!allowReorder || !selectElementsTemp[i].hasAttribute('tabindex')) && getElementsByTagNames(COMPATIBLE_TAGS,selectElementsTemp[i]).length > 0 && selectElementsTemp[i].getAttribute('data-ez-chunking') != 'group' && selectElementsTemp[i].getAttribute('data-ez-chunking') != 'block' && !(selectElementsTemp[i].getAttribute('data-ez-focusable') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-point') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-nav') == 'true')) {
       selectElementsTemp.splice(i,1); // Remove entry
     }
     else { i++; }
@@ -1163,7 +1163,7 @@ function clear_jumppoints() {
 function load_jumppoints() {
   for(var i = 0; i < selectElements.length; i++) {
     if(selectElements[i].getAttribute('data-ez-chunking') == 'group' && selectElements[i].getAttribute('data-ez-subnavtype') == 'nested' || selectElements[i].getAttribute('data-ez-subnavtype') == 'hierarchical') {
-      if(selectElements[i].getAttribute('data-ez-focusable-point') === null) {
+      if(!selectElements[i].hasAttribute('data-ez-focusable-point')) {
         selectElements[i].setAttribute('data-ez-focusable-point','false'); // Default pointer navigates INSIDE the element (not on the wrapper)
       }
       
@@ -1181,7 +1181,7 @@ function load_jumppoints() {
       }
       
       var endElement = insideElements.length+i;
-      if(selectElements[endElement].getAttribute('data-tmp-jump') === null) {
+      if(!selectElements[endElement].hasAttribute('data-tmp-jump')) {
         selectElements[endElement].setAttribute('data-tmp-jump',i);
       }
     }
@@ -1238,7 +1238,7 @@ function index_ez() {
 			if(parseFloat(selectElements[i].getAttribute('tabindex')) < 0) {
 				selectElements.splice(i,1); // Skip if < 0
 			}
-			else if(selectElements[i].getAttribute('tabindex') !== null) {
+			else if(selectElements[i].hasAttribute('tabindex')) {
 				tempselectElement[j] = selectElements.splice(i,1)[0];
 				j++;
 			}
@@ -1260,7 +1260,7 @@ function index_ez() {
 
 // On page load, load key_event() listener
 function load_ez() {
-	  if(document.body.getAttribute('data-ez-allowreorder') !== null) {
+	  if(document.body.hasAttribute('data-ez-allowreorder')) {
     allowReorder = true;
   }
   
@@ -1313,7 +1313,7 @@ function load_ez() {
   set_volume(); // If exists from previous page
   
     // "Universal" body tag stuff
-  if(document.body.getAttribute('data-ez-screenwrap') !== null) {
+  if(document.body.hasAttribute('data-ez-screenwrap')) {
     screenWrap = true;
   }
   
@@ -1396,7 +1396,7 @@ function parseOrphanedText(paragraphTags) {
 
 function load_flowfrom() {
   for(var i = 0; i < selectElements.length; i++) {
-    if(allowReorder && selectElements[i].getAttribute('aria-flowto') !== null) {
+    if(allowReorder && selectElements[i].hasAttribute('aria-flowto')) {
       var flowId = selectElements[i].getAttribute('aria-flowto').split(' ')[0]; // In case multiple exist, grab first
       for(var j = 0; j < selectElements.length; j++) {
         if(selectElements[j].id == flowId) {
@@ -1433,7 +1433,7 @@ function mouseOver(e) {
       if(currIndex == i) {
         newElement = false;
       }
-      if(selectElements[i].getAttribute('data-ez-focusable-point') === null && selectElements[i].getAttribute('data-ez-focusable') === null) {
+      if(!selectElements[i].hasAttribute('data-ez-focusable-point') && !selectElements[i].hasAttribute('data-ez-focusable')) {
         // If we're not supposed to navigate here by pointing
         selectElements[currIndex].blur(); // Add blur to old element
         currIndex = i;
