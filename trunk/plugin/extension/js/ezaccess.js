@@ -332,14 +332,26 @@ function voice_object(obj, source) {
 		if(obj.hasAttribute('multiple')) {
 			role = "Multiple-selections menu";
 			var total = 0;
-			var options = "";
+			var selected = new Array();
 			for(var i = 0; i < obj.length; i++) {
 				if(obj.options[i].selected) {
-					options += obj.options[i].value + "option " + (i+1) + ", ";
+					selected.push(obj.options[i].value + "option " + (i+1));
 					total++;
 				}
 			}
-			if(total == 0) {
+			var options = "";
+			for(var i = 0; i < selected.length; i++) {
+				if(i == selected.length-1 && selected.length > 1) {
+					options += " and " + selected[i];
+				} else if(i == 0) {
+					options += selected[i];
+				} else {
+					options += ", " + selected[i];
+				}
+			}
+			if(total == 1) {
+				value += "selected is " + options;
+			} else if(total != 0) {
 				value += "selected are " + options;
 			} else {
 				value += "is blank";
