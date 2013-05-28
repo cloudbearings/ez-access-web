@@ -179,7 +179,7 @@ function voice(obj,source,repeat) {
   chrome.extension.sendRequest(req);
 }
 
-function voice_object(obj, source, dontGetImplicitLabel) {
+function voice_object(obj, source) {
 	/**
 	 * The name or label of the interactive object.
 	 */
@@ -422,10 +422,10 @@ function getName(obj, source, defaultString) {
 	} else if(obj.hasAttribute('aria-label')) {
 		ret = obj.getAttribute('aria-label');
 	} else {
-		var label = get_label(obj, false);
+		var label = get_label(obj);
 		if(label !== null) {
 			if(typeof label === "object") {
-				ret = get_inner_alt(label, source);
+				ret = say_replace(label, get_inner_alt(label, source), source);
 			} else {
 				ret = label;
 			}
@@ -1173,7 +1173,7 @@ function load_jumppoints() {
 }
 
 // For getting label of any object
-function get_label(obj, dontGetImplicitLabel) {
+function get_label(obj) {
 	if(obj.tagName == "LABEL") return null;
 	var labelElements = document.getElementsByTagName("label");
 	if(obj.id) {
@@ -1183,14 +1183,12 @@ function get_label(obj, dontGetImplicitLabel) {
 			}
 		}
 	}
-	if(!dontGetImplicitLabel) {
-		var parentLabel = obj;
-		while(parentLabel !== null) {
-			if(parentLabel.tagName == "LABEL") {
-				return parentLabel;
-			}
-			parentLabel = parentLabel.parentNode;
+	var parentLabel = obj;
+	while(parentLabel !== null) {
+		if(parentLabel.tagName == "LABEL") {
+			return parentLabel;
 		}
+		parentLabel = parentLabel.parentNode;
 	}
 	return null;
 }
