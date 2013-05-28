@@ -180,122 +180,157 @@ function voice(obj,source,repeat) {
 }
 
 function voice_object(obj, source, dontGetImplicitLabel) {
-	// obj is a DOM object; parse accordingly
+	/**
+	 * The name or label of the interactive object.
+	 */
+	var name = '';
 	
-	var speech = "";
-	if(obj.getAttribute("aria-label")) {
-		var label = obj.getAttribute("aria-label");
-	} else {
-		var label = get_label(obj, false);
-	}
+	/**
+	 * The role or type of interactive object.
+	 */
+	var role = '';
+	
+	/**
+	 * The value or status of the interactive object along with a connecting
+	 * phrase.
+	 */
+	var value = '';
+	
+	/**
+	 * Extra spoken information that follows the value.
+	 */
+	var extra = '';
+	
+	/**
+	 * The concatenated speech string that will be returned from this function.
+	 */
+	var speech = '';
+
+	// obj is a DOM object; parse accordingly
 	
 	// Check if an input type
 	if(obj.tagName == 'INPUT') {
-		if(obj.getAttribute('readonly') || obj.getAttribute('disabled')) {
-			if(!label) {
-				speech = "Disabled field ";
-			}
+		if(obj.hasAttribute('readonly') || obj.hasAttribute('disabled')) {
+			name = "Disabled field";
 			if(obj.value) {
-				speech += "is " + obj.value;
+				value = 'is ' + obj.value;
 			} else {
-				speech += "is blank.";
+				value = 'is blank';
 			}
 		} else if(obj.type == 'submit') {
-			if(obj.value) {
-				speech = obj.value;
+			if(obj.hasAttribute('value')) {
+				name = obj.value;
 			} else {
-				speech = "Submit";
+				name = "Submit";
 			}
-			speech += " Button";
+			role = "Button";
 		} else if(obj.type == 'reset') {
-			if(obj.value) {
-				speech = obj.value;
+			if(obj.hasAttribute('value')) {
+				name = obj.value;
 			} else {
-				speech = "Reset";
+				name = "Reset";
 			}
-			speech += " Button";
+			role = "Button";
 		} else if(obj.type == 'button') {
-			if(obj.value) {
-				speech = obj.value;
+			if(obj.hasAttribute('value')) {
+				name = obj.value;
 			}
-			speech += " Button";
+			role = "Button";
 		} else if(obj.type == 'image') {
-			if(obj.title) {
-				speech = obj.title;
+			//alt is preferred, title is second choice
+			if(obj.hasAttribute('alt')) {
+				name = obj.alt;
+			} else if(obj.title) {
+				name = obj.title;
 			} else {
-				speech = "Image";
+				name = "Image";
 			}
+			role = "image input";
 		} else if(obj.type == 'radio') {
-			speech = "Radio Button";
-			speech += obj.checked ? ' is checked' : ' is unchecked';
+			role = "Radio Button";
+			value = obj.checked ? 'is checked' : 'is unchecked';
 		} else if(obj.type == 'checkbox') {
-			speech = "Checkbox";
-			speech += obj.checked ? ' is checked' : ' is unchecked';
+			role = "Checkbox";
+			value = obj.checked ? 'is checked' : 'is unchecked';
 		} else if(obj.type == 'range') {
-			speech = "Slider";
-      speech += ' at ' + obj.value + ' with range from '+obj.min+' to ' + obj.max;
-    } else if(obj.type == 'password') {
-			speech = "Password field";
-      speech += ' contains ' + obj.value.length + ' characters';
-    } else if(obj.type == 'text') {
-			speech = "Text field";
-			if(obj.value) {
-				speech += " contains " + obj.value;
+			role = "Slider";
+			value = 'is at ' + obj.value;
+			if(obj.hasAttribute('min') && obj.hasAttribute('max')) {
+				extra = 'and ranges from ' + obj.min + ' to ' + obj.max;
+			//The following are "sort of" error cases
+			} else if(obj.hasAttribute('min')) {
+				//With no max, Chrome returns '' but uses 100
+				extra = 'and ranges from ' + obj.min + ' to 100';
+			} else if(obj.hasAttribute('max')) {
+				//With no min, Chrome returns '' but uses 0
+				extra = 'and ranges from 0 to ' + obj.max;
 			} else {
-				speech += " is blank.";
+				extra = 'and ranges from 0 to 100';
 			}
-    } else if(obj.type == 'email') {
-			speech = "E-mail field";
+		} else if(obj.type == 'password') {
+			role = "Password field";
+			value = 'contains ' + obj.value.length + ' characters';
+		} else if(obj.type == 'text') {
+			role = "Text field";
 			if(obj.value) {
-				speech += " contains " + obj.value;
+				value = "contains " + obj.value;
 			} else {
-				speech += " is blank.";
+				value = "is blank";
 			}
-    } else if(obj.type == 'search') {
-			speech = "Search field";
+		} else if(obj.type == 'email') {
+			role = "E-mail field";
 			if(obj.value) {
-				speech += " contains " + obj.value;
+				value = "contains " + obj.value;
 			} else {
-				speech += " is blank.";
+				value = "is blank";
 			}
-    } else if(obj.type == 'url') {
-			speech = "Web address field";
+		} else if(obj.type == 'search') {
+			role = "Search field";
 			if(obj.value) {
-				speech += " contains " + obj.value;
+				value = "contains " + obj.value;
 			} else {
-				speech += " is blank.";
+				value = "is blank";
 			}
-    } else if(obj.type == 'tel') {
-			speech = "Telephone field";
+		} else if(obj.type == 'url') {
+			role = "Web address field";
 			if(obj.value) {
-				speech += " contains " + obj.value;
+				value = "contains " + obj.value;
 			} else {
-				speech += " is blank.";
+				value = "is blank.";
 			}
-    } else if(obj.type == 'range') {
-			speech = "Slider";
-			speech += ' is at ' + obj.value + ' ranging from '+obj.min+' to ' + obj.max;
-    } else if(obj.type == 'number') {
-			speech = "Number field";
+		} else if(obj.type == 'tel') {
+			role = "Telephone field";
 			if(obj.value) {
-				speech += " contains " + obj.value;
+				value = "contains " + obj.value;
 			} else {
-				speech += " is blank.";
+				value = "is blank";
 			}
-    }
-  } else if(obj.tagName == "BUTTON") {
-		speech = get_inner_alt(obj, source) + " Button";
-	} else if(obj.tagName == "IMG") {
-		if(obj.alt) {
-			speech = obj.alt;
-		} else {
-			speech = "Image";
+		} else if(obj.type == 'number') {
+			role = "Number field"; //spinner in Chrome
+			if(obj.value) {
+				value = "contains " + obj.value;
+			} else {
+				value = "is blank";
+			}
 		}
-	} else if(obj.tagName == "A") {
-		speech = get_inner_alt(obj, source) + " Link";
+	} else if(obj.tagName == "BUTTON") {
+		//TODO - check the output
+		name = get_inner_alt(obj, source);
+		role = 'Button';
+	} else if(obj.tagName == "IMG") { //TODO - check if necessary
+		if(obj.alt) {
+			name = obj.alt;
+		} else {
+			role = "Image";
+		}
+	} else if(obj.tagName == "A" && obj.hasAttribute('href')) {
+		name = get_inner_alt(obj, source); 
+		role = 'Link';
+		//Override the speech output for <a href="...">
+		speech = role + ': ' + name;
 	} else if(obj.tagName == "SELECT") {
-		if(obj.getAttribute('multiple')) {
-			speech = "Multiple selections menu ";
+		if(obj.hasAttribute('multiple')) {
+			role = "Multiple-selections menu";
 			var total = 0;
 			var options = "";
 			for(var i = 0; i < obj.length; i++) {
@@ -305,41 +340,163 @@ function voice_object(obj, source, dontGetImplicitLabel) {
 				}
 			}
 			if(total == 0) {
-				speech += "selected are " + options;
+				value += "selected are " + options;
 			} else {
-				speech += "is blank";
+				value += "is blank";
 			}
 		} else {
 			if(obj.selectedIndex != -1) {
-				speech = 'Menu is ' + obj.options[obj.selectedIndex].value;
+				role = 'Menu';
+				value = 'is ' + obj.options[obj.selectedIndex].value;
 			} else {
-				speech = 'Menu is blank.';
+				role = 'Menu';
+				value = 'is blank';
 			}
 		}
 	} else if(obj.tagName == "TEXTAREA") {
-		speech = "Text area";
+		role = "Text area";
 		if(obj.value) {
-			speech += " contains " + obj.value;
+			value = "contains " + obj.value;
 		} else {
-			speech += " is blank.";
+			value = "is blank";
 		}
 	} else {
 		speech = get_inner_alt(obj, source);
 	}
-  
-  // Replace override custom EZ Access
-  speech = say_replace(obj, speech, source);
-  
-  if(label !== null) {
-		if(typeof(label) == "object") {
-			speech = voice_object(label, source) + speech;
-		} else {
-			speech = label + " " + speech;
-		}
-	}
 	
+	
+	/**
+	 * Get name, role, and value which might override the ones found above
+	 */
+	name = getName(obj, source, name);
+	role = getRole(obj, role);
+	value = getValue(obj, value);
+	
+	/**
+	 * Default concatenation for the speech string to be returned.
+	 * This can be overridden if the speech string has already been defined.
+	 */
+	if (speech === '') {
+		speech = name + ' ' + role + ' ' + value + ' ' + extra + '.';
+	}
+
+	// Replace override custom EZ Access
+	speech = say_replace(obj, speech, source);
+
 	return speech;
 }
+
+/**
+ * This function looks for potential names for the element 
+ * by looking at different ways of labeling that control type.
+ * In precedence order, the name will be the object's:
+ * data-ez-sayname > aria-labelledby > aria-label > <label> > defaultString
+ * @author J. Bern Jordan
+ * @param {DOM Object} obj The DOM object for which to get an 
+ * accessible name.
+ * @param {String} source The source modality: either 'nav' for navigation or
+ * 'point' for pointing.
+ * @param {String} [defaultString=''] A default string for the object's
+ * name if a more appropriate one is not found.
+ * @return {String} An accessible name for the passed object. 
+ * The returned string is the default string if an overriding 
+ * accessible name is not found.
+ */
+function getName(obj, source, defaultString) {
+	'use strict';
+	var ret;
+
+	if (defaultString === undefined) {
+		ret = '';
+	} else {
+		ret = defaultString;
+	}
+
+	if (obj.hasAttribute('aria-labelledby')) {
+		ret = '';
+		var labelIDs = obj.getAttribute('aria-labelledby').split(' ');
+		for (var i = 0; i < labelIDs.length; i++) {
+			ret += document.getElementById(labelIDs[i]).textContent;
+			ret += ' ';
+		}
+	} else if(obj.hasAttribute('aria-label')) {
+		ret = obj.getAttribute('aria-label');
+	} else {
+		var label = get_label(obj, false);
+		if(label !== null) {
+			if(typeof label === "object") {
+				ret = get_inner_alt(label, source);
+			} else {
+				ret = label;
+			}
+		}
+	}
+
+	return ret;
+} //End function getName()
+
+/**
+ * This function looks for a potential role string and returns it.
+ * In precedence order, the role string will be the object's:
+ * data-ez-sayrole > aria-role > defaultString
+ * @author J. Bern Jordan
+ * @param {DOM Object} obj The DOM object for which to get role.
+ * @param {String} [defaultString=''] A default string for the object's 
+ * role if a more appropriate one is not found.
+ * @return {String} An accessible role for the passed object. 
+ * The returned string is the default if an overriding role
+ * is not found.
+ */
+ function getRole(obj, defaultString) {
+	'use strict';
+	var ret;
+	if (defaultString === undefined) {
+		ret = '';
+	} else {
+		ret = defaultString;
+	}
+
+	if(obj.hasAttribute('data-ez-sayrole')) {
+		ret = obj.getAttribute('data-ez-sayrole');
+	} else if (obj.hasAttribute('aria-role')) {
+		ret = obj.getAttribute('aria-role');
+	}
+
+	return ret;
+} //End function getRole()
+
+/**
+ * This function looks for a potential value string and returns it.
+ * In precedence order, the value string will be the object's:
+ * data-ez-sayvalue > aria-valuetext > aria-valuenow > defaultString
+ * @author J. Bern Jordan
+ * @param {DOM Object} obj The DOM object for which to get role.
+ * @param {String} [defaultString=''] A default string for the object's 
+ * role if a more appropriate one is not found.
+ * @return {String} An value for the passed object. The returned string is 
+ * the dafaultString if an overriding value is not found.
+ */
+ function getValue(obj, defaultString) {
+	'use strict';
+	var ret;
+	if (defaultString === undefined) {
+		ret = '';
+	} else {
+		ret = defaultString;
+	}
+
+	if(obj.hasAttribute('data-ez-sayvalue')) {
+		ret = obj.getAttribute('data-ez-sayvalue');
+	} else if (obj.hasAttribute('aria-valuetext')) {
+		//may wish to check if aria-valuetext is blank
+		ret = 'is ' + obj.getAttribute('aria-valuetext');
+	} else if (obj.hasAttribute('aria-valuenow')) {
+		ret = 'is ' + obj.getAttribute('aria-valuenow');
+	}
+
+	return ret;
+} //End function getValue()
+
 
 function get_inner_alt(obj, source) {
 	var speech = "";
