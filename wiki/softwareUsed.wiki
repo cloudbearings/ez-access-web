@@ -1,4 +1,4 @@
-#summary One-sentence summary of this page.
+#summary Overview of 3rd party code used in this project.
 
 = Main libraries/software =
 
