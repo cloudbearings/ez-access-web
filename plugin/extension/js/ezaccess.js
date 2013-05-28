@@ -624,6 +624,9 @@ function getElementsByTagNames(list,obj) {
 		});
 	}
 	
+	// We must remove leaves before ANY parsing.
+  setLeaves(resultArray);
+  
 	return resultArray;
 }
 
@@ -1089,6 +1092,7 @@ function ez_enter() {
 function indexElements(world) {  
   // INITIAL INDEXING OF PAGE ELEMENTS
   selectElementsTemp = getElementsByTagNames(COMPATIBLE_TAGS,world);
+  
   // Check if ez-focusable to remove (+ CHILDREN)
   for(var i = 0; i < selectElementsTemp.length;i++) {
     if(selectElementsTemp[i].getAttribute('data-ez-focusable') == 'false') {
@@ -1203,6 +1207,22 @@ function get_label(obj) {
 		parentLabel = parentLabel.parentNode;
 	}
 	return null;
+}
+
+function isChildOfElType(obj, type) {
+	if(obj.tagName == undefined) return false;
+	if(obj.tagName.toLowerCase() == type.toLowerCase()) return true;
+	return isChildOfElType(obj.parentNode, type);
+}
+
+function setLeaves(elements) {
+	for(var i = 0; i < elements.length; ) {
+		if(isChildOfElType(elements[i].parentNode, 'INPUT') || isChildOfElType(elements[i].parentNode, 'BUTTON')) {
+			elements.splice(i, 1);
+		} else {
+			i++;
+		}
+	}
 }
 
 function index_ez() {
