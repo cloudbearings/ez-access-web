@@ -625,7 +625,7 @@ function getElementsByTagNames(list,obj) {
 	}
 	
 	// We must remove leaves before ANY parsing.
-  setLeaves(resultArray);
+  resultArray = setLeaves(resultArray);
   
 	return resultArray;
 }
@@ -870,14 +870,16 @@ function findFocusable(location) {
 	return null;
 }
 
-function ez_navigate(move) {
-	var currElement = selectElements[currIndex];
-	index_ez();
-	currIndex = 0;
-	for(var i = 0; i < selectElements.length; i++) {
-		if(selectElements[i] == currElement) {
-			currIndex = i;
-			break;
+function ez_navigate(move, noParse) {
+	if(!noParse) {
+		var currElement = selectElements[currIndex];
+		index_ez();
+		currIndex = 0;
+		for(var i = 0; i < selectElements.length; i++) {
+			if(selectElements[i] == currElement) {
+				currIndex = i;
+				break;
+			}
 		}
 	}
 	
@@ -898,7 +900,7 @@ function ez_navigate(move) {
       currIndex++;
       if(selectElements[currIndex].getAttribute('data-ez-focusable-nav') == 'false' || selectElements[currIndex].getAttribute('data-ez-focusable') == 'false') { ez_navigate('down'); return; }
       // If the element location cannot be found; loop through.
-      if(!drawSelected(selectElements[currIndex])) { ez_navigate('down'); return; }
+      if(!drawSelected(selectElements[currIndex])) { ez_navigate('down', true); return; }
 			auto_advance_set(); // Find if autoadvancing element
       sounds[getElementAudio()].feed.play();
       selectElements[currIndex].focus(); // Add focus to new element
@@ -914,7 +916,7 @@ function ez_navigate(move) {
         if(screenWrap) {
           currIndex = findFocusable('first');
           repeatAlert = 0;
-          if(!drawSelected(selectElements[currIndex])) { ez_navigate('down'); return; }
+          if(!drawSelected(selectElements[currIndex])) { ez_navigate('down', true); return; }
           sounds[getElementAudio()].feed.play();
           voice(selectElements[currIndex],'nav');
         } else {
@@ -942,7 +944,7 @@ function ez_navigate(move) {
       if(groupSkip('up') != false) {
         currIndex = groupSkip('up');
       }
-      if(!drawSelected(selectElements[currIndex])) { ez_navigate('up'); return; }
+      if(!drawSelected(selectElements[currIndex])) { ez_navigate('up', true); return; }
 			auto_advance_set(); // Find if autoadvancing element
       sounds[getElementAudio()].feed.play();
       selectElements[currIndex].focus(); // Add focus to new element
@@ -958,7 +960,7 @@ function ez_navigate(move) {
         if(screenWrap) {
           currIndex = findFocusable('last');
           repeatAlert = 0;
-          if(!drawSelected(selectElements[currIndex])) { ez_navigate('up'); return; }
+          if(!drawSelected(selectElements[currIndex])) { ez_navigate('up', true); return; }
           sounds[getElementAudio()].feed.play();
           voice(selectElements[currIndex],'nav');
         } else {
@@ -1223,6 +1225,7 @@ function setLeaves(elements) {
 			i++;
 		}
 	}
+	return elements;
 }
 
 function index_ez() {
