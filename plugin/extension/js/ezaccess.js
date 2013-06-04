@@ -273,7 +273,7 @@ function voice_object(obj, source) {
 		} else if(obj.type == 'text') {
 			role = "Text field";
 			if(obj.value) {
-				value = "contains " + obj.value;
+				value = "contains " + getTypedSpeech(obj.value);
 			} else {
 				value = "is blank";
 			}
@@ -308,7 +308,7 @@ function voice_object(obj, source) {
 		} else if(obj.type == 'number') {
 			role = "Number field"; //spinner in Chrome
 			if(obj.value) {
-				value = "contains " + obj.value;
+				value = "is " + obj.value;
 			} else {
 				value = "is blank";
 			}
@@ -368,7 +368,7 @@ function voice_object(obj, source) {
 	} else if(obj.tagName == "TEXTAREA") {
 		role = "Text area";
 		if(obj.value) {
-			value = "contains " + obj.value;
+			value = "contains " + getTypedSpeech(obj.value);
 		} else {
 			value = "is blank";
 		}
@@ -1794,4 +1794,55 @@ function getElementAbsolutePos(elemID) {
       return false;
     }
     return res;  
+}
+
+/**
+ * This function provides speech output for strings that the user has typed.
+ * The speech output spells the last word or partial word entered if the 
+ * string passed ends with an alphabetical character.
+ * TODO: Make function more robust so that the last word's spelling cannot
+ * include punctuation or other chars.
+ * NOTE: This function only supports ASCII alphabetical characters at this 
+ * point.
+ * @author J. Bern Jordan
+ * @param {string} s The string to be parsed into speech output
+ * @return {string} The string for the speech output
+ */
+function getTypedSpeech(s) {
+	/**
+	 * Regular expression for alphabetical characters in ASCII.
+	 * NOTE: It would seem to be better to also allow for non-ASCII letters 
+	 * using something like: http://xregexp.com/
+	 * @const
+	 */
+	var ALPHABET_CHAR = /[a-zA-Z]/;
+
+	if (s.slice(-1).search(ALPHABET_CHAR) === -1) {
+		return s;
+	} //else the last letter is an alphabetical character
+	
+	/** The string to be returned */
+	var ret;
+	/** An array of words that were separated by spaces in s */
+	var words;
+	/** The last word in s (follwing the last space) */
+	var lastWord;
+	/** The last word spelled character by character */
+	var spelledWord;
+	
+	words = s.split(' ');
+	lastWord = words.pop();
+	
+	spelledWord = '';
+	for (var i=0; i < lastWord.length; i++) {
+		spelledWord += lastWord.charAt(i);
+		if (i < lastWord.length-1) {
+			spelledWord += ', ';
+		}
+	}
+	
+	ret = words.join(' ');
+	ret += ' ' + spelledWord;
+
+	return ret;
 }
