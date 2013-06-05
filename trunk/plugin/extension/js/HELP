@@ -1,0 +1,23 @@
+DOCUMENT STRUCTURE LAST MODIFIED:
+-- 6/5/2013
+
+ezaccess.js
+-- Initializing, stopping and parsing JS
+eznav.js
+-- Navigation (keyboard + touch)
+ezhelpers.js
+-- More/less generic JS functions, usually looking at the DOM,
+   to help out EZ Access
+ezsound.js
+-- Loading and finding sounds for navigating
+ezvoice.js
+-- EZ Access DOM object parsing in terms of speech synthesis, from creating 
+   the spoken strings to more technical aspects of it
+ezhelp.js
+-- EZ Help dialogue parsing
+hammer.js
+-- Multitouch support library
+tinybox.js
+-- Lightbox support library
+HELP
+-- This document
