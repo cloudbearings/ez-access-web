@@ -4,6 +4,14 @@ var repeatAlert = 0;
 // Global text to be read before next speech synthesis; can be set anywhere
 var globalSayBefore = "";
 
+/**
+  * Regular expression for alphabetical characters in ASCII.
+  * NOTE: It would seem to be better to also allow for non-ASCII letters 
+  * using something like: http://xregexp.com/
+  * @const
+  */
+ var ALPHABET_CHAR = /[a-zA-Z]/;
+
 
 // Provide easy place to change method of speech synthesis
 function voice(obj,source,repeat) {
@@ -416,49 +424,70 @@ function say_replace(obj, speech, source) {
  * This function provides speech output for strings that the user has typed.
  * The speech output spells the last word or partial word entered if the 
  * string passed ends with an alphabetical character.
- * TODO: Make function more robust so that the last word's spelling cannot
- * include punctuation or other chars.
- * NOTE: This function only supports ASCII alphabetical characters at this 
- * point.
+ * NOTE: This function only supports alphabetical characters provided in the
+ * ALPHABET_CHAR regex constant.
  * @author J. Bern Jordan
  * @param {string} s The string to be parsed into speech output
+ * @param {Regex} [regex=ALPHABET_CHAR] The regular expression object that is 
+ * to be used for alphabetic characters.
  * @return {string} The string for the speech output
  */
-function getTypedSpeech(s) {
-        /**
-         * Regular expression for alphabetical characters in ASCII.
-         * NOTE: It would seem to be better to also allow for non-ASCII letters 
-         * using something like: http://xregexp.com/
-         * @const
-         */
-        var ALPHABET_CHAR = /[a-zA-Z]/;
+function getTypedSpeech(s, regex) {
+  /** The regex object for finding alphabet characters */
+  var alphaChars;
+  if (re === undefined) {
+    alphaChars = ALPHABET_CHAR;
+  } else {
+    alphaChars = regex;
+  }
 
-        if (s.slice(-1).search(ALPHABET_CHAR) === -1) {
-                return s;
-        } //else the last letter is an alphabetical character
-        
-        /** The string to be returned */
-        var ret;
-        /** An array of words that were separated by spaces in s */
-        var words;
-        /** The last word in s (follwing the last space) */
-        var lastWord;
-        /** The last word spelled character by character */
-        var spelledWord;
-        
-        words = s.split(' ');
-        lastWord = words.pop();
-        
-        spelledWord = '';
-        for (var i=0; i < lastWord.length; i++) {
-                spelledWord += lastWord.charAt(i);
-                if (i < lastWord.length-1) {
-                        spelledWord += ', ';
-                }
-        }
-        
-        ret = words.join(' ');
-        ret += ' ' + spelledWord;
-
-        return ret;
+	if (s.slice(-1).search(alphaChars) === -1) {
+		return s;
+	} //else the last letter is an alphabetical character
+	
+	/** The string to be returned */
+	var ret;
+	/** An array of words that were separated by spaces in s */
+	var words;
+	/**
+	 * An array of letters of the last partial word in s, which is 
+	 * separated by a space from earlier words and ends with the last
+	 * non-alphabet character in the final word string.
+	 */
+	var penultimateWord;
+	/** 
+	 * An array of letters in the last word (or part of a word if 
+	 * it contains non-alphabet characters). This word/part of a word
+	 * will be spelled letter-by-letter.
+	 */
+	var lastWord = [];
+	/** The last word spelled character by character */
+	var spelledWord;
+	/** while-loop control boolean */
+	var done = false;
+	
+	words = s.split(' ');
+	penultimateWord = words.pop().split('');
+	
+  //Split the last space-delimited "word" into two if it contains other than 
+  //alphabet chars.
+	while (!done) {
+		if (penultimateWord[penultimateWord.length-1].search(alphaChars) !== -1) {
+			lastWord.unshift(penultimateWord.pop());
+		} else {
+			done = true;
+		}
+		
+		if (penultimateWord <= 0) {
+			done = true;
+		}
+	}
+	
+  //Concatenate and return the ret string
+	ret = words.join(' ');
+	if (penultimateWord.length > 0) {
+		ret += ' ' + penultimateWord.join('');
+	}
+	ret += ' ' + lastWord.join(', ');
+	return ret;
 }
