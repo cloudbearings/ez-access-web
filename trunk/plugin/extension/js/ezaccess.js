@@ -2,7 +2,7 @@
 var ezSelectorId = 'ezselected';
 
 // Tags that are candidates for highlight
-var COMPATIBLE_TAGS = 'p,img,a,div,h1,h2,h3,h4,h5,figure,figcaption,ul,ol,li,input,button,textarea,select,article,aside,hgroup,legend,dt,dd';
+var COMPATIBLE_TAGS = 'p,img,a,div,h1,h2,h3,h4,h5,figure,figcaption,ul,ol,li,input,button,textarea,select,article,aside,hgroup,legend,dt,dd,label';
 
 // Array of tags generated on pageload initialized globally
 var selectElements;
@@ -67,14 +67,38 @@ function getElementsByTagNames(list,obj) {
 	// We must remove leaves before ANY parsing.
   resultArray = setLeaves(resultArray);
   
+  // Remove labels with references
+  resultArray = removeNonOrphanedLabels(resultArray);
+  
 	return resultArray;
+}
+
+function removeNonOrphanedLabels(elements) {
+	for(var i = 0; i < elements.length; ) {
+		if(elements[i].tagName === 'LABEL' && !orphanedLabel(elements[i])) {
+			elements.splice(i, 1);
+		} else {
+			i++;
+		}
+	}
+	return elements;
+}
+
+function orphanedLabel(element) {
+	if(element.htmlFor == '') {
+		return true;
+	}
+	if(getElementsByTagNames(COMPATIBLE_TAGS,element).length > 0) {
+		return true;
+	}
+	return false;
 }
 
 function index_ez() {
   parseOrphanedText(getElementsByTagNames('p'));
   
   selectElements = indexElements(document);
-  
+    
   if(allowReorder) {
 	  // Sorting by tabindex
 	  var tempselectElement = [];

@@ -72,7 +72,7 @@ function get_label(obj) {
 	}
 	var parentLabel = obj;
 	while(parentLabel !== null) {
-		if(parentLabel.tagName == "LABEL") {
+		if(parentLabel.tagName === "LABEL") {
 			return parentLabel;
 		}
 		parentLabel = parentLabel.parentNode;
