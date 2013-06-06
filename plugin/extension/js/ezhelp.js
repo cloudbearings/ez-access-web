@@ -50,73 +50,73 @@ TERMINATOR = '||';
  * @return {null|string[]} The help layers (or null if there are no help layers).
  */
 function getHelpArray(obj) {
-        'use strict';
-        /**
-         * The return, which is either an array of strings with each help layer or
-         * null if there are no help layers associated with obj.
-         */
-        var ret;
-        /**
-         * The value of the data-ez-help attribute.
-         * @type {string}
-         */
-        var attr;
-        /**
-         * Whether the function should end or not.
-         * @type {boolean}
-         */
-        var end;
-        
-        if (obj.hasAttribute('data-ez-help')) {
-                attr = obj.getAttribute('data-ez-help');
-                
-                //See if this function needs to make a recursive call
-                if (attr.slice(-TERMINATOR.length) === TERMINATOR) {
-                        end = true;
-                } else {
-                        end = false;
-                }
-                
-                ret = attr.split(DELIMITER);
-                                
-                for (var i=0; i<ret.length; ) {
-												if(ret[i] == '' || ret[i] === null) {
-													ret.splice(i,1);
-												} else {
-													var parsedRet = parseHelpPageString(ret[i]);
-													// Merge this array at pos; delete ret[i]
-													ret.splice(i, 1);
-													ret.splice.apply(ret, [i, 0].concat(parsedRet));
-													i += parsedRet.length;
-												}
-                }       
-        } else {
-                ret = null;
-        }
+	'use strict';
+	/**
+	 * The return, which is either an array of strings with each help layer or
+	 * null if there are no help layers associated with obj.
+	 */
+	var ret;
+	/**
+	 * The value of the data-ez-help attribute.
+	 * @type {string}
+	 */
+	var attr;
+	/**
+	 * Whether the function should end or not.
+	 * @type {boolean}
+	 */
+	var end;
 
-        /**
-         * This function may be called recursively on parent elements.
-         */
-        if (!end) {
-                var parent = obj.parentNode;
-                
-                //End the recursion because there are no more parent elements
-                if (parent === null || parent.tagName === 'HTML') {
-                        return ret;
-                }
-                
-                var recursive = getHelpArray(parent);
-                
-                if (isArray(recursive) && recursive !== null) {
-                        if (ret === null) {
-                                ret = [];
-                        }
-                        ret = ret.concat(recursive);
-                } else if (recursive !== null) {
-                        throw new Error('Array not passed to getHelpArray()');
-                } //else (thus recursive === null) ret does not change (ret = ret;)
-        }
-        return ret;
+	if (obj.hasAttribute('data-ez-help')) {
+		attr = obj.getAttribute('data-ez-help');
+		
+		//See if this function needs to make a recursive call
+		if (attr.slice(-TERMINATOR.length) === TERMINATOR) {
+			end = true;
+		} else {
+			end = false;
+		}
+		
+		ret = attr.split(DELIMITER);
+										
+		for (var i=0; i<ret.length; ) {
+			if(ret[i] == '' || ret[i] === null) {
+				ret.splice(i,1);
+			} else {
+				var parsedRet = parseHelpPageString(ret[i]);
+				// Merge this array at pos; delete ret[i]
+				ret.splice(i, 1);
+				ret.splice.apply(ret, [i, 0].concat(parsedRet));
+				i += parsedRet.length;
+			}
+		}       
+	} else {
+		ret = null;
+	}
+
+	/**
+	 * This function may be called recursively on parent elements.
+	 */
+	if (!end) {
+		var parent = obj.parentNode;
+		
+		//End the recursion because there are no more parent elements
+		if (parent === null || parent.tagName === 'HTML') {
+			return ret;
+		}
+		
+		var recursive = getHelpArray(parent);
+		
+		if (isArray(recursive) && recursive !== null) {
+			if (ret === null) {
+				ret = [];
+			}
+			ret = ret.concat(recursive);
+		} else if (recursive !== null) {
+			throw new Error('Array not passed to getHelpArray()');
+		} //else (thus recursive === null) ret does not change (ret = ret;)
+	}
+	return ret;
 } //End function getHelpArray()
 
 /**
