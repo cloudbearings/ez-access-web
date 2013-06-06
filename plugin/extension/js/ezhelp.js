@@ -115,7 +115,6 @@ function getHelpArray(obj) {
 } //End function getHelpArray()
 
 /**
- * CURRENTLY A SKELETON OF A FUNCTION
  * Takes a string for a single help layer (from the data-ez-help attribute) 
  * and parses it. If the string is a reference to a part of another file, 
  * then the proper string from that file is returned. If the string is not a
