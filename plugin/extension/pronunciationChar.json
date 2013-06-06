@@ -1,0 +1,116 @@
+{
+	"alphabet": {
+		"en-us": {
+			"ascii": {
+				"a": "ay",
+				"b": "bee",
+				"c": "see",
+				"d": "dee",
+				"e": "ee",
+				"f": "ef",
+				"g": "gee",
+				"h": "aych",
+				"i": "eye",
+				"j": "jay",
+				"k": "kay",
+				"l": "el",
+				"m": "em",
+				"n": "en",
+				"o": "oh",
+				"p": "pea",
+				"q": "cue",
+				"r": "are",
+				"s": "es",
+				"t": "tea",
+				"u": "you",
+				"v": "vee",
+				"w": "double-you",
+				"x": "ex",
+				"y": "why",
+				"z": "zee"
+			}
+		},
+		"en-uk": {
+			"ascii": {
+				"a": "ay",
+				"b": "bee",
+				"c": "see",
+				"d": "dee",
+				"e": "ee",
+				"f": "ef",
+				"g": "gee",
+				"h": "aych",
+				"i": "eye",
+				"j": "jay",
+				"k": "kay",
+				"l": "el",
+				"m": "em",
+				"n": "en",
+				"o": "oh",
+				"p": "pea",
+				"q": "cue",
+				"r": "are",
+				"s": "es",
+				"t": "tea",
+				"u": "you",
+				"v": "vee",
+				"w": "double-you",
+				"x": "ex",
+				"y": "why",
+				"z": "zed"
+			}
+		}
+	},
+	"number": {
+		"en-us": {
+			"ascii": {
+				"0": "zero",
+				"1": "one",
+				"2": "two",
+				"3": "three",
+				"4": "four",
+				"5": "five",
+				"6": "six",
+				"7": "seven",
+				"8": "eight",
+				"9": "nine"
+			}
+		}
+	},
+	"punctuation": {
+		"en-us": {
+			"ascii": {
+				"!": "exclamation point",
+				"\"": "quote",
+				"$": "dollar sign",
+				"%": "percent sign",
+				"&": "ampersand",
+				"'": "apostrophe",
+				"(": "open parenthesis",
+				")": "close parenthesis",
+				"*": "asterisk",
+				"+": "plus",
+				",": "comma",
+				"-": "dash",		
+				".": "dot",
+				"/": "slash",
+				":": "colon",		
+				";": "semicolon",
+				"<": "less than",
+				">": "greater than",
+				"?": "question mark",
+				"@": "at",
+				"[": "opening bracket",
+				"\\": "back slash",
+				"]": "closing bracket",
+				"^": "caret",
+				"_": "underscore",
+				"`": "grave accent mark",
+				"{": "opening brace",
+				"|": "vertical bar",
+				"}": "closing brace",
+				"~": "tilda"
+			}
+		}
+	}
+}
