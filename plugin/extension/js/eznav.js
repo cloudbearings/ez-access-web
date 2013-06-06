@@ -35,13 +35,13 @@ var autoAdvTimer;
    http://www.dreamincode.net/code/snippet1246.htm */
 function key_event(e) {
   // 'if' keycode statements
-  if(e.keyCode == EZ_KEY_HELP) {
+  if(e.keyCode == EZ_KEY_HELP || e.keyCode == 72) { // 72 == 'h'
     if(tinyOpen) {
       tinyOpen = false;
       TINY.box.hide();
     } else {
       tinyOpen = true;
-      ez_help("You have activated the ez help dialogue.");
+      ez_help(selectElements[currIndex]);
     }
   }
   else if(e.keyCode == EZ_KEY_UP) {

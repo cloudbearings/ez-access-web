@@ -115,6 +115,16 @@ function parseOrphanedText(paragraphTags) {
 	}
 }
 
+/**
+ * Utility function to check if the passed object is an Array
+ * From: http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/
+ * @param {} o The object to be tested if it is an array.
+ * @return {boolean} If object o is an array or not.
+ */
+function isArray(o) {
+  return Object.prototype.toString.call(o) === '[object Array]';
+}
+
 // RESIZER SCRIPT
 //http://blogs.korzh.com/progtips/2008/05/28/absolute-coordinates-of-dom-element-within-document.html
 
