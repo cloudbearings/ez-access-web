@@ -7,7 +7,7 @@ function ez_help(alert) {
 	if(typeof alert === 'string') {
 		helptext = String(alert);
 	} else if(typeof alert === 'object') {
-		helptext = getHelpArray(alert)[0];
+		helptext = getHelpArray(alert)[0]; // TODO
 	}
   TINY.box.show("<span style='font-size:150%'>" + helptext + "</span>",0,400,0,0);
   voice(String(helptext));
@@ -78,11 +78,17 @@ function getHelpArray(obj) {
                 }
                 
                 ret = attr.split(DELIMITER);
-                
-                //TODO: Remove empty array elements from ret (null, '')
-                
-                for (var i=0; i<ret.length; i++) {
-                        ret[i] = parseHelpPageString(ret[i]);
+                                
+                for (var i=0; i<ret.length; ) {
+												if(ret[i] == '' || ret[i] === null) {
+													ret.splice(i,1);
+												} else {
+													var parsedRet = parseHelpPageString(ret[i]);
+													// Merge this array at pos; delete ret[i]
+													ret.splice(i, 1);
+													ret.splice.apply(ret, [i, 0].concat(parsedRet));
+													i += parsedRet.length;
+												}
                 }       
         } else {
                 ret = null;
@@ -110,7 +116,6 @@ function getHelpArray(obj) {
                         throw new Error('Array not passed to getHelpArray()');
                 } //else (thus recursive === null) ret does not change (ret = ret;)
         }
-        
         return ret;
 } //End function getHelpArray()
 
@@ -120,63 +125,79 @@ function getHelpArray(obj) {
  * then the proper string from that file is returned. If the string is not a
  * reference, it is cleaned up so that only plain text remains. 
  * @param s {string} The single help layer string to be parsed.
- * @return {string} The resulting string from the parsing.
+ * @return {string[]} The resulting layer(s) from the parsing.
  */
 function parseHelpPageString(s) {
-        /**
-         * The string to be returned.
-         */
-        var ret;
-        
-        //First check if the string is a reference to another string
-				if(s.indexOf('#') !== -1) {
-				
-					// Potentially ID-referencing
-					var ref = s.split('#');
+	/**
+	 * The string to be returned.
+	 */
+	var ret;
+	
+	//First check if the string is a reference to another string
+	if(s.indexOf('#') !== -1) {
+	
+		// Potentially ID-referencing
+		var ref = s.split('#');
+		
+		if(ref[0].trim().length === 0) {
+			//Referencing ID of el on current page
+			
+			//Hashes are *not* allowed in IDs (http://goo.gl/YgTLi), but get 
+			//rest just to be safe.
+			var id = s.slice(s.indexOf('#') + 1);
+			
+			var div = document.getElementById(id);
+			
+			ret = getHelpFromObj(div, 'current page', id);
+			
+			if(ret !== null) return ret;
+			
+		} else {
+			// (Potentially) referencing an external file
+			var url = ref[0];
+			var ext = url.slice(url.lastIndexOf('.') + 1);
+			
+			if(ext == 'htm' || ext == 'html') {
+				// Forms URL: HTM or HTML. Still don't know if exists
+				var externalDocument = getDocument(url);
+				if(externalDocument !== null) {
+					// Document exists. Still don't know if specific ID exists
+
+					var id = s.slice(s.indexOf('#') + 1);
+					var div = externalDocument.getElementById(id);
 					
-					if(ref[0].trim().length === 0) {
-						//Referencing ID of el on current page
-						
-						//Hashes are *not* allowed in IDs (http://goo.gl/YgTLi), but get 
-						//rest just to be safe.
-						var id = s.slice(s.indexOf('#') + 1);
-						
-						var div = document.getElementById(id);
-						if(div !== null) {
-							return div.innerHTML;
-						} else {
-							console.log("Error: Could not find ID '" + id + "' on current page for help layers");
-						}
-					} else {
-						// (Potentially) referencing an external file
-						var url = ref[0];
-						var ext = url.slice(url.lastIndexOf('.') + 1);
-						
-						if(ext == 'htm' || ext == 'html') {
-							// Forms URL: HTM or HTML. Still don't know if exists
-							var externalDocument = getDocument(url);
-							if(externalDocument !== null) {
-								// Document exists. Still don't know if specific ID exists
-								
-								var id = s.slice(s.indexOf('#') + 1);
-								var div = externalDocument.getElementById(id);
-								
-								if(div !== null) {
-									return div.textContent; // TODO : for some reason innerHTML not supported... (?)
-								} else {
-									// ID doesn't exist; is an error
-									console.log("Error: Could not find ID '" + id + "' on document '" + url + "' for help layers");
-								}
-							} else {
-								// Document doesn't exist; is an error
-								console.log("Error: Could not find file '" + url + "' for help layers");
-							}
-						} // ELSE: Invalid URL; not an error: Could just be a normal file
-					}
-				} // ELSE: Content is string (as-is)
-     
-        ret = s;
-        return ret;
+					ret = getHelpFromObj(div, url, id);
+					
+					if(ret !== null) return ret;
+
+				} else {
+					// Document doesn't exist; is an error
+					console.log("Error: Could not find file '" + url + "' for help layers");
+				}
+			} // ELSE: Invalid URL; not an error: Could just be a normal file
+		}
+	} // ELSE: Content is string (as-is)
+
+	ret = new Array(s);
+	return ret;
+}
+
+function getHelpFromObj(obj, url, id) {
+	if(obj !== null) {
+		if(obj.hasAttribute('data-ez-help')) {
+			var sections = obj.getElementsByTagName('section');
+			if(sections.length == 0) {
+				console.log("Error: No sections in ID '" + id + "' with data-ez-help attribute in '" + url + "' for help layers");
+			} else {
+				for(var i = 0; i < sections.length; i++) sections[i] = sections[i].textContent;
+				return sections;
+			}
+		}
+		return new Array(obj.textContent);
+	} else {
+		console.log("Error: Could not find ID '" + id + "' in '" + url + "' for help layers");
+	}
+	return null;
 }
 
 var xmlhttp = new XMLHttpRequest();
@@ -187,7 +208,9 @@ function getDocument(url) {
 	if(xmlhttp.status == 200) {
 		var xmlString = xmlhttp.responseText
 			, parser = new DOMParser()
-			, doc = parser.parseFromString(xmlString, "text/xml");
+			, doc = parser.parseFromString(xmlString, "text/html");
+			parser = new DOMParser();
+// returns a HTMLDocument, which also is a Document.
 		return doc;
 	} else {
 		return null;
