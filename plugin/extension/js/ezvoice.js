@@ -491,3 +491,46 @@ function getTypedSpeech(s, regex) {
 	ret += ' ' + lastWord.join(', ');
 	return ret;
 }
+
+
+/**
+ * This function fixes the pronunciation of a string given a dictionary
+ * (hash) of keyword:replacement pairs.
+ * @author J. Bern Jordan
+ * @param {string} s The string to be checked for keywords to be replaced.
+ * @param {Object} dictionary The dictionary/hash to be used. It should be
+ * of the form: '{ "key1":"replacement1", "key2":"replacement2" }'
+ * @return {string} The string with replacements made.
+ */
+function fixPronunciation(s, dictionary) {
+	'use strict';
+	/** The string to be made into a RegExp obj */
+	var exp;
+	/** An array of substrings of s to be searched for keys */
+	var array;
+	/** The array to be returned after join() into a string */
+	var ret = [];
+	
+	//Build regular expression from the keys in the dictionary
+	exp = '\\b(';
+	for (var keyword in dictionary) {
+		exp += keyword + '|'
+	}
+	exp = exp.slice(0,-1); //remove last pipe
+	exp += ')\\b';
+	
+	array = s.split(new RegExp(exp, 'g'));
+	if (array.length <= 1) { //Thus keys not found
+		return s; 
+	} // ELSE: need to replace words in the array
+	
+	for(var i=0, n=array.length; i<n; i++) {
+		if (dictionary[array[i]] !== undefined) {
+			ret[i] = dictionary[array[i]];
+		} else {
+			ret[i] = array[i];
+		}
+	}
+
+	return ret.join('');
+} //End fixPronunciation()
