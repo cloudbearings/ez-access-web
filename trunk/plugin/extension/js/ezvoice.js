@@ -202,7 +202,7 @@ function voice_object(obj, source) {
 	/**
 	 * Concatenation for the speech string to be returned.
 	 */
-	if (speech !== '') { //default concatenation
+	if (speech === '') { //default concatenation
     speech = name + ' ' + role + ' ' + value + ' ' + extra + '.';
   }
   
@@ -242,6 +242,8 @@ function getName(obj, source, defaultString) {
 	} else {
 		ret = defaultString;
 	}
+	
+	var label = get_label(obj);
 
 	if (obj.hasAttribute('aria-labelledby')) {
 		ret = '';
@@ -252,17 +254,14 @@ function getName(obj, source, defaultString) {
 		}
 	} else if (obj.hasAttribute('aria-label')) {
 		ret = obj.getAttribute('aria-label');
-	} else if (true) { 
-    //always check for a label before checking for default names
-		var label = get_label(obj);
-		if(label !== null) {
-			if(typeof label === "object") {
-				ret = say_replace(label, get_inner_alt(label, source), source);
-			} else {
-				ret = label;
-			}
+	} else if (label !== null) { 
+		//always check for a label before checking for default names
+		if(typeof label === "object") {
+			ret = say_replace(label, get_inner_alt(label, source), source);
+		} else {
+			ret = label;
 		}
-	} 
+	}
   // Get generic name for specific input types
   else if (obj.tagName === 'INPUT') {
 		if (obj.hasAttribute('readonly') || obj.hasAttribute('disabled')) {
@@ -619,7 +618,7 @@ function fixPronunciation(s, dictionary, caseSensitive) {
 	} // ELSE: need to replace words in the array
 	
 	if (caseSensitive) {
-		for (var i=0, var n=array.length; i<n; i++) {
+		for (var i=0, n=array.length; i<n; i++) {
 			if (dictionary[array[i]] !== undefined) {
 				ret[i] = dictionary[array[i]];
 			} else {
@@ -627,7 +626,7 @@ function fixPronunciation(s, dictionary, caseSensitive) {
 			}
 		}
 	} else {
-		for (var i=0, var n=array.length; i<n; i++) {
+		for (var i=0, n=array.length; i<n; i++) {
 			if (lowerCaseShadow[array[i].toLowerCase()] !== undefined) {
 				ret[i] = dictionary[lowerCaseShadow[array[i].toLowerCase()]];
 			} else {
