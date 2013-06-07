@@ -4,6 +4,8 @@ var repeatAlert = 0;
 // Global text to be read before next speech synthesis; can be set anywhere
 var globalSayBefore = "";
 
+var dictionary = null;
+
 /**
   * Regular expression for alphabetical characters in ASCII.
   * NOTE: It would seem to be better to also allow for non-ASCII letters 
@@ -31,12 +33,19 @@ function voice(obj,source,repeat) {
     speech = globalSayBefore + speech;
     globalSayBefore = "";
   }
-  if(speech.length > 300) { voice("One moment"); } // If speech generation will take a while
+  
+  if(dictionary !== null) {
+		speech = fixPronunciation(speech, dictionary);
+	}
   
   var req = {"tts": speech,
 			 "volume": String(audioVolume/100)};
+	
   chrome.extension.sendRequest(req);
 }
+
+
+
 
 function voice_object(obj, source) {
 	/**

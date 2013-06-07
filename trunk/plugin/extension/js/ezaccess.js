@@ -332,6 +332,16 @@ function load_ez() {
       stopEZ();
     };
   }
+  
+  // Load any potential dictionary
+  if(document.body.hasAttribute('data-ez-pronounce')) {
+		Lib.ajax.getJSON({
+				url: document.body.getAttribute('data-ez-pronounce'),
+				type: 'json'
+		}, function(dictionary) {
+				this.dictionary = JSON.parse(dictionary);
+		});
+	}
 }
 
 // Draws selected box around DOM object referenced to
