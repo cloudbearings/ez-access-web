@@ -73,172 +73,121 @@ function voice_object(obj, source) {
 	 * The concatenated speech string that will be returned from this function.
 	 */
 	var speech = '';
-
+  
+  /**
+   * Get name & role
+   */
+  name = getName(obj, source, name);
+	role = getRole(obj, role);
+  
+  /**
+   * Get value & extra for different elements
+   */
 	// obj is a DOM object; parse accordingly
-	
 	// Check if an input type
-	if(obj.tagName == 'INPUT') {
-		if(obj.hasAttribute('readonly') || obj.hasAttribute('disabled')) {
-			name = "Disabled field";
-			if(obj.value) {
+	if (obj.tagName === 'INPUT') {
+		if (obj.hasAttribute('readonly') || obj.hasAttribute('disabled')) {
+			if (obj.value) {
 				value = 'is ' + obj.value;
 			} else {
 				value = 'is blank';
 			}
-		} else if(obj.type == 'submit') {
-			if(obj.hasAttribute('value')) {
-				name = obj.value;
-			} else {
-				name = "Submit";
-			}
-			role = "Button";
-		} else if(obj.type == 'reset') {
-			if(obj.hasAttribute('value')) {
-				name = obj.value;
-			} else {
-				name = "Reset";
-			}
-			role = "Button";
-		} else if(obj.type == 'button') {
-			if(obj.hasAttribute('value')) {
-				name = obj.value;
-			}
-			role = "Button";
-		} else if(obj.type == 'image') {
-			//alt is preferred, title is second choice
-			if(obj.hasAttribute('alt')) {
-				name = obj.alt;
-			} else if(obj.title) {
-				name = obj.title;
-			} else {
-				name = "Image";
-			}
-			role = "image input";
-		} else if(obj.type == 'radio') {
-			role = "Radio Button";
+		} else if (obj.type === 'radio') {
 			value = obj.checked ? 'is checked' : 'is unchecked';
-		} else if(obj.type == 'checkbox') {
-			role = "Checkbox";
+		} else if (obj.type === 'checkbox') {
 			value = obj.checked ? 'is checked' : 'is unchecked';
-		} else if(obj.type == 'range') {
-			role = "Slider";
+		} else if (obj.type === 'range') {
 			value = 'is at ' + obj.value;
-			if(obj.hasAttribute('min') && obj.hasAttribute('max')) {
+			if (obj.hasAttribute('min') && obj.hasAttribute('max')) {
 				extra = 'and ranges from ' + obj.min + ' to ' + obj.max;
 			//The following are "sort of" error cases
-			} else if(obj.hasAttribute('min')) {
+			} else if (obj.hasAttribute('min')) {
 				//With no max, Chrome returns '' but uses 100
 				extra = 'and ranges from ' + obj.min + ' to 100';
-			} else if(obj.hasAttribute('max')) {
+			} else if (obj.hasAttribute('max')) {
 				//With no min, Chrome returns '' but uses 0
 				extra = 'and ranges from 0 to ' + obj.max;
 			} else {
 				extra = 'and ranges from 0 to 100';
 			}
-		} else if(obj.type == 'password') {
-			role = "Password field";
+		} else if (obj.type === 'password') {
 			value = 'contains ' + obj.value.length + ' characters';
-		} else if(obj.type == 'text') {
-			role = "Text field";
-			if(obj.value) {
-				value = "contains " + getTypedSpeech(obj.value);
+		} else if (obj.type === 'text') {
+			if (obj.value) {
+				value = 'contains ' + getTypedSpeech(obj.value);
 			} else {
-				value = "is blank";
+				value = 'is blank';
 			}
-		} else if(obj.type == 'email') {
-			role = "E-mail field";
-			if(obj.value) {
-				value = "contains " + obj.value;
+		} else if (obj.type === 'email') {
+			if (obj.value) {
+				value = 'contains ' + obj.value;
 			} else {
-				value = "is blank";
+				value = 'is blank';
 			}
-		} else if(obj.type == 'search') {
-			role = "Search field";
-			if(obj.value) {
-				value = "contains " + obj.value;
+		} else if (obj.type === 'search') {
+			if (obj.value) {
+				value = 'contains ' + obj.value;
 			} else {
-				value = "is blank";
+				value = 'is blank';
 			}
-		} else if(obj.type == 'url') {
-			role = "Web address field";
-			if(obj.value) {
-				value = "contains " + obj.value;
+		} else if (obj.type === 'url') {
+			if (obj.value) {
+				value = 'contains ' + obj.value;
 			} else {
-				value = "is blank.";
+				value = 'is blank';
 			}
-		} else if(obj.type == 'tel') {
-			role = "Telephone field";
-			if(obj.value) {
-				value = "contains " + obj.value;
+		} else if (obj.type === 'tel') {
+			if (obj.value) {
+				value = 'contains ' + obj.value;
 			} else {
-				value = "is blank";
+				value = 'is blank';
 			}
-		} else if(obj.type == 'number') {
-			role = "Number field"; //spinner in Chrome
-			if(obj.value) {
-				value = "is " + obj.value;
+		} else if (obj.type === 'number') {
+			if (obj.value) {
+				value = 'is ' + obj.value;
 			} else {
-				value = "is blank";
+				value = 'is blank';
 			}
 		}
-	} else if(obj.tagName == "BUTTON") {
-		//TODO - check the output
-		name = get_inner_alt(obj, source);
-		role = 'Button';
-	} else if(obj.tagName == "IMG") { //TODO - check if necessary
-		if(obj.alt) {
-			name = obj.alt;
-		} else {
-			role = "Image";
-		}
-	} else if(obj.tagName == "A" && obj.hasAttribute('href')) {
-		name = get_inner_alt(obj, source); 
-		role = 'Link';
-		//Override the speech output for <a href="...">
-		speech = role + ': ' + name;
-	} else if(obj.tagName == "SELECT") {
-		if(obj.hasAttribute('multiple')) {
-			role = "Multiple-selections menu";
+	} else if (obj.tagName === 'SELECT') {
+		if (obj.hasAttribute('multiple')) {
 			var total = 0;
-			var selected = new Array();
-			for(var i = 0; i < obj.length; i++) {
-				if(obj.options[i].selected) {
+			var selected = [];
+			for (var i = 0; i < obj.length; i++) {
+				if (obj.options[i].selected) {
 					selected.push(obj.options[i].value + "option " + (i+1));
 					total++;
 				}
 			}
-			var options = "";
-			for(var i = 0; i < selected.length; i++) {
-				if(i == selected.length-1 && selected.length > 1) {
-					options += " and " + selected[i];
-				} else if(i == 0) {
+			var options = '';
+			for (var i = 0; i < selected.length; i++) {
+				if (i == selected.length-1 && selected.length > 1) {
+					options += ' and ' + selected[i];
+				} else if (i == 0) {
 					options += selected[i];
 				} else {
 					options += ", " + selected[i];
 				}
 			}
-			if(total == 1) {
-				value += "selected is " + options;
+			if (total == 1) {
+				value += 'selected is ' + options;
 			} else if(total != 0) {
-				value += "selected are " + options;
+				value += 'selected are ' + options;
 			} else {
-				value += "is blank";
+				value += 'is blank';
 			}
 		} else {
-			if(obj.selectedIndex != -1) {
-				role = 'Menu';
+			if (obj.selectedIndex != -1) {
 				value = 'is ' + obj.options[obj.selectedIndex].value;
 			} else {
-				role = 'Menu';
 				value = 'is blank';
 			}
 		}
-	} else if(obj.tagName == "TEXTAREA") {
-		role = "Text area";
+	} else if(obj.tagName === 'TEXTAREA') {
 		if(obj.value) {
 			value = "contains " + getTypedSpeech(obj.value);
 		} else {
-			value = "is blank";
+			value = 'is blank';
 		}
 	} else {
 		speech = get_inner_alt(obj, source);
@@ -246,19 +195,20 @@ function voice_object(obj, source) {
 	
 	
 	/**
-	 * Get name, role, and value which might override the ones found above
+	 * Get value which might override the ones found above
 	 */
-	name = getName(obj, source, name);
-	role = getRole(obj, role);
 	value = getValue(obj, value);
 	
 	/**
-	 * Default concatenation for the speech string to be returned.
-	 * This can be overridden if the speech string has already been defined.
+	 * Concatenation for the speech string to be returned.
 	 */
-	if (speech === '') {
-		speech = name + ' ' + role + ' ' + value + ' ' + extra + '.';
-	}
+	if (speech !== '') { //default concatenation
+    speech = name + ' ' + role + ' ' + value + ' ' + extra + '.';
+  }
+  
+	if (obj.tagname === 'A' && obj.hasAttribute('href')) {
+    speech = role + ': ' + name;
+  }
 
 	// Replace override custom EZ Access
 	speech = say_replace(obj, speech, source);
@@ -270,12 +220,13 @@ function voice_object(obj, source) {
  * This function looks for potential names for the element 
  * by looking at different ways of labeling that control type.
  * In precedence order, the name will be the object's:
- * data-ez-sayname > aria-labelledby > aria-label > <label> > defaultString
+ * data-ez-sayname > aria-labelledby > aria-label > <label> > 
+ * tag-specific "labels" > defaultString
  * @author J. Bern Jordan
  * @param {DOM Object} obj The DOM object for which to get an 
  * accessible name.
- * @param {String} source The source modality: either 'nav' for navigation or
- * 'point' for pointing.
+ * @param {String} source The source modality: either 'nav' for navigation
+ * or 'point' for pointing.
  * @param {String} [defaultString=''] A default string for the object's
  * name if a more appropriate one is not found.
  * @return {String} An accessible name for the passed object. 
@@ -299,9 +250,10 @@ function getName(obj, source, defaultString) {
 			ret += document.getElementById(labelIDs[i]).textContent;
 			ret += ' ';
 		}
-	} else if(obj.hasAttribute('aria-label')) {
+	} else if (obj.hasAttribute('aria-label')) {
 		ret = obj.getAttribute('aria-label');
-	} else {
+	} else if (true) { 
+    //always check for a label before checking for default names
 		var label = get_label(obj);
 		if(label !== null) {
 			if(typeof label === "object") {
@@ -310,6 +262,66 @@ function getName(obj, source, defaultString) {
 				ret = label;
 			}
 		}
+	} 
+  // Get generic name for specific input types
+  else if (obj.tagName === 'INPUT') {
+		if (obj.hasAttribute('readonly') || obj.hasAttribute('disabled')) {
+			ret = 'Disabled field';
+		} else if (obj.type === 'submit') {
+			if (obj.hasAttribute('value')) {
+				ret = obj.value;
+			} else {
+				ret = 'Submit';
+			}
+		} else if (obj.type === 'reset') {
+			if (obj.hasAttribute('value')) {
+				ret = obj.value;
+			} else {
+				ret = 'Reset';
+			}
+		} else if (obj.type === 'button') {
+			if (obj.hasAttribute('value')) {
+				ret = obj.value;
+			}
+		} else if (obj.type === 'image') {
+			//alt is preferred, title is second choice
+			if (obj.hasAttribute('alt')) {
+				ret = obj.alt;
+			} else if (obj.title) {
+				ret = obj.title;
+			} else {
+				ret = 'Image';
+			}
+		} else if (obj.type === 'password' || obj.type === 'text'   ||
+               obj.type === 'email'    || obj.type === 'search' ||
+               obj.type === 'url'      || obj.type === 'tel'    ||
+               obj.type === 'number'                               ) {
+			if (obj.hasAttribute('placeholder')) {
+        /**
+         * Using a placeholder as a label is NOT generally recommended, 
+         * but it is probably better than nothing in this case (because 
+         * no other more appropriate label/name can be found).
+         */
+        ret = obj.getAttribute('placeholder');
+      }
+		} //Now tags besides <input />...
+	} else if(obj.tagName === 'BUTTON') {
+		ret = get_inner_alt(obj, source);
+	} else if(obj.tagName === 'IMG') { //TODO - check if necessary
+		if(obj.alt) {
+			ret = obj.alt;
+		}
+	} else if(obj.tagName === 'A' && obj.hasAttribute('href')) {
+		ret = get_inner_alt(obj, source); 
+	} else if(obj.tagName === 'TEXTAREA') {
+		if (obj.hasAttribute('placeholder')) {
+      /**
+       * Using a placeholder as a label is NOT generally recommended, 
+       * but it is probably better than nothing in this case (because 
+       * no other more appropriate label/name can be found).
+       */
+      ret = obj.getAttribute('placeholder');
+    }
 	}
 
 	return ret;
@@ -318,7 +330,7 @@ function getName(obj, source, defaultString) {
 /**
  * This function looks for a potential role string and returns it.
  * In precedence order, the role string will be the object's:
- * data-ez-sayrole > aria-role > defaultString
+ * data-ez-sayrole > aria-role > input-specific roles > defaultString
  * @author J. Bern Jordan
  * @param {DOM Object} obj The DOM object for which to get role.
  * @param {String} [defaultString=''] A default string for the object's 
@@ -330,6 +342,7 @@ function getName(obj, source, defaultString) {
  function getRole(obj, defaultString) {
 	'use strict';
 	var ret;
+  
 	if (defaultString === undefined) {
 		ret = '';
 	} else {
@@ -341,6 +354,52 @@ function getName(obj, source, defaultString) {
 	} else if (obj.hasAttribute('aria-role')) {
 		ret = obj.getAttribute('aria-role');
 	}
+  
+  // Roles for specific input types
+	else if (obj.tagName === 'INPUT') {
+		if(obj.type === 'submit' || obj.type === 'button' || 
+       obj.type === 'reset'                              ) {
+			ret = 'Button';
+		} else if (obj.type === 'image') {
+			ret = 'image input';
+		} else if (obj.type === 'radio') {
+			ret = 'Radio Button';
+		} else if (obj.type === 'checkbox') {
+			ret = 'Checkbox';
+		} else if (obj.type === 'range') {
+			ret = 'Slider';
+		} else if (obj.type === 'password') {
+			ret = 'Password field';
+		} else if (obj.type === 'text') {
+			ret = 'Text field';
+		} else if (obj.type === 'email') {
+			ret = 'E-mail field';
+		} else if (obj.type === 'search') {
+			ret = 'Search field';
+		} else if (obj.type === 'url') {
+			ret = 'Web address field';
+		} else if (obj.type === 'tel') {
+			ret = 'Telephone field';
+		} else if (obj.type === 'number') {
+			ret = 'Number field'; //spinner in Chrome
+		}
+	} else if (obj.tagName === 'BUTTON') {
+		ret = 'Button';
+	} else if (obj.tagName === 'IMG') { //TODO - check if necessary
+		if (!obj.hasAttribute('alt')) {
+			ret = "Image";
+		}
+	} else if (obj.tagName === 'A' && obj.hasAttribute('href')) {
+		ret = 'Link';
+	} else if (obj.tagName === 'SELECT') {
+		if (obj.hasAttribute('multiple')) {
+			ret = 'Multiple-selections menu';
+		} else {
+			ret = 'Menu';
+		}
+	} else if (obj.tagName === 'TEXTAREA') {
+		ret = 'Text area';
+	} 
 
 	return ret;
 } //End function getRole()
@@ -349,16 +408,17 @@ function getName(obj, source, defaultString) {
  * This function looks for a potential value string and returns it.
  * In precedence order, the value string will be the object's:
  * data-ez-sayvalue > aria-valuetext > aria-valuenow > defaultString
+ * This function does NOT look for values specific to different tags.
  * @author J. Bern Jordan
  * @param {DOM Object} obj The DOM object for which to get role.
  * @param {String} [defaultString=''] A default string for the object's 
- * role if a more appropriate one is not found.
+ * value if a more appropriate one is not found.
  * @return {String} An value for the passed object. The returned string is 
- * the dafaultString if an overriding value is not found.
+ * the defaultString if an overriding value is not found.
  */
  function getValue(obj, defaultString) {
 	'use strict';
-	var ret;
+	var ret, temp;
 	if (defaultString === undefined) {
 		ret = '';
 	} else {
@@ -368,10 +428,15 @@ function getName(obj, source, defaultString) {
 	if(obj.hasAttribute('data-ez-sayvalue')) {
 		ret = obj.getAttribute('data-ez-sayvalue');
 	} else if (obj.hasAttribute('aria-valuetext')) {
-		//may wish to check if aria-valuetext is blank
-		ret = 'is ' + obj.getAttribute('aria-valuetext');
+		temp = obj.getAttribute('aria-valuetext');
+    if (temp.length > 0) {
+		  ret = 'is ' + temp;
+    }
 	} else if (obj.hasAttribute('aria-valuenow')) {
-		ret = 'is ' + obj.getAttribute('aria-valuenow');
+		temp = obj.getAttribute('aria-valuenow');
+    if (temp.length > 0) {
+      ret = 'is ' + temp;
+    }
 	}
 
 	return ret;
@@ -444,7 +509,7 @@ function say_replace(obj, speech, source) {
 function getTypedSpeech(s, regex) {
   /** The regex object for finding alphabet characters */
   var alphaChars;
-  if (re === undefined) {
+  if (regex === undefined) {
     alphaChars = ALPHABET_CHAR;
   } else {
     alphaChars = regex;
@@ -527,8 +592,8 @@ function fixPronunciation(s, dictionary, caseSensitive) {
   }
   
   /** Associative array to map lowercase key to real dictionary key */
-	if(!caseSensitive) {
-		var lowerCaseShadow = { };
+	var lowerCaseShadow = { };
+  if(!caseSensitive) {
 		for(var keyword in dictionary) {
 			lowerCaseShadow[keyword.toLowerCase()] = keyword;
 		}
@@ -537,7 +602,7 @@ function fixPronunciation(s, dictionary, caseSensitive) {
 	//Build regular expression from the keys in the dictionary
 	exp = '\\b(';
 	for (var keyword in dictionary) {
-		exp += keyword + '|'
+		exp += keyword + '|';
 	}
 	exp = exp.slice(0,-1); //remove last pipe
 	exp += ')\\b';
@@ -553,8 +618,8 @@ function fixPronunciation(s, dictionary, caseSensitive) {
 		return s; 
 	} // ELSE: need to replace words in the array
 	
-	if(caseSensitive) {
-		for(var i=0, n=array.length; i<n; i++) {
+	if (caseSensitive) {
+		for (var i=0, var n=array.length; i<n; i++) {
 			if (dictionary[array[i]] !== undefined) {
 				ret[i] = dictionary[array[i]];
 			} else {
@@ -562,7 +627,7 @@ function fixPronunciation(s, dictionary, caseSensitive) {
 			}
 		}
 	} else {
-		for(var i=0, n=array.length; i<n; i++) {
+		for (var i=0, var n=array.length; i<n; i++) {
 			if (lowerCaseShadow[array[i].toLowerCase()] !== undefined) {
 				ret[i] = dictionary[lowerCaseShadow[array[i].toLowerCase()]];
 			} else {
