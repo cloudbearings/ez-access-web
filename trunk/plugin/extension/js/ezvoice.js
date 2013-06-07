@@ -525,7 +525,15 @@ function fixPronunciation(s, dictionary, caseSensitive) {
   if (caseSensitive === undefined) {
     caseSensitive = false;
   }
-  	
+  
+  /** Associative array to map lowercase key to real dictionary key */
+	if(!caseSensitive) {
+		var lowerCaseShadow = { };
+		for(var keyword in dictionary) {
+			lowerCaseShadow[keyword.toLowerCase()] = keyword;
+		}
+	}
+	
 	//Build regular expression from the keys in the dictionary
 	exp = '\\b(';
 	for (var keyword in dictionary) {
@@ -545,11 +553,21 @@ function fixPronunciation(s, dictionary, caseSensitive) {
 		return s; 
 	} // ELSE: need to replace words in the array
 	
-	for(var i=0, n=array.length; i<n; i++) {
-		if (dictionary[array[i]] !== undefined) {
-			ret[i] = dictionary[array[i]];
-		} else {
-			ret[i] = array[i];
+	if(caseSensitive) {
+		for(var i=0, n=array.length; i<n; i++) {
+			if (dictionary[array[i]] !== undefined) {
+				ret[i] = dictionary[array[i]];
+			} else {
+				ret[i] = array[i];
+			}
+		}
+	} else {
+		for(var i=0, n=array.length; i<n; i++) {
+			if (lowerCaseShadow[array[i].toLowerCase()] !== undefined) {
+				ret[i] = dictionary[lowerCaseShadow[array[i].toLowerCase()]];
+			} else {
+				ret[i] = array[i];
+			}
 		}
 	}
 
