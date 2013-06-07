@@ -509,9 +509,11 @@ function getTypedSpeech(s, regex) {
  * @param {string} s The string to be checked for keywords to be replaced.
  * @param {Object} dictionary The dictionary/hash to be used. It should be
  * of the form: '{ "key1":"replacement1", "key2":"replacement2" }'
+ * @param {boolean} [caseSensitive=false] if a case sensitive search should
+ * be made.
  * @return {string} The string with replacements made.
  */
-function fixPronunciation(s, dictionary) {
+function fixPronunciation(s, dictionary, caseSensitive) {
 	'use strict';
 	/** The string to be made into a RegExp obj */
 	var exp;
@@ -519,7 +521,11 @@ function fixPronunciation(s, dictionary) {
 	var array;
 	/** The array to be returned after join() into a string */
 	var ret = [];
-	
+   
+  if (caseSensitive === undefined) {
+    caseSensitive = false;
+  }
+  	
 	//Build regular expression from the keys in the dictionary
 	exp = '\\b(';
 	for (var keyword in dictionary) {
@@ -528,8 +534,14 @@ function fixPronunciation(s, dictionary) {
 	exp = exp.slice(0,-1); //remove last pipe
 	exp += ')\\b';
 	
-	array = s.split(new RegExp(exp, 'g'));
-	if (array.length <= 1) { //Thus keys not found
+  if (caseSensitive) {
+    array = s.split(new RegExp(exp, 'g'));
+  } else {
+    array = s.split(new RegExp(exp, 'gi'));
+  }
+ 
+   
+  if (array.length <= 1) { //Thus keys not found
 		return s; 
 	} // ELSE: need to replace words in the array
 	
