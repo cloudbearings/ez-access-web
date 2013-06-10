@@ -3,28 +3,30 @@ var tinyOpen = false;
 
 function ez_help(alert) {
 	var helptext = new String();
-	
+
 	if(typeof alert === 'string') {
 		helptext = String(alert);
 	} else if(typeof alert === 'object') {
 		helptext = getHelpArray(alert)[0]; // TODO
 	}
-  TINY.box.show("<span style='font-size:150%'>" + helptext + "</span>",0,400,0,0);
-  voice(String(helptext));
+	TINY.box.show("<span style='font-size:150%'>" + helptext + "</span>", 0, 400, 0, 0);
+	voice(String(helptext));
 }
 
 function idle_loop(display) {
-  if(!display) {
-	if(alerts.idle.wait != -1) {
-		idleLoop = self.setInterval(function(){idle_loop(true)},alerts.idle.wait);
+	if(!display) {
+		if(alerts.idle.wait != -1) {
+			idleLoop = self.setInterval(function () {
+				idle_loop(true)
+			}, alerts.idle.wait);
+		}
+	} else {
+		if(!tinyOpen && !ez_navigateToggle) {
+			idleLoop = self.clearInterval(idleLoop);
+			tinyOpen = true;
+			ez_help(alerts.idle.value);
+		}
 	}
-  } else {
-    if(!tinyOpen && !ez_navigateToggle) {
-      idleLoop = self.clearInterval(idleLoop);
-      tinyOpen = true;
-      ez_help(alerts.idle.value);
-    }
-  }
 }
 
 /**
@@ -33,7 +35,7 @@ function idle_loop(display) {
  */
 DELIMITER = '|';
 /**
- * The terminator in the data-ez-help attribute. If the attribute ends with 
+ * The terminator in the data-ez-help attribute. If the attribute ends with
  * the TERMINATOR, then no additional help layers are provided.
  * @const
  */
@@ -41,14 +43,15 @@ TERMINATOR = '||';
 
 /**
  * Takes a DOM object and creates an array of all of the help layers associated
- * with that object (given with the data-ez-help attribute). This function is 
- * recursive so that the help layers from ancestor elements are included 
- * (unless the help string associated with an object ends with the TERMINATOR 
+ * with that object (given with the data-ez-help attribute). This function is
+ * recursive so that the help layers from ancestor elements are included
+ * (unless the help string associated with an object ends with the TERMINATOR
  * character string).
  * @author J. Bern Jordan
  * @param {Object} obj The DOM object for which to get the help layers.
  * @return {null|string[]} The help layers (or null if there are no help layers).
  */
+
 function getHelpArray(obj) {
 	'use strict';
 	/**
@@ -67,21 +70,21 @@ function getHelpArray(obj) {
 	 */
 	var end;
 
-	if (obj.hasAttribute('data-ez-help')) {
+	if(obj.hasAttribute('data-ez-help')) {
 		attr = obj.getAttribute('data-ez-help');
-		
+
 		//See if this function needs to make a recursive call
-		if (attr.slice(-TERMINATOR.length) === TERMINATOR) {
+		if(attr.slice(-TERMINATOR.length) === TERMINATOR) {
 			end = true;
 		} else {
 			end = false;
 		}
-		
+
 		ret = attr.split(DELIMITER);
-										
-		for (var i=0; i<ret.length; ) {
+
+		for(var i = 0; i < ret.length;) {
 			if(ret[i] == '' || ret[i] === null) {
-				ret.splice(i,1);
+				ret.splice(i, 1);
 			} else {
 				var parsedRet = parseHelpPageString(ret[i]);
 				// Merge this array at pos; delete ret[i]
@@ -89,7 +92,7 @@ function getHelpArray(obj) {
 				ret.splice.apply(ret, [i, 0].concat(parsedRet));
 				i += parsedRet.length;
 			}
-		}       
+		}
 	} else {
 		ret = null;
 	}
@@ -97,22 +100,22 @@ function getHelpArray(obj) {
 	/**
 	 * This function may be called recursively on parent elements.
 	 */
-	if (!end) {
+	if(!end) {
 		var parent = obj.parentNode;
-		
+
 		//End the recursion because there are no more parent elements
-		if (parent === null || parent.tagName === 'HTML') {
+		if(parent === null || parent.tagName === 'HTML') {
 			return ret;
 		}
-		
+
 		var recursive = getHelpArray(parent);
-		
-		if (isArray(recursive) && recursive !== null) {
-			if (ret === null) {
+
+		if(isArray(recursive) && recursive !== null) {
+			if(ret === null) {
 				ret = [];
 			}
 			ret = ret.concat(recursive);
-		} else if (recursive !== null) {
+		} else if(recursive !== null) {
 			throw new Error('Array not passed to getHelpArray()');
 		} //else (thus recursive === null) ret does not change (ret = ret;)
 	}
@@ -120,43 +123,44 @@ function getHelpArray(obj) {
 } //End function getHelpArray()
 
 /**
- * Takes a string for a single help layer (from the data-ez-help attribute) 
- * and parses it. If the string is a reference to a part of another file, 
+ * Takes a string for a single help layer (from the data-ez-help attribute)
+ * and parses it. If the string is a reference to a part of another file,
  * then the proper string from that file is returned. If the string is not a
- * reference, it is cleaned up so that only plain text remains. 
+ * reference, it is cleaned up so that only plain text remains.
  * @param s {string} The single help layer string to be parsed.
  * @return {string[]} The resulting layer(s) from the parsing.
  */
+
 function parseHelpPageString(s) {
 	/**
 	 * The string to be returned.
 	 */
 	var ret;
-	
+
 	//First check if the string is a reference to another string
 	if(s.indexOf('#') !== -1) {
-	
+
 		// Potentially ID-referencing
 		var ref = s.split('#');
-		
+
 		if(ref[0].trim().length === 0) {
 			//Referencing ID of el on current page
-			
+
 			//Hashes are *not* allowed in IDs (http://goo.gl/YgTLi), but get 
 			//rest just to be safe.
 			var id = s.slice(s.indexOf('#') + 1);
-			
+
 			var div = document.getElementById(id);
-			
+
 			ret = getHelpFromObj(div, 'current page', id);
-			
+
 			if(ret !== null) return ret;
-			
+
 		} else {
 			// (Potentially) referencing an external file
 			var url = ref[0];
 			var ext = url.slice(url.lastIndexOf('.') + 1);
-			
+
 			if(ext == 'htm' || ext == 'html') {
 				// Forms URL: HTM or HTML. Still don't know if exists
 				var externalDocument = getDocument(url);
@@ -165,9 +169,9 @@ function parseHelpPageString(s) {
 
 					var id = s.slice(s.indexOf('#') + 1);
 					var div = externalDocument.getElementById(id);
-					
+
 					ret = getHelpFromObj(div, url, id);
-					
+
 					if(ret !== null) return ret;
 
 				} else {
@@ -203,14 +207,14 @@ function getHelpFromObj(obj, url, id) {
 var xmlhttp = new XMLHttpRequest();
 
 function getDocument(url) {
-	xmlhttp.open("GET",url + '?t=' + new Date().getTime() ,false); // TODO : Disable caching for troubleshooting
+	xmlhttp.open("GET", url + '?t=' + new Date().getTime(), false); // TODO : Disable caching for troubleshooting
 	xmlhttp.send();
 	if(xmlhttp.status == 200) {
-		var xmlString = xmlhttp.responseText
-			, parser = new DOMParser()
-			, doc = parser.parseFromString(xmlString, "text/html");
-			parser = new DOMParser();
-// returns a HTMLDocument, which also is a Document.
+		var xmlString = xmlhttp.responseText,
+			parser = new DOMParser(),
+			doc = parser.parseFromString(xmlString, "text/html");
+		parser = new DOMParser();
+		// returns a HTMLDocument, which also is a Document.
 		return doc;
 	} else {
 		return null;
