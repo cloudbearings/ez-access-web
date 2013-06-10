@@ -1,24 +1,11 @@
-// Test the text of the body element against our regular expression.
-function addLoadEvent(func) {
-	var oldonload = window.onload;
-	if (typeof window.onload != 'function') {
-		window.onload = func;
-	} else {
-		window.onload = function() {
-			if (oldonload) {
-				oldonload();
-			}
-			func();
-		}
-	}
-}
 var EzCustomColor;
 chrome.extension.sendRequest({localstorage: "ezHighlightColor" }, function(response) {
 	EzCustomColor = response.ezHighlightColor;
 });
 
 var ezSessionDisable = sessionStorage["ezSessionDisable"];
-var checkingIfEz = function() {
+
+function checkingIfEz() {
   if(ezSessionDisable == "true") {
 	chrome.extension.sendRequest({ezShow: "true"}, function(response) {});
   } else if (document.body.getAttribute('data-ez') !== null) {
@@ -36,8 +23,8 @@ var checkingIfEz = function() {
 		});
   }
 }
-addLoadEvent(checkingIfEz);
 
+checkingIfEz();
 
 // Storing whether to disable for this session
 chrome.extension.onRequest.addListener(
