@@ -9,6 +9,7 @@ function isDescendant(parent, child) {
      return false;
 }
 
+// Generic anonymous JSON-getter function
 (function() {
     var Lib = {
         ajax: {
