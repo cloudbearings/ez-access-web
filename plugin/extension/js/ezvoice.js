@@ -225,6 +225,17 @@ function voice_object(obj, source) {
 		speech = role + ': ' + name;
 	}
 
+	/**
+	 * Adding SSML wrapper markup if required.
+	 */
+	if (SSML) {
+		speech = '<?xml version="1.0"?>' +
+		         '<speak>' +
+		         speech +
+		         '</speak>';
+	}
+	return speech;
+
 	// Replace override custom EZ Access
 	speech = say_replace(obj, speech, source);
 
