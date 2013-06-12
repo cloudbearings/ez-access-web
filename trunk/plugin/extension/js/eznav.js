@@ -1,9 +1,13 @@
-// Tab keycodes
+/**
+ * Tab keycodes
+ */
 var KB_TAB = 9;
 var KB_SHIFT = 16;
 var KB_ENTER = 13;
 
-//EZ-Access keycode declarations
+/**
+ * EZ-Access keycode declarations
+ */
 var EZ_KEY_SKIPFORWARD = 135; // is >>
 var EZ_KEY_SKIPBACKWARD = 134; // is <<
 var EZ_KEY_HELP = 128; // is ?
@@ -13,16 +17,27 @@ var EZ_KEY_UP = 129; // is up arrow key
 var EZ_KEY_DOWN = 130; // is down arrow key
 var EZ_KEY_ENTER = 131; // is green circle enter key
 
-// Whether slide to read is enabled universally
+/**
+ * Whether slide to read is enabled universally
+ * @type {boolean}
+ */
 var slideToRead = true;
 
-// Determines key autorepeat preperty or not
+/**
+ * Determines key autorepeat preperty or not
+ * @type {string}
+ */
 var autoRepeat = 'off';
 
-// Tabular navigation behavior (& cooperation w/ browser)
+/**
+ * Tabular navigation behavior (& cooperation w/ browser)
+ * @type {string}
+ */
 var tabNav = 'ezaccess';
 
-// Global idle loop timer if no user action is taken
+/**
+ * Global idle loop timer if no user action is taken
+ */
 var idleLoop;
 
 // If autoadvance is enabled or not
@@ -34,6 +49,11 @@ var autoAdvTimer;
 /* Referred to by window.onload anonymous function.
    http://www.dreamincode.net/code/snippet1246.htm */
 
+/**
+ * Handles key events for EZ Access (except for multi-key pressed, like tab+shift handled by multikey_event)
+ * @param {event} e Event object passed from set up on EZ Access startup.
+ * @returns {boolean} If false, disables default key action.
+ */
 function key_event(e) {
 	// 'if' keycode statements
 	if(e.keyCode == EZ_KEY_HELP || e.keyCode == 72) { // 72 == 'h'
@@ -171,6 +191,13 @@ function key_event(e) {
 	return true;
 }
 
+/**
+ * Main EZ Navigation function: Moves selector up or down selectElements, and calls all relevant functions (speech,
+ * tooltips etc.)
+ * @param {'up'|'down'} move Direction of navigation.
+ * @param {boolean} noParse Whether or not the page should be reparsed. Reparsed by default, but when brute-force
+ * skipping hidden elements, this should be disabled because it takes too much time.
+ */
 function ez_navigate(move, noParse) {
 	if(!noParse) {
 		var currElement = selectElements[currIndex];
@@ -300,6 +327,11 @@ function ez_navigate(move, noParse) {
 	}
 }
 
+/**
+ * Jump directly to a specific element.
+ * TODO WARNING: Doesn't check if valid.
+ * @param {number} location Valid index to jump to.
+ */
 function ez_jump(location) {
 	selectElements[currIndex].blur();
 	currIndex = parseFloat(location);
@@ -309,6 +341,10 @@ function ez_jump(location) {
 	voice(selectElements[currIndex], 'nav');
 }
 
+/**
+ * Decides what to do, if anything, when EZ Action is pressed.
+ * TODO Will be revamped to handle better speech synthesis on EZ Action.
+ */
 function ez_enter() {
 	var obj = selectElements[currIndex];
 	if(obj.tagName == "A") {
@@ -363,8 +399,10 @@ function ez_enter() {
 	}
 }
 
-// Check if new element (and exists to be highlighted), and then highlights
-
+/**
+ * Check if new element (and exists to be highlighted), and then highlights
+ * @param {object} e Object currently mouseover'd
+ */
 function mouseOver(e) {
 	var newElement = true;
 	var found = false;
@@ -391,6 +429,11 @@ function mouseOver(e) {
 	}
 }
 
+/**
+ * Handles multi-key events, such as shift+tab
+ * @param {event} e Key event passed to be evaluated.
+ * @returns {boolean} If false, overrides default action.
+ */
 function multikey_event(e) {
 	e = e || event //to deal with IE
 	map[e.keyCode] = e.type == 'keydown' ? true : false
@@ -424,6 +467,9 @@ function multikey_event(e) {
 	return true;
 }
 
+/**
+ * Sets autoadvancing timer.
+ */
 function auto_advance_set() {
 	// If this is a new element to start autoadvancing, set the timer
 	if(find_parent_attr(selectElements[currIndex], 'data-ez-autoadvance') !== undefined) {
@@ -439,6 +485,9 @@ function auto_advance_set() {
 	}
 }
 
+/**
+ * Handles autoadvancing, and stopping autoadvancing if runs into end.
+ */
 function auto_advance_decide() {
 	window.clearInterval(autoAdvTimer);
 	if(autoAdvance !== 0) {
@@ -456,8 +505,11 @@ function auto_advance_decide() {
 	}
 }
 
-//Finds y value of given object -- for automated scrolling
-
+/**
+ * Finds y value of given object -- for automated scrolling
+ * @param {object} obj Object in question
+ * @returns {Array} Position nested.
+ */
 function findPos(obj) {
 	var curtop = -100;
 	if(obj.offsetParent) {
@@ -468,9 +520,11 @@ function findPos(obj) {
 	}
 }
 
-// Smooth Scrolling
-// http://www.itnewb.com/tutorial/Creating-the-Smooth-Scroll-Effect-with-JavaScript
-
+/**
+ * Smooth Scrolling
+ * http://www.itnewb.com/tutorial/Creating-the-Smooth-Scroll-Effect-with-JavaScript
+ * @returns {number} Where to scroll to
+ */
 function currentYPosition() {
 	// Firefox, Chrome, Opera, Safari
 	if(self.pageYOffset) return self.pageYOffset;
@@ -482,6 +536,10 @@ function currentYPosition() {
 	return 0;
 }
 
+/**
+ * Does the smooth scrolling + slow advancing
+ * @param stopY Where to stop the incremental scrolling
+ */
 function smoothScroll(stopY) {
 	var startY = currentYPosition();
 	var distance = stopY > startY ? stopY - startY : startY - stopY;

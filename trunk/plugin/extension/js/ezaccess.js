@@ -1,32 +1,55 @@
-// Selector ID to use on the page
+/**
+ * Selector ID to use on the page
+ * @type {string}
+  */
 var ezSelectorId = 'ezselected';
 
-// Tags that are candidates for highlight
+/**
+ * Tags that are candidates for highlight
+ * @type {string}
+ * @const
+ */
 var COMPATIBLE_TAGS = 'p,img,a,div,h1,h2,h3,h4,h5,figure,figcaption,ul,ol,li,input,button,textarea,select,article,aside,hgroup,legend,dt,dd,label';
 
-// Array of tags generated on pageload initialized globally
+/**
+ * Array of tags generated on pageload initialized globally
+ * @type {object[]}
+ */
 var selectElements;
 
-// Current index (of selectElements array) for navigation purposes
+/**
+ * Current index (of selectElements array) for navigation purposes
+ * @type {number}
+ */
 var currIndex = 0;
 
-// Whether EZ navigation mode is activated or not
+/**
+ * Whether EZ navigation mode is activated or not
+ * @type {boolean}
+ */
 var ez_navigateToggle = false;
 
-// Wrap elements on the screen
+/**
+ * Wrap elements on the screen
+ * @type {boolean}
+ */
 var screenWrap = false;
 
-// Whether to allow reordering elements manually from DOM standard.
+/**
+ * Whether to allow reordering elements manually from DOM standard.
+ * @type {boolean}
+ */
 var allowReorder = false;
 
 
-/* http://www.quirksmode.org/dom/getElementsByTagNames.html
-   Gets all elements, IN ORDER _AND_ by element name.
-   Commands:
-   list :: A string with a comma-separated list of tag names.
-   obj  :: An optional start element. If it's present the script searches only for tags that
-           are descendants of this element, if it's absent the script searches the entire document. */
-
+/**
+ * Gets all elements, IN ORDER _AND_ by element name.
+ * http://www.quirksmode.org/dom/getElementsByTagNames.html
+ * @param {string} list A string with a comma-separated list of tag names.
+ * @param {object} obj An optional start element. If it's present the script searches only for tags that
+ * are descendants of this element, if it's absent the script searches the entire document.
+ * @returns {Array} References to object as an array that are requested.
+ */
 function getElementsByTagNames(list, obj) {
 	if(!obj) var obj = document;
 	var tagNames = list.split(',');
@@ -74,6 +97,11 @@ function getElementsByTagNames(list, obj) {
 	return resultArray;
 }
 
+/**
+ * Removes labels that do not reference anything.
+ * @param {object[]} elements Object array of elements
+ * @returns {object[]} An array of a selection of labels via 'elements' that are not orphaned (reference something).
+ */
 function removeNonOrphanedLabels(elements) {
 	for(var i = 0; i < elements.length;) {
 		if(elements[i].tagName === 'LABEL' && !orphanedLabel(elements[i])) {
@@ -85,6 +113,12 @@ function removeNonOrphanedLabels(elements) {
 	return elements;
 }
 
+/**
+ * Used by fn removeNonOrphanedLabels. Finds if label is orphaned returns boolean on state. Assumes the 'for' attribute
+ * references a valid element. Looks for implicit AND explicit referencing.
+ * @param {object} element MUST be a label for function to operate properly.
+ * @returns {boolean} True iff orphaned.
+ */
 function orphanedLabel(element) {
 	if(element.htmlFor == '') {
 		return true;
@@ -95,6 +129,11 @@ function orphanedLabel(element) {
 	return false;
 }
 
+/**
+ * This function reparses and updates the selectElements element, as well as modifying some DOM element attributes for
+ * EZ Access. However, a lot of the actual 'parsing' and manipulation of the retrieved potentially navigable elements
+ * is done by the indexElements function.
+ */
 function index_ez() {
 	parseOrphanedText(getElementsByTagNames('p'));
 
@@ -128,8 +167,12 @@ function index_ez() {
 	}
 }
 
-//Index elements on the page.
-
+/**
+ * Creates a selectElements candidate given a scope.
+ * @param {object} world The scope to look at. If given element, only looks at children. If given 'document' ==> valid for whole
+ * web page.
+ * @returns {object[]} Returns a new selectElements potential variable.
+ */
 function indexElements(world) {
 	// INITIAL INDEXING OF PAGE ELEMENTS
 	selectElementsTemp = getElementsByTagNames(COMPATIBLE_TAGS, world);
@@ -197,16 +240,22 @@ function indexElements(world) {
 	return selectElementsTemp;
 }
 
+/**
+ * Starts EZ Access navigation on the current page, whether automatically or from an EZ Access keypress.
+ * @param {boolean} propagated Whether or not the EZ Access was enabled previously (startid depends on this, and some other
+ * things like a url with a #element reference do as well.
+ */
 function ez_navigate_start(propagated) {
 	ez_navigateToggle = true;
 	sessionStorage.setItem("EZ_Toggle", "1");
 	if(document.body.hasAttribute('data-ez-startat')) {
+        var startid;
 		if(propagated) {
 			// Of "#<id> #<id>" of second element
-			var startid = document.body.getAttribute('data-ez-startat').split(" ")[1].slice(1);
+			startid = document.body.getAttribute('data-ez-startat').split(" ")[1].slice(1);
 		} else {
 			// Of "#<id> #<id>" of first element
-			var startid = document.body.getAttribute('data-ez-startat').split(" ")[0].slice(1);
+            startid = document.body.getAttribute('data-ez-startat').split(" ")[0].slice(1);
 		}
 		for(var i = 0; i < selectElements.length; i++) {
 			if(selectElements[i].id !== null && selectElements[i].id == startid) {
@@ -233,8 +282,10 @@ function ez_navigate_start(propagated) {
 	voice(selectElements[currIndex], 'nav');
 }
 
-// On page load, load key_event() listener
-
+/**
+ * Loads one-time stuff to start EZ Access (such as audio, multitouch library & external JSON data).
+ * Determines if EZ Access should be started by default (or just loaded).
+ */
 function load_ez() {
 	if(document.body.hasAttribute('data-ez-allowreorder')) {
 		allowReorder = true;
@@ -350,8 +401,12 @@ function load_ez() {
 	}
 }
 
-// Draws selected box around DOM object referenced to
-
+/**
+ * Draws selected box around DOM object referenced to. Creates selected box if & inserts into DOM if it doesn't
+ * previously exist.
+ * @param {object} obj DOM Object to draw box selected box around.
+ * @returns {boolean} If finding dimensions of element failed (such as if hidden).
+ */
 function drawSelected(obj) {
 	//var tmp = obj.style.display;  // INLINE BLOCK OUTLINE FIXER
 	//obj.style.display = "inline-block"; // INLINE BLOCK OUTLINE FIXER
@@ -396,14 +451,20 @@ function drawSelected(obj) {
 	return true;
 }
 
-// Event listener if window is resized the selected box will be redrawn
-// TODO: Make not overwrite anything else
+/**
+ * Event listener if window is resized ==> The selected box will be redrawn.
+ */
 window.onresize = function () {
 	if(ez_navigateToggle) {
 		drawSelected(selectElements[currIndex]);
 	}
 }
 
+/**
+ * If on a group, will skip past it + nested elements in selectElements.
+ * @param {string} move String 'up' || 'down' Depending on direction navigating.
+ * @returns {number|boolean} New currIndex, or false no jump needed.
+ */
 function groupSkip(move) {
 	if(selectElements[currIndex].getAttribute('data-ez-chunking') == 'group' && selectElements[currIndex].getAttribute('data-ez-subnavtype') == 'nested' || selectElements[currIndex].getAttribute('data-ez-subnavtype') == 'hierarchical') {
 		if(move == 'down') {
@@ -417,6 +478,11 @@ function groupSkip(move) {
 	return false;
 }
 
+/**
+ * Controls if the navigation should be stopped due to a hierarchical group.
+ * @param {string} move 'up' || 'down' depending on nav direction.
+ * @returns {boolean} If stopped or not.
+ */
 function hierarchicalStopper(move) {
 	var oldLevel = selectElements[currIndex].getAttribute('data-tmp-level');
 	var newLevel;
@@ -452,6 +518,10 @@ function hierarchicalStopper(move) {
 	return false;
 }
 
+/**
+ * Looks for a data-tmp-level attribute parent.
+ * @returns {number} Group element currIndex
+ */
 function findGroupParent() {
 	var oldLevel = selectElements[currIndex].getAttribute('data-tmp-level');
 	var i = currIndex;
@@ -464,8 +534,10 @@ function findGroupParent() {
 	return i; // Return group element currIndex #
 }
 
-// Like ez_navigate("down"), but for when navigating to first element inside a group
-
+/**
+ * Like ez_navigate("down"), but for when navigating to first element inside a group
+ * TODO Merge with other stuff! Outdated!
+ */
 function ez_navigate_in_group() {
 	if(selectElements[currIndex].hasAttribute('data-ez-groupdefault')) {
 		ez_jump(getCurrIndexById(selectElements[currIndex].getAttribute('data-ez-groupdefault').split(' ')[0]));
@@ -485,8 +557,11 @@ function ez_navigate_in_group() {
 	voice(selectElements[currIndex], 'nav', globalSayBefore);
 }
 
-// Finds the first or last focusable element of selectElements; returns index
-
+/**
+ * Finds the first or last focusable element of selectElements
+ * @param {number} location Whether looking for 'first || 'last' navigable element of selectElements.
+ * @returns {number} New currIndex of next focusable element of selectElements in nav'ing direction.
+ */
 function findFocusable(location) {
 	if(location == 'last') {
 		for(var i = selectElements.length - 1; i > 0;) {
@@ -518,6 +593,9 @@ function findFocusable(location) {
 	return null;
 }
 
+/**
+ * Removes data-tmp-level && data-tmp-jump from selectElements.
+ */
 function clear_jumppoints() {
 	for(var i = 0; i < selectElements.length; i++) {
 		selectElements[i].removeAttribute("data-tmp-level");
@@ -525,6 +603,9 @@ function clear_jumppoints() {
 	}
 }
 
+/**
+ * Creates data-tmp-level && data-tmp-jump for selectElements depending on if in a group or not.
+ */
 function load_jumppoints() {
 	for(var i = 0; i < selectElements.length; i++) {
 		if(selectElements[i].getAttribute('data-ez-chunking') == 'group' && selectElements[i].getAttribute('data-ez-subnavtype') == 'nested' || selectElements[i].getAttribute('data-ez-subnavtype') == 'hierarchical') {
@@ -553,6 +634,11 @@ function load_jumppoints() {
 	}
 }
 
+/**
+ * Removes elements that are children of an 'input' or 'button' tag.
+ * @param {object[]} elements Elements to potentially remove
+ * @returns {object[]} Returns elements param with removed children of leaves.
+ */
 function setLeaves(elements) {
 	for(var i = 0; i < elements.length;) {
 		if(isChildOfElType(elements[i].parentNode, 'INPUT') || isChildOfElType(elements[i].parentNode, 'BUTTON')) {
@@ -564,6 +650,10 @@ function setLeaves(elements) {
 	return elements;
 }
 
+/**
+ * Creates data-tmp-flowfrom tags to complement aria-flowto tags (so not looking each time + slowing down).
+ * Basically caching.
+ */
 function load_flowfrom() {
 	for(var i = 0; i < selectElements.length; i++) {
 		if(allowReorder && selectElements[i].hasAttribute('aria-flowto')) {
@@ -578,6 +668,9 @@ function load_flowfrom() {
 	}
 }
 
+/**
+ * Stops EZ Access navigation, hides EZ Access selector and resets variables.
+ */
 function stopEZ() {
 	ez_navigateToggle = false;
 	idle_loop();

@@ -1,9 +1,18 @@
-// Alert of how many times user has pressed up
+/**
+ * Alert of how many times user has pressed up
+ * @type {number}
+ */
 var repeatAlert = 0;
 
-// Global text to be read before next speech synthesis; can be set anywhere
+/**
+ * Global text to be read before next speech synthesis; can be set anywhere
+ * @type {string}
+ */
 var globalSayBefore = "";
 
+/**
+ * Global text to be read before next speech synthesis; can be set anywhere
+ */
 var dictionary = null;
 
 /**
@@ -21,8 +30,12 @@ var ALPHABET_CHAR = /[a-zA-Z]/;
 var SSML = true;
 
 
-// Provide easy place to change method of speech synthesis
-
+/**
+ * Provide easy place to change method of speech synthesis
+ * @param {object|string} obj A string to be voiced, or an object to be voiced
+ * @param source {'nav'|'point'} Navigation method passed from calling function
+ * @param repeat If speech is being repeated (EZ Action + no possible action)
+ */
 function voice(obj, source, repeat) {
 	var speech = "";
 	if(typeof (obj) == 'string') {
@@ -52,9 +65,12 @@ function voice(obj, source, repeat) {
 	chrome.extension.sendRequest(req);
 }
 
-
-
-
+/**
+ * Voices an object by putting together name, role and value.
+ * @param {object} obj The object to be voiced
+ * @param {'nav'|'point'} source The navigation method
+ * @returns {string} The object voiced text
+ */
 function voice_object(obj, source) {
 	/**
 	 * The name or label of the interactive object.
@@ -251,7 +267,7 @@ function voice_object(obj, source) {
  * @author J. Bern Jordan
  * @param {DOM Object} obj The DOM object for which to get an
  * accessible name.
- * @param {String} source The source modality: either 'nav' for navigation
+ * @param {'nav'|'point'} source The source modality: either 'nav' for navigation
  * or 'point' for pointing.
  * @param {String} [defaultString=''] A default string for the object's
  * name if a more appropriate one is not found.
@@ -259,7 +275,6 @@ function voice_object(obj, source) {
  * The returned string is the default string if an overriding
  * accessible name is not found.
  */
-
 function getName(obj, source, defaultString) {
 	'use strict';
 	var ret;
@@ -365,7 +380,6 @@ function getName(obj, source, defaultString) {
  * The returned string is the default if an overriding role
  * is not found.
  */
-
 function getRole(obj, defaultString) {
 	'use strict';
 	var ret;
@@ -443,7 +457,6 @@ function getRole(obj, defaultString) {
  * @return {String} An value for the passed object. The returned string is
  * the defaultString if an overriding value is not found.
  */
-
 function getValue(obj, defaultString) {
 	'use strict';
 	var ret, temp;
@@ -470,7 +483,13 @@ function getValue(obj, defaultString) {
 	return ret;
 } //End function getValue()
 
-
+/**
+ * Gets the inner elements of an object and gets the voice parsing of that element, combining at the end. Needed for
+ * tailoring to EZ Access.
+ * @param {object} obj The object to look for child elements of
+ * @param {'nav'|'point'} source The source of navigation
+ * @returns {string} The inner elements voice
+ */
 function get_inner_alt(obj, source) {
 	var speech = "";
 	for(var i = 0; i < obj.childNodes.length; i++) {
@@ -483,10 +502,14 @@ function get_inner_alt(obj, source) {
 	return speech;
 }
 
-// Sayalt
-
+/**
+ * Looks for EZ Access attributes to append or replace the regular speech synthesized speech
+ * @param {object} obj The object in question
+ * @param {string} speech The speech string to modify
+ * @param {'nav'|'point'} source The navigation method
+ * @returns {string} The (potentially) modified speech output
+ */
 function say_replace(obj, speech, source) {
-
 	// data-ez-sayalt
 	if(source == 'nav' && obj.hasAttribute('data-ez-sayalt-nav')) {
 		speech = obj.getAttribute('data-ez-sayalt-nav');
@@ -529,7 +552,6 @@ function say_replace(obj, speech, source) {
  * to be used for alphabetic characters.
  * @return {string} The string for the speech output
  */
-
 function getTypedSpeech(s, regex) {
 	/** The regex object for finding alphabet characters */
 	var alphaChars;
@@ -602,7 +624,6 @@ function getTypedSpeech(s, regex) {
  * be made.
  * @return {string} The string with replacements made.
  */
-
 function fixPronunciation(s, dictionary, caseSensitive) {
 	'use strict';
 	/** The string to be made into a RegExp obj */
