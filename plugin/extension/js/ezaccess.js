@@ -365,7 +365,7 @@ function load_ez() {
 		}, 10);
 	}
 
-	//idle_loop(); // TODO/TEMP
+	//idle_loop(); // TODO/ TEMP
 
 	// Multitouch gesture dragging
 	if(slideToRead) { // If not allowed, do not initialize

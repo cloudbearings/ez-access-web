@@ -108,72 +108,73 @@ function voice_object(obj, source) {
 	 * Get value & extra for different elements
 	 */
 	// obj is a DOM object; parse accordingly
+
+    var type = getType(obj);
+
 	// Check if an input type
-	if(obj.tagName === 'INPUT') {
-		if(obj.hasAttribute('readonly') || obj.hasAttribute('disabled')) {
-			if(obj.value) {
-				value = 'is ' + obj.value;
-			} else {
-				value = 'is blank';
-			}
-		} else if(obj.type === 'radio') {
-			value = obj.checked ? 'is checked' : 'is unchecked';
-		} else if(obj.type === 'checkbox') {
-			value = obj.checked ? 'is checked' : 'is unchecked';
-		} else if(obj.type === 'range') {
-			value = 'is at ' + obj.value;
-			if(obj.hasAttribute('min') && obj.hasAttribute('max')) {
-				extra = 'and ranges from ' + obj.min + ' to ' + obj.max;
-				//The following are "sort of" error cases
-			} else if(obj.hasAttribute('min')) {
-				//With no max, Chrome returns '' but uses 100
-				extra = 'and ranges from ' + obj.min + ' to 100';
-			} else if(obj.hasAttribute('max')) {
-				//With no min, Chrome returns '' but uses 0
-				extra = 'and ranges from 0 to ' + obj.max;
-			} else {
-				extra = 'and ranges from 0 to 100';
-			}
-		} else if(obj.type === 'password') {
-			value = 'contains ' + obj.value.length + ' characters';
-		} else if(obj.type === 'text') {
-			if(obj.value) {
-				value = 'contains ' + getTypedSpeech(obj.value);
-			} else {
-				value = 'is blank';
-			}
-		} else if(obj.type === 'email') {
-			if(obj.value) {
-				value = 'contains ' + obj.value;
-			} else {
-				value = 'is blank';
-			}
-		} else if(obj.type === 'search') {
-			if(obj.value) {
-				value = 'contains ' + obj.value;
-			} else {
-				value = 'is blank';
-			}
-		} else if(obj.type === 'url') {
-			if(obj.value) {
-				value = 'contains ' + obj.value;
-			} else {
-				value = 'is blank';
-			}
-		} else if(obj.type === 'tel') {
-			if(obj.value) {
-				value = 'contains ' + obj.value;
-			} else {
-				value = 'is blank';
-			}
-		} else if(obj.type === 'number') {
-			if(obj.value) {
-				value = 'is ' + obj.value;
-			} else {
-				value = 'is blank';
-			}
-		}
-	} else if(obj.tagName === 'SELECT') {
+    if(obj.hasAttribute('readonly') || obj.hasAttribute('disabled')) {
+        if(obj.value) {
+            value = 'is ' + obj.value;
+        } else {
+            value = 'is blank';
+        }
+    } else if(type === 'radio') {
+        value = obj.checked ? 'is checked' : 'is unchecked';
+    } else if(type === 'checkbox') {
+        value = obj.checked ? 'is checked' : 'is unchecked';
+    } else if(type === 'range') {
+        value = 'is at ' + obj.value;
+        if(obj.hasAttribute('min') && obj.hasAttribute('max')) {
+            extra = 'and ranges from ' + obj.min + ' to ' + obj.max;
+            //The following are "sort of" error cases
+        } else if(obj.hasAttribute('min')) {
+            //With no max, Chrome returns '' but uses 100
+            extra = 'and ranges from ' + obj.min + ' to 100';
+        } else if(obj.hasAttribute('max')) {
+            //With no min, Chrome returns '' but uses 0
+            extra = 'and ranges from 0 to ' + obj.max;
+        } else {
+            extra = 'and ranges from 0 to 100';
+        }
+    } else if(type === 'password') {
+        value = 'contains ' + obj.value.length + ' characters';
+    } else if(type === 'text') {
+        if(obj.value) {
+            value = 'contains ' + getTypedSpeech(obj.value);
+        } else {
+            value = 'is blank';
+        }
+    } else if(type === 'email') {
+        if(obj.value) {
+            value = 'contains ' + obj.value;
+        } else {
+            value = 'is blank';
+        }
+    } else if(type === 'search') {
+        if(obj.value) {
+            value = 'contains ' + obj.value;
+        } else {
+            value = 'is blank';
+        }
+    } else if(type === 'url') {
+        if(obj.value) {
+            value = 'contains ' + obj.value;
+        } else {
+            value = 'is blank';
+        }
+    } else if(type === 'tel') {
+        if(obj.value) {
+            value = 'contains ' + obj.value;
+        } else {
+            value = 'is blank';
+        }
+    } else if(type === 'number') {
+        if(obj.value) {
+            value = 'is ' + obj.value;
+        } else {
+            value = 'is blank';
+        }
+    } else if(type === 'select') {
 		if(obj.hasAttribute('multiple')) {
 			var total = 0;
 			var selected = [];
@@ -207,7 +208,7 @@ function voice_object(obj, source) {
 				value = 'is blank';
 			}
 		}
-	} else if(obj.tagName === 'TEXTAREA') {
+	} else if(type === 'textarea') {
 		if(obj.value) {
 			value = "contains " + getTypedSpeech(obj.value);
 		} else {
@@ -258,6 +259,39 @@ function voice_object(obj, source) {
 }
 
 /**
+ * Gets the type of the object and returns type as a string. Aria-role can overwrite.
+ * @param {object} obj The object to be checked. Returns lowercase.
+ * For inputs, returns type. For select w/ multiple, returns 'multiple'. Otherwise, returns tag name.
+ */
+function getType(obj) {
+    /**
+     * Defines supported aria-roles
+     * @type {Array}
+     * @const
+     */
+    var ariaRoles = ['checkbox','radio','button'];
+
+    // Check for aria-role, and return iff valid
+    if(obj.hasAttribute('aria-role')) {
+        var type = obj.getAttribute('aria-role').toLowerCase();
+        for(i = 0; i < ariaRoles.length; i++) {
+            if(type === ariaRoles[i]) {
+                 return type;
+            }
+        }
+    }
+
+    // Special case
+    if(obj.tagName === 'INPUT') {
+       return obj.type.toLowerCase();
+    }
+
+    // Else return tag name
+    return obj.tagName.toLowerCase();
+
+}
+
+/**
  * This function looks for potential names for the element
  * by looking at different ways of labeling that control type.
  * In precedence order, the name will be the object's:
@@ -303,57 +337,58 @@ function getName(obj, source, defaultString) {
 			ret = label;
 		}
 	}
+
+    var type = getType(obj);
+
 	// Get generic name for specific input types
-	else if(obj.tagName === 'INPUT') {
-		if(obj.hasAttribute('readonly') || obj.hasAttribute('disabled')) {
-			ret = 'Disabled field';
-		} else if(obj.type === 'submit') {
-			if(obj.hasAttribute('value')) {
-				ret = obj.value;
-			} else {
-				ret = 'Submit';
-			}
-		} else if(obj.type === 'reset') {
-			if(obj.hasAttribute('value')) {
-				ret = obj.value;
-			} else {
-				ret = 'Reset';
-			}
-		} else if(obj.type === 'button') {
-			if(obj.hasAttribute('value')) {
-				ret = obj.value;
-			}
-		} else if(obj.type === 'image') {
-			//alt is preferred, title is second choice
-			if(obj.hasAttribute('alt')) {
-				ret = obj.alt;
-			} else if(obj.title) {
-				ret = obj.title;
-			} else {
-				ret = 'Image';
-			}
-		} else if(obj.type === 'password' || obj.type === 'text' ||
-			obj.type === 'email' || obj.type === 'search' ||
-			obj.type === 'url' || obj.type === 'tel' ||
-			obj.type === 'number') {
-			if(obj.hasAttribute('placeholder')) {
-				/**
-				 * Using a placeholder as a label is NOT generally recommended,
-				 * but it is probably better than nothing in this case (because
-				 * no other more appropriate label/name can be found).
-				 */
-				ret = obj.getAttribute('placeholder');
-			}
-		} //Now tags besides <input />...
-	} else if(obj.tagName === 'BUTTON') {
+    if(obj.hasAttribute('readonly') || obj.hasAttribute('disabled')) {
+        ret = 'Disabled field';
+    } else if(type === 'submit') {
+        if(obj.hasAttribute('value')) {
+            ret = obj.value;
+        } else {
+            ret = 'Submit';
+        }
+    } else if(type === 'reset') {
+        if(obj.hasAttribute('value')) {
+            ret = obj.value;
+        } else {
+            ret = 'Reset';
+        }
+    } else if(type === 'button') {
+        if(obj.hasAttribute('value')) {
+            ret = obj.value;
+        }
+    } else if(type === 'image') {
+        //alt is preferred, title is second choice
+        if(obj.hasAttribute('alt')) {
+            ret = obj.alt;
+        } else if(obj.title) {
+            ret = obj.title;
+        } else {
+            ret = 'Image';
+        }
+    } else if(type === 'password' || type === 'text' ||
+        type === 'email' || type === 'search' ||
+        type === 'url' || type === 'tel' ||
+        type === 'number') {
+        if(obj.hasAttribute('placeholder')) {
+            /**
+             * Using a placeholder as a label is NOT generally recommended,
+             * but it is probably better than nothing in this case (because
+             * no other more appropriate label/name can be found).
+             */
+            ret = obj.getAttribute('placeholder');
+        }
+	} else if(type === 'button') {
 		ret = get_inner_alt(obj, source);
-	} else if(obj.tagName === 'IMG') { //TODO - check if necessary
+	} else if(type === 'img') { //TODO - check if necessary
 		if(obj.alt) {
 			ret = obj.alt;
 		}
-	} else if(obj.tagName === 'A' && obj.hasAttribute('href')) {
+	} else if(type === 'a' && obj.hasAttribute('href')) {
 		ret = get_inner_alt(obj, source);
-	} else if(obj.tagName === 'TEXTAREA') {
+	} else if(type === 'textarea') {
 		if(obj.hasAttribute('placeholder')) {
 			/**
 			 * Using a placeholder as a label is NOT generally recommended,
@@ -391,53 +426,51 @@ function getRole(obj, defaultString) {
 
 	if(obj.hasAttribute('data-ez-sayrole')) {
 		ret = obj.getAttribute('data-ez-sayrole');
-	} else if(obj.hasAttribute('aria-role')) {
-		ret = obj.getAttribute('aria-role');
 	}
 
+    var type = getType(obj);
+
 	// Roles for specific input types
-	else if(obj.tagName === 'INPUT') {
-		if(obj.type === 'submit' || obj.type === 'button' ||
-			obj.type === 'reset') {
-			ret = 'Button';
-		} else if(obj.type === 'image') {
-			ret = 'image input';
-		} else if(obj.type === 'radio') {
-			ret = 'Radio Button';
-		} else if(obj.type === 'checkbox') {
-			ret = 'Checkbox';
-		} else if(obj.type === 'range') {
-			ret = 'Slider';
-		} else if(obj.type === 'password') {
-			ret = 'Password field';
-		} else if(obj.type === 'text') {
-			ret = 'Text field';
-		} else if(obj.type === 'email') {
-			ret = 'E-mail field';
-		} else if(obj.type === 'search') {
-			ret = 'Search field';
-		} else if(obj.type === 'url') {
-			ret = 'Web address field';
-		} else if(obj.type === 'tel') {
-			ret = 'Telephone field';
-		} else if(obj.type === 'number') {
-			ret = 'Number field'; //spinner in Chrome
-		}
-	} else if(obj.tagName === 'BUTTON') {
-		ret = 'Button';
-	} else if(obj.tagName === 'IMG') { //TODO - check if necessary
+    if(type === 'submit' || type === 'button' ||
+        type === 'reset') {
+        ret = 'Button';
+    } else if(type === 'image') {
+        ret = 'image input';
+    } else if(type === 'radio') {
+        ret = 'Radio Button';
+    } else if(type === 'checkbox') {
+        ret = 'Checkbox';
+    } else if(type === 'range') {
+        ret = 'Slider';
+    } else if(type === 'password') {
+        ret = 'Password field';
+    } else if(type === 'text') {
+        ret = 'Text field';
+    } else if(type === 'email') {
+        ret = 'E-mail field';
+    } else if(type === 'search') {
+        ret = 'Search field';
+    } else if(type === 'url') {
+        ret = 'Web address field';
+    } else if(type === 'tel') {
+        ret = 'Telephone field';
+    } else if(type === 'number') {
+        ret = 'Number field'; //spinner in Chrome
+    } else if(type === 'button') {
+        ret = 'Button';
+	} else if(type === 'img') { //TODO - check if necessary
 		if(!obj.hasAttribute('alt')) {
 			ret = "Image";
 		}
-	} else if(obj.tagName === 'A' && obj.hasAttribute('href')) {
+	} else if(type === 'a' && obj.hasAttribute('href')) {
 		ret = 'Link';
-	} else if(obj.tagName === 'SELECT') {
+	} else if(type === 'select') {
 		if(obj.hasAttribute('multiple')) {
 			ret = 'Multiple-selections menu';
 		} else {
 			ret = 'Menu';
 		}
-	} else if(obj.tagName === 'TEXTAREA') {
+	} else if(type === 'textarea') {
 		ret = 'Text area';
 	}
 
