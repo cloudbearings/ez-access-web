@@ -1,15 +1,17 @@
-// Volume of the audio elements (0-100)
+/**
+ * Volume of the audio elements (0-100)
+ */
+var audioValume;
 if(sessionStorage.getItem("EZ_Volume") !== null) {
-	var audioVolume = parseInt(sessionStorage.getItem("EZ_Volume"));
+	audioVolume = parseInt(sessionStorage.getItem("EZ_Volume"));
 } else {
-	var audioVolume = 100;
+	audioVolume = 100;
 }
 
 /**
  * AUDIO CONSTANTS finder function
  * loads all audio files into cache
  */
-
 function load_audio() {
 	var i;
 	for(i = 0; i < sounds.length; i++) {
@@ -31,9 +33,8 @@ var AUDIO_BUTTON = find_audio('button');
 /**
  * Searches sounds array of objects for name of sound
  * @param audio_name Name of the audio file to search in object for
- * @return {Number} Position in sounds[].name array
+ * @return {number} Position in sounds[].name array
  */
-
 function find_audio(audio_name) {
 	for(var i = 0; i < sounds.length; i++) {
 		if(audio_name === sounds[i].name) {
@@ -44,12 +45,19 @@ function find_audio(audio_name) {
 	return -1;
 }
 
+/**
+ * Sets to volume of all audio feeds.
+ */
 function set_volume() {
 	for(var i = 0; i < sounds.length; i++) {
 		sounds[i].feed.volume = audioVolume / 100;
 	}
 }
 
+/**
+ * Indexes sounds for specific tags from JSON setup file.
+ * @returns {number} The audio ID.
+ */
 function getElementAudio() {
 	for(var tmp = ['p', 'span', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'li'], i = 0; i < tmp.length; i++) {
 		// To simplify comparing to a whole lot of possibilities, use a loop

@@ -1,3 +1,9 @@
+/**
+ * Checks if parent is a descendant of the child.
+ * @param {object} parent The DOM parent object.
+ * @param {object} child The DOM child element.
+ * @returns {boolean} True iff descendant.
+ */
 function isDescendant(parent, child) {
 	var node = child.parentNode;
 	while(node != null) {
@@ -9,7 +15,9 @@ function isDescendant(parent, child) {
 	return false;
 }
 
-// Generic anonymous JSON-getter function
+/**
+ * Generic anonymous JSON-getter function
+ */
 (function () {
 	var Lib = {
 		ajax: {
@@ -44,8 +52,13 @@ function isDescendant(parent, child) {
 	};
 
 	window.Lib = Lib;
-})()
+})();
 
+/**
+ * Converts a hexadecimal to RGB
+ * @param {string} hex A valid hexadecimal color
+ * @returns {{r: Number, g: Number, b: Number}} RGB object
+ */
 function hexToRgb(hex) {
 	var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 	return result ? {
@@ -55,6 +68,11 @@ function hexToRgb(hex) {
 	} : null;
 }
 
+/**
+ * Gets the current index by an ID in selectElements
+ * @param id The ID of the element
+ * @returns {number} The index in selectElements (currIndex-eable)
+ */
 function getCurrIndexById(id) {
 	for(var i = 0; i < selectElements.length; i++) {
 		if(selectElements[i].id == id) {
@@ -64,6 +82,11 @@ function getCurrIndexById(id) {
 	return -1;
 }
 
+/**
+ * Gets the current index in selectElements by a name
+ * @param name The name to look for
+ * @returns {number} The index of selectElements it's at
+ */
 function getCurrIndexByName(name) {
 	for(var i = 0; i < selectElements.length; i++) {
 		if(selectElements[i].getAttribute('name') == name) {
@@ -73,6 +96,12 @@ function getCurrIndexByName(name) {
 	return -1;
 }
 
+/**
+ * Finds and returns the parent attribute value if exists.
+ * @param obj The object to look parent-ly from
+ * @param attr The attribute name to look for
+ * @returns {string|undefined} The value of the attribute (if found)
+ */
 function find_parent_attr(obj, attr) {
 	if(obj == null) {
 		return undefined;
@@ -86,6 +115,11 @@ function find_parent_attr(obj, attr) {
 	return undefined;
 }
 
+/**
+ * Gets first clickeable parent element from obj
+ * @param {object} obj The object to check from
+ * @returns {object|undefined} The object, if one is found clickeable
+ */
 function getClick(obj) {
 	while(obj !== null) {
 		if(typeof obj.href == "string") {
@@ -98,8 +132,11 @@ function getClick(obj) {
 	return undefined;
 }
 
-// For getting label of any object
-
+/**
+ * Gets the explicit or implicit label of obj
+ * @param {object} obj The object to check from
+ * @returns {object|null} The label, if found
+ */
 function get_label(obj) {
 	if(obj.tagName == "LABEL") return null;
 	var labelElements = document.getElementsByTagName("label");
@@ -120,12 +157,22 @@ function get_label(obj) {
 	return null;
 }
 
+/**
+ * Looks for if obj is a child of a specific element type
+ * @param {object} obj Object to start from
+ * @param {string} type Object type to look for
+ * @returns {boolean} True iff found
+ */
 function isChildOfElType(obj, type) {
 	if(obj.tagName == undefined) return false;
 	if(obj.tagName.toLowerCase() == type.toLowerCase()) return true;
 	return isChildOfElType(obj.parentNode, type);
 }
 
+/**
+ * Parses orphaned text nodes in each object in an array
+ * @param {object[]} paragraphTags The objects (as an array) to parse
+ */
 function parseOrphanedText(paragraphTags) {
 	for(var i = 0; i < paragraphTags.length; i++) {
 		var para = paragraphTags[i];
@@ -160,7 +207,6 @@ function parseOrphanedText(paragraphTags) {
  * @param {} o The object to be tested if it is an array.
  * @return {boolean} If object o is an array or not.
  */
-
 function isArray(o) {
 	return Object.prototype.toString.call(o) === '[object Array]';
 }

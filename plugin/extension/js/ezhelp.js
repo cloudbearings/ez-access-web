@@ -1,6 +1,13 @@
-// Keep track if the TINY modal is open or not
+/**
+ * Keep track if the TINY modal is open or not
+ */
 var tinyOpen = false;
 
+
+/**
+ * Creates a TINY lightbox given a reference.
+ * @param {string|object} alert A string to display or object to get help info about.
+ */
 function ez_help(alert) {
 	var helptext = new String();
 
@@ -13,6 +20,11 @@ function ez_help(alert) {
 	voice(String(helptext));
 }
 
+/**
+ * Alerts EZ Access idle loop lightbox asking user if still there.
+ * TODO Not currently b/c of debugging + development
+ * @param {boolean} display If false, start timer for idle loop. Otherwise, display lightbox + reset.
+ */
 function idle_loop(display) {
 	if(!display) {
 		if(alerts.idle.wait != -1) {
@@ -51,7 +63,6 @@ TERMINATOR = '||';
  * @param {Object} obj The DOM object for which to get the help layers.
  * @return {null|string[]} The help layers (or null if there are no help layers).
  */
-
 function getHelpArray(obj) {
 	'use strict';
 	/**
@@ -130,7 +141,6 @@ function getHelpArray(obj) {
  * @param s {string} The single help layer string to be parsed.
  * @return {string[]} The resulting layer(s) from the parsing.
  */
-
 function parseHelpPageString(s) {
 	/**
 	 * The string to be returned.
@@ -186,6 +196,13 @@ function parseHelpPageString(s) {
 	return ret;
 }
 
+/**
+ * Gets help information from an object.
+ * @param obj Object to look for help layers from.
+ * @param url For console debugging: URL of HTML file looking inside for object.
+ * @param id For console debugging: ID of element.
+ * @returns {string[]} Returns array of strings of 'help layers' that can be used from a given object.
+ */
 function getHelpFromObj(obj, url, id) {
 	if(obj !== null) {
 		if(obj.hasAttribute('data-ez-help')) {
@@ -204,8 +221,18 @@ function getHelpFromObj(obj, url, id) {
 	return null;
 }
 
+/**
+ * Create XMLHttpRequest to get HTML file of help layers on page load.
+ * @type {XMLHttpRequest}
+ */
 var xmlhttp = new XMLHttpRequest();
 
+/**
+ * Gets
+ * TODO DOM Parser can break! No error message provided if it does.
+ * @param {string} url Location (relative to current page) of help layers reference file.
+ * @returns {document} Returns DOM of URL requested.
+ */
 function getDocument(url) {
 	xmlhttp.open("GET", url + '?t=' + new Date().getTime(), false); // TODO : Disable caching for troubleshooting
 	xmlhttp.send();
