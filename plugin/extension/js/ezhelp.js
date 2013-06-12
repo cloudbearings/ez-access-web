@@ -4,11 +4,6 @@
 var tinyOpen = false;
 
 /**
- * Dictionary stored for page load duration
- */
-var dictionary;
-
-/**
  * Creates a TINY lightbox given a reference.
  * @param {string|object} alert A string to display or object to get help info about.
  */
