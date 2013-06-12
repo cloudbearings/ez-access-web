@@ -184,7 +184,7 @@ function voice_object(obj, source) {
 				}
 			}
 			var options = '';
-			for(var i = 0; i < selected.length; i++) {
+			for(i = 0; i < selected.length; i++) {
 				if(i == selected.length - 1 && selected.length > 1) {
 					options += ' and ' + selected[i];
 				} else if(i == 0) {
@@ -241,19 +241,18 @@ function voice_object(obj, source) {
 		speech = role + ': ' + name;
 	}
 
-	/**
-	 * Adding SSML wrapper markup if required.
-	 */
-	if (SSML) {
-		speech = '<?xml version="1.0"?>' +
-		         '<speak>' +
-		         speech +
-		         '</speak>';
-	}
-	return speech;
-
 	// Replace override custom EZ Access
 	speech = say_replace(obj, speech, source);
+
+    /**
+     * Adding SSML wrapper markup if required.
+     */
+    if (SSML) {
+        speech = '<?xml version="1.0"?>' +
+            '<speak>' +
+            speech +
+            '</speak>';
+    }
 
 	return speech;
 }
@@ -265,7 +264,7 @@ function voice_object(obj, source) {
  * data-ez-sayname > aria-labelledby > aria-label > <label> >
  * tag-specific "labels" > defaultString
  * @author J. Bern Jordan
- * @param {DOM Object} obj The DOM object for which to get an
+ * @param {object} obj The DOM object for which to get an
  * accessible name.
  * @param {'nav'|'point'} source The source modality: either 'nav' for navigation
  * or 'point' for pointing.
@@ -373,7 +372,7 @@ function getName(obj, source, defaultString) {
  * In precedence order, the role string will be the object's:
  * data-ez-sayrole > aria-role > input-specific roles > defaultString
  * @author J. Bern Jordan
- * @param {DOM Object} obj The DOM object for which to get role.
+ * @param {object} obj The DOM object for which to get role.
  * @param {String} [defaultString=''] A default string for the object's
  * role if a more appropriate one is not found.
  * @return {String} An accessible role for the passed object.
@@ -451,7 +450,7 @@ function getRole(obj, defaultString) {
  * data-ez-sayvalue > aria-valuetext > aria-valuenow > defaultString
  * This function does NOT look for values specific to different tags.
  * @author J. Bern Jordan
- * @param {DOM Object} obj The DOM object for which to get role.
+ * @param {object} obj The DOM object for which to get role.
  * @param {String} [defaultString=''] A default string for the object's
  * value if a more appropriate one is not found.
  * @return {String} An value for the passed object. The returned string is
@@ -548,7 +547,7 @@ function say_replace(obj, speech, source) {
  * ALPHABET_CHAR regex constant.
  * @author J. Bern Jordan
  * @param {string} s The string to be parsed into speech output
- * @param {Regex} [regex=ALPHABET_CHAR] The regular expression object that is
+ * @param {string} [regex=ALPHABET_CHAR] The regular expression object that is
  * to be used for alphabetic characters.
  * @return {string} The string for the speech output
  */
@@ -581,8 +580,7 @@ function getTypedSpeech(s, regex) {
 	 * will be spelled letter-by-letter.
 	 */
 	var lastWord = [];
-	/** The last word spelled character by character */
-	var spelledWord;
+
 	/** while-loop control boolean */
 	var done = false;
 
@@ -640,8 +638,9 @@ function fixPronunciation(s, dictionary, caseSensitive) {
 	/** Associative array to map lowercase key to real dictionary key */
 	var lowerCaseShadow = {};
 	if(!caseSensitive) {
-		for(var keyword in dictionary) {
-			lowerCaseShadow[keyword.toLowerCase()] = keyword;
+		for(keyword in dictionary) {
+			//noinspection JSUnfilteredForInLoop
+            lowerCaseShadow[keyword.toLowerCase()] = keyword;
 		}
 	}
 
@@ -673,7 +672,7 @@ function fixPronunciation(s, dictionary, caseSensitive) {
 			}
 		}
 	} else {
-		for(var i = 0, n = array.length; i < n; i++) {
+		for(i = 0, n = array.length; i < n; i++) {
 			if(lowerCaseShadow[array[i].toLowerCase()] !== undefined) {
 				ret[i] = dictionary[lowerCaseShadow[array[i].toLowerCase()]];
 			} else {

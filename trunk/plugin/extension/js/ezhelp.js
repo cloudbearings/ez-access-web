@@ -3,13 +3,17 @@
  */
 var tinyOpen = false;
 
+/**
+ * Dictionary stored for page load duration
+ */
+var dictionary;
 
 /**
  * Creates a TINY lightbox given a reference.
  * @param {string|object} alert A string to display or object to get help info about.
  */
 function ez_help(alert) {
-	var helptext = new String();
+	var helptext = "";
 
 	if(typeof alert === 'string') {
 		helptext = String(alert);
@@ -85,11 +89,7 @@ function getHelpArray(obj) {
 		attr = obj.getAttribute('data-ez-help');
 
 		//See if this function needs to make a recursive call
-		if(attr.slice(-TERMINATOR.length) === TERMINATOR) {
-			end = true;
-		} else {
-			end = false;
-		}
+        end = attr.slice(-TERMINATOR.length) === TERMINATOR;
 
 		ret = attr.split(DELIMITER);
 
@@ -121,7 +121,7 @@ function getHelpArray(obj) {
 
 		var recursive = getHelpArray(parent);
 
-		if(isArray(recursive) && recursive !== null) {
+		if(isArray({o: recursive}) && recursive !== null) {
 			if(ret === null) {
 				ret = [];
 			}
@@ -158,9 +158,9 @@ function parseHelpPageString(s) {
 
 			//Hashes are *not* allowed in IDs (http://goo.gl/YgTLi), but get 
 			//rest just to be safe.
-			var id = s.slice(s.indexOf('#') + 1);
+			id = s.slice(s.indexOf('#') + 1);
 
-			var div = document.getElementById(id);
+			div = document.getElementById(id);
 
 			ret = getHelpFromObj(div, 'current page', id);
 
@@ -238,11 +238,9 @@ function getDocument(url) {
 	xmlhttp.send();
 	if(xmlhttp.status == 200) {
 		var xmlString = xmlhttp.responseText,
-			parser = new DOMParser(),
-			doc = parser.parseFromString(xmlString, "text/html");
-		parser = new DOMParser();
-		// returns a HTMLDocument, which also is a Document.
-		return doc;
+			parser = new DOMParser();
+        // returns a HTMLDocument, which also is a Document.
+		return parser.parseFromString(xmlString, "text/html");
 	} else {
 		return null;
 	}

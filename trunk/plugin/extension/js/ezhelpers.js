@@ -19,10 +19,10 @@ function isDescendant(parent, child) {
  * Generic anonymous JSON-getter function
  */
 (function () {
-	var Lib = {
+	Lib = {
 		ajax: {
 			xhr: function () {
-				var instance = new XMLHttpRequest();
+				instance = new XMLHttpRequest();
 				return instance;
 			},
 			getJSON: function (options, callback) {
@@ -204,10 +204,11 @@ function parseOrphanedText(paragraphTags) {
 /**
  * Utility function to check if the passed object is an Array
  * From: http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/
- * @param {} o The object to be tested if it is an array.
+ * @param {object} param The object to be tested if it is an array.
  * @return {boolean} If object o is an array or not.
  */
-function isArray(o) {
+function isArray(param) {
+    var o = param.o;
 	return Object.prototype.toString.call(o) === '[object Array]';
 }
 
@@ -269,7 +270,7 @@ function __parseBorderWidth(width) {
 //returns border width for some element
 
 function __getBorderWidth(element) {
-	var res = new Object();
+	var res = {};
 	res.left = 0;
 	res.top = 0;
 	res.right = 0;
@@ -303,7 +304,7 @@ function getElementAbsolutePos(elemID) {
 		element = elemID;
 	}
 
-	var res = new Object();
+	var res = {};
 	res.x = 0;
 	res.y = 0;
 	if(element !== null) {

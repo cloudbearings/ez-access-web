@@ -51,20 +51,20 @@ var allowReorder = false;
  * @returns {Array} References to object as an array that are requested.
  */
 function getElementsByTagNames(list, obj) {
-	if(!obj) var obj = document;
+	if(!obj) obj = document;
 	var tagNames = list.split(',');
-	var resultArray = new Array();
-	for(var i = 0; i < tagNames.length; i++) {
+	var resultArray = [];
+	for(i = 0; i < tagNames.length; i++) {
 		var tags = obj.getElementsByTagName(tagNames[i]);
 		for(var j = 0; j < tags.length; j++) {
 			resultArray.push(tags[j]);
 		}
 	}
-	var nodeList_parsed = document.querySelectorAll("[data-ez-parse]")
+	var nodeList_parsed = document.querySelectorAll("[data-ez-parse]");
 
 	var force_parsed = [],
 		l = nodeList_parsed.length >>> 0; // Convert to array
-	for(; l--; force_parsed[l] = nodeList_parsed[l]);
+	for( ; l--; force_parsed[l] = nodeList_parsed[l]);
 
 	for(var i = 0; i < force_parsed.length;) {
 		if(!isDescendant(obj, force_parsed[i])) {
@@ -123,10 +123,7 @@ function orphanedLabel(element) {
 	if(element.htmlFor == '') {
 		return true;
 	}
-	if(getElementsByTagNames(COMPATIBLE_TAGS, element).length > 0) {
-		return true;
-	}
-	return false;
+    return getElementsByTagNames(COMPATIBLE_TAGS, element).length > 0;
 }
 
 /**
@@ -175,28 +172,29 @@ function index_ez() {
  */
 function indexElements(world) {
 	// INITIAL INDEXING OF PAGE ELEMENTS
-	selectElementsTemp = getElementsByTagNames(COMPATIBLE_TAGS, world);
+	var children;
+    selectElementsTemp = getElementsByTagNames(COMPATIBLE_TAGS, world);
 
 	// Check if ez-focusable to remove (+ CHILDREN)
-	for(var i = 0; i < selectElementsTemp.length; i++) {
+	for(i = 0; i < selectElementsTemp.length; i++) {
 		if(selectElementsTemp[i].getAttribute('data-ez-focusable') == 'false') {
-			var children = getElementsByTagNames(COMPATIBLE_TAGS, selectElementsTemp[i]);
-			for(var j = 0; j < children.length + 1; j++) {
+            children = getElementsByTagNames(COMPATIBLE_TAGS, selectElementsTemp[i]);
+			for(j = 0; j < children.length + 1; j++) {
 				if(!selectElementsTemp[i + j].hasAttribute('data-ez-focusable') || selectElementsTemp[i + j].getAttribute('data-ez-focusable') === 'inherit') {
 					selectElementsTemp[i + j].setAttribute('data-ez-focusable', 'false');
 				}
 			}
 		}
 		if(selectElementsTemp[i].getAttribute('data-ez-focusable-nav') == 'false') { // Like above code for *-nav
-			var children = getElementsByTagNames(COMPATIBLE_TAGS, selectElementsTemp[i]);
-			for(var j = 0; j < children.length + 1; j++) {
+			children = getElementsByTagNames(COMPATIBLE_TAGS, selectElementsTemp[i]);
+			for(j = 0; j < children.length + 1; j++) {
 				if(!selectElementsTemp[i + j].hasAttribute('data-ez-focusable-nav') || selectElementsTemp[i + j].getAttribute('data-ez-focusable-nav') === 'inherit') {
 					selectElementsTemp[i + j].setAttribute('data-ez-focusable-nav', 'false');
 				}
 			}
 		}
 		if(selectElementsTemp[i].getAttribute('data-ez-focusable-point') == 'false') { // Like above code for *-point
-			var children = getElementsByTagNames(COMPATIBLE_TAGS, selectElementsTemp[i]);
+			children = getElementsByTagNames(COMPATIBLE_TAGS, selectElementsTemp[i]);
 			for(var j = 0; j < children.length + 1; j++) {
 				if(!selectElementsTemp[i + j].hasAttribute('data-ez-focusable-point') || selectElementsTemp[i + j].getAttribute('data-ez-focusable-point') === 'inherit') {
 					selectElementsTemp[i + j].setAttribute('data-ez-focusable-point', 'false');
@@ -206,9 +204,9 @@ function indexElements(world) {
 	}
 
 	// Check if ez-chunking == group; if so, group 'em
-	for(var i = 0; i < selectElementsTemp.length;) {
+	for(i = 0; i < selectElementsTemp.length;) {
 		if(selectElementsTemp[i].getAttribute('data-ez-chunking') == 'group' && !selectElementsTemp[i].hasAttribute('data-ez-subnavtype')) {
-			var removeAmount = getElementsByTagNames(COMPATIBLE_TAGS, selectElementsTemp[i]).length;
+            removeAmount = getElementsByTagNames(COMPATIBLE_TAGS, selectElementsTemp[i]).length;
 			selectElementsTemp.splice(i + 1, removeAmount);
 			i += removeAmount + 1;
 		} else {
@@ -218,7 +216,7 @@ function indexElements(world) {
 
 	// Check and remove elements with children if tabindex (excluding grouped stuff).
 	if(allowReorder) {
-		for(var i = 0; i < selectElementsTemp.length;) {
+		for(i = 0; i < selectElementsTemp.length;) {
 			if(selectElementsTemp[i].hasAttribute('tabindex') && getElementsByTagNames(COMPATIBLE_TAGS, selectElementsTemp[i]).length > 0 && !(selectElementsTemp[i].getAttribute('data-ez-focusable') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-point') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-nav') == 'true')) {
 				var removeAmount = getElementsByTagNames(COMPATIBLE_TAGS, selectElementsTemp[i]).length;
 				selectElementsTemp.splice(i + 1, removeAmount);
@@ -299,15 +297,15 @@ function load_ez() {
 
 	var lastEvent;
 	var heldKeys = {};
-	map = {} // Have to do this weird thing in order to detect two keys at same time (e.g., shift+tab)
+	map = {}; // Have to do this weird thing in order to detect two keys at same time (e.g., shift+tab)
 	onkeydown = function (event) {
-		autoAdvance = 0; // Stop any autoadvancing timers
+        autoAdvance = 0; // Stop any autoadvancing timers
 		window.clearInterval(autoAdvTimer);
 		if(autoRepeat == 'keyboard') {
-			var return1 = multikey_event(event);
+            return1 = multikey_event(event);
 		} else if(autoRepeat == 'on') {
-			var return1 = multikey_event(event);
-			var return2 = key_event(event);
+			return1 = multikey_event(event);
+            return2 = key_event(event);
 		}
 		if(lastEvent && lastEvent.keyCode == event.keyCode) {
 			return false;
@@ -315,16 +313,14 @@ function load_ez() {
 		lastEvent = event;
 		heldKeys[event.keyCode] = true;
 		if(autoRepeat == 'off') {
-			var return1 = multikey_event(event);
-			var return2 = key_event(event);
+			return1 = multikey_event(event);
+			return2 = key_event(event);
 		} else if(autoRepeat == 'keyboard') {
-			var return2 = key_event(event);
+			return2 = key_event(event);
 		}
-		if(return1 && return2) {
-			return;
-		} else {
-			return false;
-		}
+        if (!(return1 && return2)) {
+            return false;
+        }
 	};
 	onkeyup = function (event) {
 		multikey_event(event);
@@ -385,7 +381,7 @@ function load_ez() {
 			}
 			mouseOver(document.elementFromPoint(parseFloat(ev.position.x) - parseFloat(window.scrollX), parseFloat(ev.position.y) - parseFloat(window.scrollY)));
 		};
-		hammer.ontap = function (ev) {
+		hammer.ontap = function () {
 			stopEZ();
 		};
 	}
@@ -395,8 +391,8 @@ function load_ez() {
 		Lib.ajax.getJSON({
 			url: document.body.getAttribute('data-ez-pronounce'),
 			type: 'json'
-		}, function (dictionary) {
-			this.dictionary = JSON.parse(dictionary);
+		}, function (getDictionary) {
+			dictionary = JSON.parse(getDictionary);
 		});
 	}
 }
@@ -458,7 +454,7 @@ window.onresize = function () {
 	if(ez_navigateToggle) {
 		drawSelected(selectElements[currIndex]);
 	}
-}
+};
 
 /**
  * If on a group, will skip past it + nested elements in selectElements.
@@ -564,8 +560,8 @@ function ez_navigate_in_group() {
  */
 function findFocusable(location) {
 	if(location == 'last') {
-		for(var i = selectElements.length - 1; i > 0;) {
-			var pos = getElementAbsolutePos(selectElements[i]);
+		for(i = selectElements.length - 1; i > 0;) {
+			pos = getElementAbsolutePos(selectElements[i]);
 			if(selectElements[i].getAttribute('data-ez-focusable-nav') == 'false' || selectElements[i].getAttribute('data-ez-focusable') == 'false') {
 				i--;
 			} else if(!pos || selectElements[i].offsetWidth == 0 || selectElements[i].offsetWidth == 0) {
