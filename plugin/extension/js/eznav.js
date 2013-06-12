@@ -335,7 +335,7 @@ function ez_navigate(move, noParse) {
 function ez_jump(location) {
 	selectElements[currIndex].blur();
 	currIndex = parseFloat(location);
-	drawSelected(selectElements[currIndex])
+	drawSelected(selectElements[currIndex]);
 	sounds[getElementAudio()].feed.play();
 	selectElements[currIndex].focus();
 	voice(selectElements[currIndex], 'nav');
@@ -351,9 +351,9 @@ function ez_enter() {
 		if(obj.href.indexOf("#") != -1) {
 			var hrefBase = obj.href.substring(0, obj.href.indexOf("#"));
 			if(window.location.href.indexOf("#") != -1) {
-				var pageBase = window.location.href.substring(0, window.location.href.indexOf("#"));
+				pageBase = window.location.href.substring(0, window.location.href.indexOf("#"));
 			} else {
-				var pageBase = window.location.href;
+				pageBase = window.location.href;
 			}
 			if(hrefBase == "" || hrefBase == pageBase) { // If from same URL base
 				var jumpTo = obj.href.substring(obj.href.indexOf("#") + 1);
@@ -435,8 +435,8 @@ function mouseOver(e) {
  * @returns {boolean} If false, overrides default action.
  */
 function multikey_event(e) {
-	e = e || event //to deal with IE
-	map[e.keyCode] = e.type == 'keydown' ? true : false
+	e = e || event; //to deal with IE
+	map[e.keyCode] = !!(e.type == 'keydown');
 	if(map[KB_TAB] && map[KB_SHIFT] && tabNav != 'none') { //SHIFT+TAB
 		if(tinyOpen) {
 			tinyOpen = false;
@@ -518,6 +518,7 @@ function findPos(obj) {
 		} while (obj = obj.offsetParent);
 		return [curtop];
 	}
+    return [null];
 }
 
 /**
@@ -553,7 +554,7 @@ function smoothScroll(stopY) {
 	var leapY = stopY > startY ? startY + step : startY - step;
 	var timer = 0;
 	if(stopY > startY) {
-		for(var i = startY; i < stopY; i += step) {
+		for(i = startY; i < stopY; i += step) {
 			setTimeout("window.scrollTo(0, " + leapY + ")", timer * speed);
 			leapY += step;
 			if(leapY > stopY) leapY = stopY;
@@ -561,7 +562,7 @@ function smoothScroll(stopY) {
 		}
 		return;
 	}
-	for(var i = startY; i > stopY; i -= step) {
+	for(i = startY; i > stopY; i -= step) {
 		setTimeout("window.scrollTo(0, " + leapY + ")", timer * speed);
 		leapY -= step;
 		if(leapY < stopY) leapY = stopY;
