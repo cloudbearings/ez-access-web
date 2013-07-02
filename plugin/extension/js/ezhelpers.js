@@ -69,34 +69,6 @@ function hexToRgb(hex) {
 }
 
 /**
- * Gets the current index by an ID in selectElements
- * @param id The ID of the element
- * @returns {number} The index in selectElements (currIndex-eable)
- */
-function getCurrIndexById(id) {
-	for(var i = 0; i < selectElements.length; i++) {
-		if(selectElements[i].id == id) {
-			return i;
-		}
-	}
-	return -1;
-}
-
-/**
- * Gets the current index in selectElements by a name
- * @param name The name to look for
- * @returns {number} The index of selectElements it's at
- */
-function getCurrIndexByName(name) {
-	for(var i = 0; i < selectElements.length; i++) {
-		if(selectElements[i].getAttribute('name') == name) {
-			return i;
-		}
-	}
-	return -1;
-}
-
-/**
  * Finds and returns the parent attribute value if exists.
  * @param obj The object to look parent-ly from
  * @param attr The attribute name to look for
