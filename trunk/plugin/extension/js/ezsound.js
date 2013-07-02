@@ -58,16 +58,16 @@ function set_volume() {
  * Indexes sounds for specific tags from JSON setup file.
  * @returns {number} The audio ID.
  */
-function getElementAudio() {
+function getElementAudio(obj) {
 	for(var tmp = ['p', 'span', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'li'], i = 0; i < tmp.length; i++) {
 		// To simplify comparing to a whole lot of possibilities, use a loop
-		if(getClick(selectElements[currIndex]) !== undefined || selectElements[currIndex].tagName == 'INPUT') {
+		if(getClick(obj) !== undefined || obj.tagName == 'INPUT') {
 			return AUDIO_BUTTON;
 		}
-		if(selectElements[currIndex].tagName == tmp[i].toUpperCase()) {
+		if(obj.tagName == tmp[i].toUpperCase()) {
 			return AUDIO_MOVE;
 		}
 	}
-	console.log('No specific sound for "' + selectElements[currIndex].tagName + '" HTML tag.');
+	console.log('No specific sound for "' + obj.tagName + '" HTML tag.');
 	return AUDIO_MOVE;
 }

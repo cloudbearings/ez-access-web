@@ -1,27 +1,20 @@
 /**
+ * The DOM object on the page being highlighted.
+ * If null, no element is selected yet (usually will get the first navigable one on the page).
+ * @type {Element|null}
+ */
+var selectEl = null;
+
+/**
+ * The ID of the EZ masking span tag.
+ * @type {string}
+ */
+var maskId = 'EZ_mask';
+/**
  * Selector ID to use on the page
  * @type {string}
   */
 var ezSelectorId = 'ezselected';
-
-/**
- * Tags that are candidates for highlight
- * @type {string}
- * @const
- */
-var COMPATIBLE_TAGS = 'p,img,a,div,h1,h2,h3,h4,h5,figure,figcaption,ul,ol,li,input,button,textarea,select,article,aside,hgroup,legend,dt,dd,label';
-
-/**
- * Array of tags generated on pageload initialized globally
- * @type {object[]}
- */
-var selectElements;
-
-/**
- * Current index (of selectElements array) for navigation purposes
- * @type {number}
- */
-var currIndex = 0;
 
 /**
  * Whether EZ navigation mode is activated or not
@@ -43,199 +36,750 @@ var allowReorder = false;
 
 
 /**
- * Gets all elements, IN ORDER _AND_ by element name.
- * http://www.quirksmode.org/dom/getElementsByTagNames.html
- * @param {string} list A string with a comma-separated list of tag names.
- * @param {object} obj An optional start element. If it's present the script searches only for tags that
- * are descendants of this element, if it's absent the script searches the entire document.
- * @returns {Array} References to object as an array that are requested.
+ * An array/list of input types and tags that are interactive and should be
+ * highlighted separately from other elements.
  */
-function getElementsByTagNames(list, obj) {
-	if(!obj) obj = document;
-	var tagNames = list.split(',');
-	var resultArray = [];
-	for(i = 0; i < tagNames.length; i++) {
-		var tags = obj.getElementsByTagName(tagNames[i]);
-		for(var j = 0; j < tags.length; j++) {
-			resultArray.push(tags[j]);
-		}
-	}
-	var nodeList_parsed = document.querySelectorAll("[data-ez-parse]");
+var INTERACTIVE_TYPES = [
+    'checkbox', 'radio', 'select', 'button', 'submit', 'reset',
+    'range', 'number',
+    'text', 'password', 'email', 'search', 'url', 'tel', 'textarea'];
 
-	var force_parsed = [],
-		l = nodeList_parsed.length >>> 0; // Convert to array
-	for( ; l--; force_parsed[l] = nodeList_parsed[l]);
+/**
+ * An array/list of HTML tags that are inline and should not normally be
+ * navigated to in an individual manner. In general, these tags are safe
+ * to be "fused" together with other similar types of content.
+ * @const
+ */
+var INLINE_TAGS = [
+    'a', //<a> without an href attribute is treated as inline
+    'abbr', 'acronym', 'address', 'b',
+    'bdi', 'bdo',
+    'big', 'blink', 'br',
+    'cite', 'code',
+    'data', //experimental in HTML spec
+    'del', 'dfn', 'em',
+    'figcaption', //To be lumped together with everything else in the <caption>
+    'font', 'hr', 'i',
+    'img', //<img> alt-text generally included with other content
+    'ins', 'kbd', 'mark', 'q', 's',
+    'samp', 'small', 'span', 'strike',
+    'strong', 'sub', 'sup', 'time',
+    'tt', 'u', 'var', 'wbr', 'xmp'];
 
-	for(var i = 0; i < force_parsed.length;) {
-		if(!isDescendant(obj, force_parsed[i])) {
-			force_parsed.splice(i, 1);
-		} else {
-			i++;
-		}
-	}
 
-	resultArray = resultArray.concat(force_parsed);
+/**
+ * An array/list of tags associated with tabular content.
+ * This content is not specifically supported at this point.
+ * @const
+ */
+var TABLE_TAGS = [
+    'col', 'colgroup', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr'];
 
-	var testNode = resultArray[0];
-	if(!testNode) return [];
-	if(testNode.sourceIndex) {
-		resultArray.sort(function (a, b) {
-			return a.sourceIndex - b.sourceIndex;
-		});
-	} else if(testNode.compareDocumentPosition) {
-		resultArray.sort(function (a, b) {
-			return 3 - (a.compareDocumentPosition(b) & 6);
-		});
-	}
+/**
+ * An array/list of tags that are not supported by EZ Access.
+ * @const
+ */
+var UNSUPPORTED_TAGS = [
+    'iframe',
+    'ruby', 'rp', 'rt',
+    'keygen',
+    'menu'];
 
-	// We must remove leaves before ANY parsing.
-	resultArray = setLeaves(resultArray);
+/**
+ * An array/list of tags that encapsulate data that does not make sense to be
+ * navigated by the user.
+ * @const
+ */
+var UNNAVIGABLE_TAGS = [
+    'map', 'area',
+    'datalist', 'option', 'optgroup',
+    'menuitem', 'command',
+    'script', 'noscript'];
 
-	// Remove labels with references
-	resultArray = removeNonOrphanedLabels(resultArray);
+/**
+ * These tags generally contain content that must be rendered using
+ * a plugin or other browser module. They are not supported by
+ * EZ Access.
+ * @const
+ */
+var PLUGIN_TAGS = [
+    'applet', 'canvas', 'embed', 'object', 'param',
+    'audio', 'bgsound', 'video', 'source', 'track'];
 
-	return resultArray;
+/**
+ * These tags have been deprecated or are obselete and are not supported
+ * by EZ Access.
+ * Note that some deprecated tags (namely those that may contain
+ * inline content) are supported by EZ Access.
+ * @const
+ */
+var DEPRECATED_TAGS = [
+    'basefont', 'dir', 'frame', 'frameset', 'isindex', 'listing',
+    'nobr', 'noframes', 'plaintext', 'spacer', 'command'];
+
+/**
+ * These tags should never be present in the <body> and should be skipped
+ * by EZ Access unless they have specific attributes.
+ * @const
+ */
+var HEAD_TAGS = [
+    'html', 'head', 'base', 'body', 'link', 'meta', 'style', 'title'];
+
+/**
+ * This is an array/list of HTML tags that should be completely skipped
+ * when navigating or pointing to elements unless they have specific attributes.
+ * Some of these tags are unsupported in EZ Access.
+ * @const
+ */
+var SKIPPED_TAGS = [].concat(UNSUPPORTED_TAGS, UNNAVIGABLE_TAGS, PLUGIN_TAGS,
+    DEPRECATED_TAGS, HEAD_TAGS);
+
+
+/**
+ * An array of all tags in HTML, including deprecated, obsolete, and
+ * non-standard tags. This list should only be used when looking for
+ * unknown or custom tags in the DOM. The data for this list came from:
+ * https://developer.mozilla.org/en-US/docs/Web/HTML/Element
+ * as of 2013-06-17 and may be updated as HTML continues to evolve.
+ * @const
+ */
+var ALL_HTML_TAGS = [
+    'a', 'abbr', 'acronym', 'address', 'applet', 'area',
+    'article', 'aside', 'audio', 'b', 'base', 'basefont', 'bdi', 'bdo',
+    'bgsound', 'big', 'blink', 'blockquote', 'body', 'br', 'button',
+    'canvas', 'command', 'caption', 'center', 'cite', 'code', 'col',
+    'colgroup', 'data', 'datalist', 'dd', 'del', 'details', 'dfn', 'dir',
+    'div', 'dl', 'dt', 'em', 'embed', 'fieldset', 'figcaption', 'figure',
+    'font', 'footer', 'form', 'frame', 'frameset',
+    'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'head', 'header', 'hgroup',
+    'hr', 'html', 'i', 'iframe', 'img', 'input', 'ins', 'isindex',
+    'kbd', 'keygen', 'label', 'legend', 'li', 'link', 'listing',
+    'main', 'map', 'mark', 'marquee', 'menu', 'menuitem', 'meta',
+    'meter', 'nav', 'nobr', 'noframes', 'noscript', 'object', 'ol',
+    'optgroup', 'option', 'output', 'p', 'param', 'plaintext', 'pre',
+    'progress', 'q', 'rp', 'rt', 'ruby', 's', 'samp', 'script',
+    'section', 'select', 'small', 'source', 'spacer', 'span', 'strike',
+    'strong', 'style', 'sub', 'summary', 'sup', 'table', 'tbody', 'td',
+    'textarea', 'tfoot', 'th', 'thead', 'time', 'title', 'tr', 'track',
+    'tt', 'u', 'ul', 'var', 'video', 'wbr', 'xmp'];
+
+
+/**
+ * Checks to see if the DOM Object o is focusable in EZ Access when
+ * the user is navigating (i.e., using EZ Up or EZ Down).
+ * The data-ez-focusable attribute is inherited,
+ * so this function checks for inheritance.
+ * @author J. Bern Jordan, Alexander Harding
+ * @param {object} o The DOM object to be checked.
+ * @param [{'nav'|'point'}] source Navigation method passed from calling function
+ * @return {boolean} Whether o is focusable with EZ Access navigation.
+ */
+function isFocusable(o, source) {
+    'use strict';
+
+    // Look for nodes and elements only; return false otherwise
+    if(isElement(o));
+    else if(isNode(o)) o = o.parentElement;
+    else return false;
+
+    if(source === undefined) source = 'nav';
+
+    if (SKIPPED_TAGS.indexOf(o.tagName.toLowerCase()) !== -1) {
+        return false;
+    }
+
+    var attr = '';
+
+    /** Check to see if immediate element is focusable or not */
+    if (o.hasAttribute('data-ez-focusable')) {
+        attr = o.getAttribute('data-ez-focusable');
+    }
+    if (source === 'nav' && o.hasAttribute('data-ez-focusable-nav')) {
+        attr = o.getAttribute('data-ez-focusable-nav');
+    }
+    if (source === 'point' && o.hasAttribute('data-ez-focusable-point')) {
+        attr = o.getAttribute('data-ez-focusable-point');
+    }
+
+    if (attr === 'true') {
+        return true;
+    }
+    if (attr === 'false') {
+        return false;
+    }
+
+    //Check recursively to see if the parents are focusable
+    var parent = o.parentElement;
+    if (parent === null || parent.tagName === 'BODY') {
+        return true; //by default element is focusable if nothing to inherit
+    }
+    return isFocusable(parent);
+}
+
+//Returns true if it is a DOM node
+function isNode(o){
+    return (
+        typeof Node === "object" ? o instanceof Node :
+            o && typeof o === "object" && typeof o.nodeType === "number" && typeof o.nodeName==="string"
+        );
+}
+
+//Returns true if it is a DOM element
+function isElement(o){
+    return (
+        typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
+            o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName==="string"
+        );
 }
 
 /**
- * Removes labels that do not reference anything.
- * @param {object[]} elements Object array of elements
- * @returns {object[]} An array of a selection of labels via 'elements' that are not orphaned (reference something).
+ * Checks to see if the DOM Object o is a supported interactive element.
+ * @author J. Bern Jordan, Alexander Harding
+ * @param {object} o The DOM object to be checked.
+ * @return {boolean} Whether o is a supported interactive element.
  */
-function removeNonOrphanedLabels(elements) {
-	for(var i = 0; i < elements.length;) {
-		if(elements[i].tagName === 'LABEL' && !orphanedLabel(elements[i])) {
-			elements.splice(i, 1);
-		} else {
-			i++;
-		}
-	}
-	return elements;
+function isInteractive(o) {
+    'use strict';
+
+    // Look for nodes and elements only; return false otherwise
+    if(isElement(o));
+    else if(isNode(o)) o = o.parentElement;
+    else return false;
+
+    if (o.hasAttribute('onlick')) {
+        return true;
+    }
+    var type = o.tagName.toLowerCase();
+    if (type === 'a') {
+        //<a> without href is not interactive
+        return o.hasAttribute('href');
+    }
+    return INTERACTIVE_TYPES.indexOf(type) > -1;
 }
 
 /**
- * Used by fn removeNonOrphanedLabels. Finds if label is orphaned returns boolean on state. Assumes the 'for' attribute
- * references a valid element. Looks for implicit AND explicit referencing.
- * @param {object} element MUST be a label for function to operate properly.
- * @returns {boolean} True iff orphaned.
+ * Checks to see whether the passed node can be inline with other inline
+ * nodes (i.e., it can be safely combined with other inline elements when
+ * being highlighted and read.
+ * Note: A return of false implies that the node may be a block-level element,
+ * but its decendendants need to be checked to make sure all of them are
+ * inline elements.
+ * @author J. Bern Jordan, Alexander Harding
+ * @param {object} o A Node object or DOM element to be checked.
+ * @param {'nav'|'point'} source Navigation method passed from calling function
+ * @throws {Error} Throws an error if o is neither a text or DOM node.
  */
-function orphanedLabel(element) {
-	if(element.htmlFor == '') {
-		return true;
-	}
-    return getElementsByTagNames(COMPATIBLE_TAGS, element).length > 0;
+function isInlineElement(o, source) {
+    'use strict';
+
+    // Look for nodes and elements only; return false otherwise
+    if(isElement(o));
+    else return isNode(o);
+
+    if(source === undefined) source = 'nav';
+
+    if (o.nodeType !== 1) {
+        if (o.nodeType === 3) {
+            return true; //text node can be inline with other nodes
+        } //else
+        throw new Error('Node not a DOM or text node.');
+    } //Else: o is a DOM element
+
+    /** Interactive elements should not be inline with other elements */
+    if (isInteractive(o)) {
+        return false;
+    }
+
+    /**
+     * Check to see if o has an attribute which would otherwise override
+     * the inline presentation behavior.
+     */
+    if (o.hasAttribute('data-ez-chunking')) {
+        var chunking = o.getAttribute('data-ez-chunking');
+
+        if (source === 'nav') {
+            if (chunking === 'block-nav') {
+                return false;
+            }
+            if (chunking === 'inline-nav') {
+                return true;
+            }
+        }
+
+        if (source === 'point') {
+            if (chunking === 'block-point') {
+                return false;
+            }
+            if (chunking === 'block-inline') {
+                return true;
+            }
+        }
+
+        if (chunking === 'block') {
+            return false;
+        }
+        if (chunking === 'inline') {
+            return true;
+        }
+    }
+
+    /** Now, have to check the type of element (tag) o is */
+    var tag = o.tagName.toLowerCase();
+
+    /** Check to see if o is an inline tag */
+    if (INLINE_TAGS.indexOf(tag) !== -1) {
+        return true;
+    }
+
+    /** Check to see if o is an unknown tag */
+    if (ALL_HTML_TAGS.indexOf(tag) === -1) {
+        //a custom/unknown tag should be treated as inline by default
+        return true;
+    }
+
+    /** If not explicitly an inline tag, treat potentially as block-level */
+    return false;
 }
 
 /**
- * This function reparses and updates the selectElements element, as well as modifying some DOM element attributes for
- * EZ Access. However, a lot of the actual 'parsing' and manipulation of the retrieved potentially navigable elements
- * is done by the indexElements function.
+ * Checks all descendants of the given node to see if all of them are either
+ * inline or have "display: none".
+ * @author J. Bern Jordan
+ * @param o {object} A Node object to be checked.
+ * @param source ['nav'|'point'} Navigation method passed from calling function
  */
-function index_ez() {
-	parseOrphanedText(getElementsByTagNames('p'));
+function areAllChildrenInline(o, source) {
+    'use strict';
 
-	selectElements = indexElements(document);
+    var children = getChildNodes(o, source);
 
-	if(allowReorder) {
-		// Sorting by tabindex
-		var tempselectElement = [];
-		j = 0;
-		for(var i = 0; i < selectElements.length;) {
-			if(parseFloat(selectElements[i].getAttribute('tabindex')) < 0) {
-				selectElements.splice(i, 1); // Skip if < 0
-			} else if(selectElements[i].hasAttribute('tabindex')) {
-				tempselectElement[j] = selectElements.splice(i, 1)[0];
-				j++;
-			} else {
-				i++;
-			}
-		}
-		tempselectElement.sort(function (a, b) {
-			return a.getAttribute('tabindex') - b.getAttribute('tabindex');
-		});
-		selectElements = tempselectElement.concat(selectElements);
-	}
+    if (children === null) {
+        return true;
+    }
 
-	clear_jumppoints();
-	load_jumppoints();
+    var i, n; //loop control variables
+    var result;
 
-	if(allowReorder) {
-		load_flowfrom();
-	}
+    /** Go through children using recursive calls as necessary */
+    for (i = 0, n = children.length; i < n; i++) {
+        if (o.style.display === 'none') {
+            result = true;
+            //if a node is not displayed, it is "inline" for these
+            //purposes and the decendants do not need to be checked
+        } else {
+            result = isInlineElement(children[i], source) &&
+                areAllChildrenInline(children[i], source);
+        }
+
+        if (!result) {
+            return false; //shortcut if any false result
+        }
+    }
+
+    /** No false result found */
+    return true;
 }
 
 /**
- * Creates a selectElements candidate given a scope.
- * @param {object} world The scope to look at. If given element, only looks at children. If given 'document' ==> valid for whole
- * web page.
- * @returns {object[]} Returns a new selectElements potential variable.
+ * A version of |Node.childNodes| that skips nodes that are entirely
+ * whitespace or comments. Unlike Node.childNodes, this function returns an
+ * actual array of nodes rather than a NodeList.
+ * @author J. Bern Jordan
+ * @param {Node} nod The node object for which to get all children.
+ * @param source ['nav'|'point'} Navigation method passed from calling function
+ * @return {null|Node[]} An actual array of child nodes that are "useful"
+ * in HTML. If there are no appropriate child nodes, the function returns null.
  */
-function indexElements(world) {
-	// INITIAL INDEXING OF PAGE ELEMENTS
-	var children;
-    selectElementsTemp = getElementsByTagNames(COMPATIBLE_TAGS, world);
+function getChildNodes( nod, source ) {
+    'use strict';
+    /** The array to be returned */
+    var ret = [];
 
-	// Check if ez-focusable to remove (+ CHILDREN)
-	for(i = 0; i < selectElementsTemp.length; i++) {
-		if(selectElementsTemp[i].getAttribute('data-ez-focusable') == 'false') {
-            children = getElementsByTagNames(COMPATIBLE_TAGS, selectElementsTemp[i]);
-			for(j = 0; j < children.length + 1; j++) {
-				if(!selectElementsTemp[i + j].hasAttribute('data-ez-focusable') || selectElementsTemp[i + j].getAttribute('data-ez-focusable') === 'inherit') {
-					selectElementsTemp[i + j].setAttribute('data-ez-focusable', 'false');
-				}
-			}
-		}
-		if(selectElementsTemp[i].getAttribute('data-ez-focusable-nav') == 'false') { // Like above code for *-nav
-			children = getElementsByTagNames(COMPATIBLE_TAGS, selectElementsTemp[i]);
-			for(j = 0; j < children.length + 1; j++) {
-				if(!selectElementsTemp[i + j].hasAttribute('data-ez-focusable-nav') || selectElementsTemp[i + j].getAttribute('data-ez-focusable-nav') === 'inherit') {
-					selectElementsTemp[i + j].setAttribute('data-ez-focusable-nav', 'false');
-				}
-			}
-		}
-		if(selectElementsTemp[i].getAttribute('data-ez-focusable-point') == 'false') { // Like above code for *-point
-			children = getElementsByTagNames(COMPATIBLE_TAGS, selectElementsTemp[i]);
-			for(var j = 0; j < children.length + 1; j++) {
-				if(!selectElementsTemp[i + j].hasAttribute('data-ez-focusable-point') || selectElementsTemp[i + j].getAttribute('data-ez-focusable-point') === 'inherit') {
-					selectElementsTemp[i + j].setAttribute('data-ez-focusable-point', 'false');
-				}
-			}
-		}
-	}
+    var child = first_child(nod);
+    if (child === null) {
+        return null;
+    }
 
-	// Check if ez-chunking == group; if so, group 'em
-	for(i = 0; i < selectElementsTemp.length;) {
-		if(selectElementsTemp[i].getAttribute('data-ez-chunking') == 'group' && !selectElementsTemp[i].hasAttribute('data-ez-subnavtype')) {
-            removeAmount = getElementsByTagNames(COMPATIBLE_TAGS, selectElementsTemp[i]).length;
-			selectElementsTemp.splice(i + 1, removeAmount);
-			i += removeAmount + 1;
-		} else {
-			i++;
-		}
-	}
+    while (child !== null) {
+        ret.push(child);
+        child = node_after(child, source);
+    }
 
-	// Check and remove elements with children if tabindex (excluding grouped stuff).
-	if(allowReorder) {
-		for(i = 0; i < selectElementsTemp.length;) {
-			if(selectElementsTemp[i].hasAttribute('tabindex') && getElementsByTagNames(COMPATIBLE_TAGS, selectElementsTemp[i]).length > 0 && !(selectElementsTemp[i].getAttribute('data-ez-focusable') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-point') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-nav') == 'true')) {
-				var removeAmount = getElementsByTagNames(COMPATIBLE_TAGS, selectElementsTemp[i]).length;
-				selectElementsTemp.splice(i + 1, removeAmount);
-				i += removeAmount + 1;
-			} else {
-				i++;
-			}
-		}
-	}
+    return ret;
+}
 
-	// Check and remove elements with children (excluding grouped stuff). MUST BE LAST THING DONE
-	for(var i = 0; i < selectElementsTemp.length;) {
-		if((!allowReorder || !selectElementsTemp[i].hasAttribute('tabindex')) && getElementsByTagNames(COMPATIBLE_TAGS, selectElementsTemp[i]).length > 0 && selectElementsTemp[i].getAttribute('data-ez-chunking') != 'group' && selectElementsTemp[i].getAttribute('data-ez-chunking') != 'block' && !(selectElementsTemp[i].getAttribute('data-ez-focusable') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-point') == 'true' || selectElementsTemp[i].getAttribute('data-ez-focusable-nav') == 'true')) {
-			selectElementsTemp.splice(i, 1); // Remove entry
-		} else {
-			i++;
-		}
-	}
-	return selectElementsTemp;
+/** All following code from
+ https://developer.mozilla.org/en-US/docs/Web/Guide/DOM/Whitespace_in_the_DOM */
+
+/**
+ * Throughout, whitespace is defined as one of the characters
+ *  "\t" TAB \u0009
+ *  "\n" LF  \u000A
+ *  "\r" CR  \u000D
+ *  " "  SPC \u0020
+ *
+ * This does not use Javascript's "\s" because that includes non-breaking
+ * spaces (and also some other characters).
+ */
+
+
+/**
+ * Determine whether a node's text content is entirely whitespace.
+ *
+ * @preserve This function came from:
+ * https://developer.mozilla.org/en-US/docs/Web/Guide/DOM/Whitespace_in_the_DOM
+ * on 2013-06-14 and is available either under the MIT License or is in the
+ * public domain (please check the site if the exact license is important to
+ * you).
+ * @param nod  A node implementing the |CharacterData| interface (i.e.,
+ *             a |Text|, |Comment|, or |CDATASection| node
+ * @return     True if all of the text content of |nod| is whitespace,
+ *             otherwise false.
+ */
+function is_all_ws( nod ) {
+    return !(/[^\t\n\r ]/.test(nod.data));
+}
+
+
+/**
+ * Determine if a node should be ignored by the iterator functions.
+ *
+ * @preserve This function came from:
+ * https://developer.mozilla.org/en-US/docs/Web/Guide/DOM/Whitespace_in_the_DOM
+ * on 2013-06-14 and is available either under the MIT License or is in the
+ * public domain (please check the site if the exact license is important to
+ * you).
+ * @param nod  An object implementing the DOM1 |Node| interface.
+ * @return     true if the node is:
+ *                1) A |Text| node that is all whitespace
+ *                2) A |Comment| node
+ *             and otherwise false.
+ */
+function is_ignorable( nod ) {
+    return ( nod.nodeType == 8) || // A comment node
+        ( (nod.nodeType == 3) && is_all_ws(nod) ); // a text node, all ws
+}
+
+/**
+ * Version of |previousSibling| that skips nodes that are entirely
+ * whitespace or comments.  (Normally |previousSibling| is a property
+ * of all DOM nodes that gives the sibling node, the node that is
+ * a child of the same parent, that occurs immediately before the
+ * reference node.)
+ * @preserve This function came from:
+ * https://developer.mozilla.org/en-US/docs/Web/Guide/DOM/Whitespace_in_the_DOM
+ * on 2013-06-14 and is available either under the MIT License or is in the
+ * public domain (please check the site if the exact license is important to
+ * you).
+ * @param sib  The reference node.
+ * @return     Either:
+ *               1) The closest previous sibling to |sib| that is not
+ *                  ignorable according to |is_ignorable|, or
+ *               2) null if no such node exists.
+ */
+function node_before( sib, source ) {
+    while ((sib = sib.previousSibling)) {
+        if (!is_ignorable(sib) && isFocusable(sib, source)) {
+            return sib;
+        }
+    }
+    return null;
+}
+
+/**
+ * Version of |nextSibling| that skips nodes that are entirely
+ * whitespace or comments.
+ *
+ * @preserve This function came from:
+ * https://developer.mozilla.org/en-US/docs/Web/Guide/DOM/Whitespace_in_the_DOM
+ * on 2013-06-14 and is available either under the MIT License or is in the
+ * public domain (please check the site if the exact license is important to
+ * you).
+ * @param sib  The reference node.
+ * @return     Either:
+ *               1) The closest next sibling to |sib| that is not
+ *                  ignorable according to |is_ignorable|, or
+ *               2) null if no such node exists.
+ */
+function node_after( sib, source ) {
+    while ((sib = sib.nextSibling)) {
+        if (!is_ignorable(sib) && isFocusable(sib, source)) {
+            return sib;
+        }
+    }
+    return null;
+}
+
+/**
+ * Version of |lastChild| that skips nodes that are entirely
+ * whitespace or comments.  (Normally |lastChild| is a property
+ * of all DOM nodes that gives the last of the nodes contained
+ * directly in the reference node.)
+ *
+ * @preserve This function came from:
+ * https://developer.mozilla.org/en-US/docs/Web/Guide/DOM/Whitespace_in_the_DOM
+ * on 2013-06-14 and is available either under the MIT License or is in the
+ * public domain (please check the site if the exact license is important to
+ * you).
+ * @param sib  The reference node.
+ * @return     Either:
+ *               1) The last child of |sib| that is not
+ *                  ignorable according to |is_ignorable|, or
+ *               2) null if no such node exists.
+ */
+function last_child( par, source ) {
+    var res=par.lastChild;
+    while (res) {
+        if (!is_ignorable(res) && isFocusable(res, source)) {
+            return res;
+        }
+        res = res.previousSibling;
+    }
+    return null;
+}
+
+/**
+ * Version of |firstChild| that skips nodes that are entirely
+ * whitespace and comments.
+ *
+ * @preserve This function came from:
+ * https://developer.mozilla.org/en-US/docs/Web/Guide/DOM/Whitespace_in_the_DOM
+ * on 2013-06-14 and is available either under the MIT License or is in the
+ * public domain (please check the site if the exact license is important to
+ * you).
+ * @param sib  The reference node.
+ * @return     Either:
+ *               1) The first child of |sib| that is not
+ *                  ignorable according to |is_ignorable|, or
+ *               2) null if no such node exists.
+ */
+function first_child( par, source ) {
+    // If interactive == leaf node; no children
+    if(isInteractive(par)) return null;
+
+    var res=par.firstChild;
+    while (res) {
+        if (!is_ignorable(res) && isFocusable(res, source)) {
+            return res;
+        }
+        res = res.nextSibling;
+    }
+    return null;
+}
+
+/**
+ * Version of |data| that doesn't include whitespace at the beginning
+ * and end and normalizes all whitespace to a single space.  (Normally
+ * |data| is a property of text nodes that gives the text of the node.)
+ *
+ * @preserve This function came from:
+ * https://developer.mozilla.org/en-US/docs/Web/Guide/DOM/Whitespace_in_the_DOM
+ * on 2013-06-14 and is available either under the MIT License or is in the
+ * public domain (please check the site if the exact license is important to
+ * you).
+ * @param txt  The text node whose data should be returned
+ * @return     A string giving the contents of the text node with
+ *             whitespace collapsed.
+ */
+function data_of( txt ) {
+    var data = txt.data;
+    // Use ECMA-262 Edition 3 String and RegExp features
+    data = data.replace(/[\t\n\r ]+/g, " ");
+    if (data.charAt(0) == " ") {
+        data = data.substring(1, data.length);
+    }
+    if (data.charAt(data.length - 1) == " ") {
+        data = data.substring(0, data.length - 1);
+    }
+    return data;
+}
+
+/**
+ * Version of |data| that doesn't include whitespace at the beginning
+ * and end and normalizes all whitespace to a single space.  (Normally
+ * |data| is a property of text nodes that gives the text of the node.)
+ *
+ * @preserve This function came from:
+ * https://developer.mozilla.org/en-US/docs/Web/Guide/DOM/Whitespace_in_the_DOM
+ * on 2013-06-14 and is available either under the MIT License or is in the
+ * public domain (please check the site if the exact license is important to
+ * you).
+ * @param startEl  The text node whose data should be returned
+ * @param source ['nav'|'point'} Navigation method passed from calling function
+ * @return {object|[object, object]|null} Returns node, element, an element to-from, or null (for end of document)
+ */
+function getNextNodes(startEl, source) {
+    // Through recursion, reached end of document.
+    if(startEl === null) return null;
+
+    if(startEl.last !== undefined) startEl = startEl.last;
+
+    var first = node_after(startEl, source);
+    if(first === null) {
+        // Fall back onto the parent; no first el exists at this level
+        return getNextNodes(startEl.parentNode, source);
+    }
+    // First el exists, so check if child of first el exists
+    while(first_child(first, source) !== null && !areAllChildrenInline(first, source)) {
+        first = first_child(first, source);
+    }
+
+    var last = first;
+    while(node_after(last, source) !== null && isInlineElement(node_after(last), source)) {
+        last = node_after(last, source);
+    }
+
+    if(first === last) {
+        return first;
+    }
+    return {'first': first, 'last': last};
+}
+
+/**
+ * Version of |data| that doesn't include whitespace at the beginning
+ * and end and normalizes all whitespace to a single space.  (Normally
+ * |data| is a property of text nodes that gives the text of the node.)
+ *
+ * @preserve This function came from:
+ * https://developer.mozilla.org/en-US/docs/Web/Guide/DOM/Whitespace_in_the_DOM
+ * on 2013-06-14 and is available either under the MIT License or is in the
+ * public domain (please check the site if the exact license is important to
+ * you).
+ * @param startEl  The text node whose data should be returned
+ * @param source ['nav'|'point'} Navigation method passed from calling function
+ * @return {object|[object, object]|null} Returns node, element, an element to-from, or null (for end of document)
+ */
+function getLastNodes(startEl, source) {
+    // Through recursion, reached end of document.
+    if(startEl === null) return null;
+
+    if(startEl.first !== undefined) startEl = startEl.first;
+
+    var last = node_before(startEl, source);
+    if(last === null) {
+        // Fall back onto the parent; no first el exists at this level
+        return getLastNodes(startEl.parentNode, source);
+    }
+    // First el exists, so check if child of first el exists
+    while(last_child(last, source) !== null && !areAllChildrenInline(last, source)) {
+        last = last_child(last, source);
+    }
+
+    var first = last;
+    while(node_before(first, source) !== null && isInlineElement(node_before(first), source)) {
+        first = node_before(first, source);
+    }
+
+    if(last === first) {
+        return last;
+    }
+    return {'first': first, 'last': last};
+}
+
+/**
+ * Gets the first node (or range of nodes) that is navigable
+ * @param start The starting element. If wanting first node, start === document.body.
+ * @param {'nav'|'point'} source Method of navigating initiated from.
+ * @returns {Element|{first: Element, last: Element}} Reference to first (or range) of navigable nodes
+ */
+function getFirstElement(start, source) {
+
+    var first = first_child(start, source);
+
+    if(first === null) {
+        var last = start;
+        while(isInlineElement(node_after(last, source), source)) {
+            last = node_after(last);
+        }
+        if(start === last) {
+            return mask_DOMObjs(start);
+        }
+        return mask_DOMObjs(start, last);
+    }
+    else return getFirstElement(first);
+}
+
+/**
+ * Gets the maskId to select
+ * @param {'nav'|'point'} source Method of navigating initiated from.
+ * @returns {HTMLElement} The maskId reference
+ */
+function getNextSelection(source) {
+    var fromEl = last_child(selectEl);
+
+    strip_masking();
+
+    var selectedNodes = getNextNodes(fromEl, source);
+    if (selectedNodes === null) return null;
+    else if (selectedNodes.last !== undefined) {
+        return mask_DOMObjs(selectedNodes.first, selectedNodes.last);
+    }
+    return mask_DOMObjs(selectedNodes);
+}
+
+/**
+ * Gets the maskId to select
+ * @param {'nav'|'point'} source Method of navigating initiated from.
+ * @returns {HTMLElement} The maskId reference
+ */
+function getPrevSelection(source) {
+    var fromEl = first_child(selectEl);
+
+    strip_masking();
+
+    var selectedNodes = getLastNodes(fromEl, source);
+    if (selectedNodes === null) return null;
+    else if (selectedNodes.last !== undefined) {
+        return mask_DOMObjs(selectedNodes.first, selectedNodes.last);
+    }
+    return mask_DOMObjs(selectedNodes);
+}
+
+/**
+ * Masks either a range of nodes (with the same parents) inclusively from first to last, or one node
+ * @param {Element} first Inclusive start of wrap
+ * @param {Element} last Inclusive end of wrap -- can be same as first to wrap one node, or left undefined.
+ * @returns {HTMLElement} The masked element reference with the nodes masked inside
+ */
+function mask_DOMObjs(first, last) {
+
+    if(last === undefined) last = first; // Only mask one object
+
+    if(first.parentElement !== last.parentElement) throw new Error('DOM Objects must have same parent');
+
+    var parentEl = first.parentElement;
+
+    var maskEl = document.createElement('span');
+    maskEl.id = maskId;
+
+    parentEl.insertBefore(maskEl, first);
+
+    var next = first;
+    while(next !== last) {
+        var insert = next;
+        next = next.nextSibling;
+        maskEl.insertBefore(insert, null);
+    }
+    maskEl.insertBefore(last, null); // Mask last element
+
+    return maskEl;
+
+}
+
+/**
+ * Removes maskId span el, and replaces it with child nodes inside.
+ */
+function strip_masking() {
+    var maskEl = document.getElementById(maskId);
+
+    if(maskEl !== null) {
+        while(maskEl.childNodes.length !== 0) {
+            maskEl.parentElement.insertBefore(maskEl.firstChild, maskEl);
+        }
+
+        maskEl.parentElement.removeChild(maskEl);
+
+    }
 }
 
 /**
@@ -255,29 +799,26 @@ function ez_navigate_start(propagated) {
 			// Of "#<id> #<id>" of first element
             startid = document.body.getAttribute('data-ez-startat').split(" ")[0].slice(1);
 		}
-		for(var i = 0; i < selectElements.length; i++) {
-			if(selectElements[i].id !== null && selectElements[i].id == startid) {
-				currIndex = i;
-				break;
-			} // Else, default initial currIndex = 0 (from beginning)
-		}
+		ez_jump(startid);
 	} else {
 		if(propagated) {
 			if(document.URL.indexOf("#") != -1) {
 				var jumpTo = document.URL.substring(document.URL.indexOf("#") + 1);
-				var idLocation = getCurrIndexById(jumpTo);
-				if(idLocation != -1) {
-					currIndex = idLocation;
-				}
+                ez_jump(jumpTo);
 			}
 		}
 	}
-	auto_advance_set(); // Find if autoadvancing element
+	// TODO auto_advance_set(); // Find if autoadvancing element
+
+    if(selectEl === null) {
+        selectEl = getFirstElement(document.body, 'nav');
+    }
+
 	if(!propagated) {
 		sounds[getElementAudio()].feed.play();
 	}
-	drawSelected(selectElements[currIndex]);
-	voice(selectElements[currIndex], 'nav');
+	drawSelected(selectEl);
+	voice(selectEl, 'nav');
 }
 
 /**
@@ -329,8 +870,6 @@ function load_ez() {
 		return false;
 	};
 
-	index_ez();
-
 	load_audio();
 
 	set_volume(); // If exists from previous page
@@ -356,18 +895,19 @@ function load_ez() {
 		// On chrome, will not draw until a small amount of time passes for some reason
 		setTimeout(function () {
 			ez_navigate_start();
-			drawSelected(selectElements[currIndex]);
+			drawSelected(selectEl);
 		}, 10);
 	} else if(parseInt(sessionStorage.getItem("EZ_Toggle")) == true && document.body.getAttribute('data-ez-startingmode') != 'ezoff') {
 		setTimeout(function () {
 			ez_navigate_start(true);
-			drawSelected(selectElements[currIndex]);
+			drawSelected(selectEl);
 		}, 10);
 	}
 
 	//idle_loop(); // TODO/ TEMP
 
 	// Multitouch gesture dragging
+    /* TODO
 	if(slideToRead) { // If not allowed, do not initialize
 		var hammer = new Hammer(document.body);
 		hammer.ondrag = function (ev) {
@@ -384,7 +924,7 @@ function load_ez() {
 		hammer.ontap = function () {
 			stopEZ();
 		};
-	}
+	}*/
 
 	// Load any potential dictionary
 	if(document.body.hasAttribute('data-ez-pronounce')) {
@@ -452,217 +992,9 @@ function drawSelected(obj) {
  */
 window.onresize = function () {
 	if(ez_navigateToggle) {
-		drawSelected(selectElements[currIndex]);
+		drawSelected(selectEl);
 	}
 };
-
-/**
- * If on a group, will skip past it + nested elements in selectElements.
- * @param {string} move String 'up' || 'down' Depending on direction navigating.
- * @returns {number|boolean} New currIndex, or false no jump needed.
- */
-function groupSkip(move) {
-	if(selectElements[currIndex].getAttribute('data-ez-chunking') == 'group' && selectElements[currIndex].getAttribute('data-ez-subnavtype') == 'nested' || selectElements[currIndex].getAttribute('data-ez-subnavtype') == 'hierarchical') {
-		if(move == 'down') {
-			return currIndex + indexElements(selectElements[currIndex]).length;
-		}
-	} else if(move == 'up') {
-		if(selectElements[currIndex].hasAttribute("data-tmp-jump")) {
-			return parseFloat(selectElements[currIndex].getAttribute("data-tmp-jump"));
-		}
-	}
-	return false;
-}
-
-/**
- * Controls if the navigation should be stopped due to a hierarchical group.
- * @param {string} move 'up' || 'down' depending on nav direction.
- * @returns {boolean} If stopped or not.
- */
-function hierarchicalStopper(move) {
-	var oldLevel = selectElements[currIndex].getAttribute('data-tmp-level');
-	var newLevel;
-	var skip;
-	if(move == 'down') {
-		skip = currIndex + indexElements(selectElements[currIndex]).length + 1;
-		newLevel = selectElements[skip].getAttribute('data-tmp-level');
-	} else if(move == 'up') {
-		skip = selectElements[currIndex - 1].getAttribute("data-tmp-jump");
-		if(skip === null) {
-			skip = currIndex - 1;
-		} else {
-			skip = parseFloat(selectElements[currIndex - 1].getAttribute("data-tmp-jump"));
-		}
-		newLevel = selectElements[skip].getAttribute('data-tmp-level');
-	}
-	if(newLevel == 0 && oldLevel == 0) {
-		return false;
-	}
-	if(newLevel != oldLevel) {
-		if(selectElements[findGroupParent()].getAttribute("data-ez-chunking") == 'group' && selectElements[findGroupParent()].getAttribute("data-ez-subnavtype") == 'hierarchical') {
-			document.getElementById(ezSelectorId).className = 'pulse';
-			setTimeout(function () {
-				document.getElementById(ezSelectorId).className = '';
-			}, 300);
-			sounds[AUDIO_NOACTION].feed.play();
-			voice("Press back to leave the group");
-			return true;
-		} else if(selectElements[findGroupParent()].getAttribute("data-ez-chunking") == 'group' && selectElements[findGroupParent()].getAttribute("data-ez-subnavtype") == 'nested') {
-			globalSayBefore = "Navigating out of group... ";
-		}
-	}
-	return false;
-}
-
-/**
- * Looks for a data-tmp-level attribute parent.
- * @returns {number} Group element currIndex
- */
-function findGroupParent() {
-	var oldLevel = selectElements[currIndex].getAttribute('data-tmp-level');
-	var i = currIndex;
-	while(i > 0 && parseFloat(selectElements[i].getAttribute('data-tmp-level')) >= oldLevel) {
-		i--;
-	}
-	if(i == currIndex) {
-		return currIndex;
-	} // No group (@ 0th level)
-	return i; // Return group element currIndex #
-}
-
-/**
- * Like ez_navigate("down"), but for when navigating to first element inside a group
- * TODO Merge with other stuff! Outdated!
- */
-function ez_navigate_in_group() {
-	if(selectElements[currIndex].hasAttribute('data-ez-groupdefault')) {
-		ez_jump(getCurrIndexById(selectElements[currIndex].getAttribute('data-ez-groupdefault').split(' ')[0]));
-		return;
-	}
-	currIndex++;
-	if(selectElements[currIndex].getAttribute('data-ez-focusable-nav') == 'false' || selectElements[currIndex].getAttribute('data-ez-focusable') == 'false') {
-		ez_navigate_in_group();
-		return;
-	}
-	if(!drawSelected(selectElements[currIndex])) {
-		ez_navigate('down');
-		return;
-	}
-	sounds[getElementAudio()].feed.play();
-	selectElements[currIndex].focus(); // Add focus to new element
-	voice(selectElements[currIndex], 'nav', globalSayBefore);
-}
-
-/**
- * Finds the first or last focusable element of selectElements
- * @param {number} location Whether looking for 'first || 'last' navigable element of selectElements.
- * @returns {number} New currIndex of next focusable element of selectElements in nav'ing direction.
- */
-function findFocusable(location) {
-	if(location == 'last') {
-		for(i = selectElements.length - 1; i > 0;) {
-			pos = getElementAbsolutePos(selectElements[i]);
-			if(selectElements[i].getAttribute('data-ez-focusable-nav') == 'false' || selectElements[i].getAttribute('data-ez-focusable') == 'false') {
-				i--;
-			} else if(!pos || selectElements[i].offsetWidth == 0 || selectElements[i].offsetWidth == 0) {
-				// If there is a problem finding the element position
-				i--;
-			} else {
-				return i;
-			}
-		}
-		return 0;
-	} else if(location == 'first') {
-		for(var i = 0; i < selectElements.length - 1;) {
-			var pos = getElementAbsolutePos(selectElements[i]);
-			if(selectElements[i].getAttribute('data-ez-focusable-nav') == 'false' || selectElements[i].getAttribute('data-ez-focusable') == 'false') {
-				i++;
-			} else if(!pos || selectElements[i].offsetWidth == 0 || selectElements[i].offsetWidth == 0) {
-				// If there is a problem finding the element position
-				i++;
-			} else {
-				return i;
-			}
-		}
-		return selectElements.length - 1;
-	}
-	return null;
-}
-
-/**
- * Removes data-tmp-level && data-tmp-jump from selectElements.
- */
-function clear_jumppoints() {
-	for(var i = 0; i < selectElements.length; i++) {
-		selectElements[i].removeAttribute("data-tmp-level");
-		selectElements[i].removeAttribute("data-tmp-jump");
-	}
-}
-
-/**
- * Creates data-tmp-level && data-tmp-jump for selectElements depending on if in a group or not.
- */
-function load_jumppoints() {
-	for(var i = 0; i < selectElements.length; i++) {
-		if(selectElements[i].getAttribute('data-ez-chunking') == 'group' && selectElements[i].getAttribute('data-ez-subnavtype') == 'nested' || selectElements[i].getAttribute('data-ez-subnavtype') == 'hierarchical') {
-			if(!selectElements[i].hasAttribute('data-ez-focusable-point')) {
-				selectElements[i].setAttribute('data-ez-focusable-point', 'false'); // Default pointer navigates INSIDE the element (not on the wrapper)
-			}
-
-			var insideElements = indexElements(selectElements[i]);
-
-			for(var j = 0; j < insideElements.length; j++) {
-				var level = insideElements[j].getAttribute('data-tmp-level');
-				if(level === null) {
-					level = 0;
-				} else {
-					level = parseFloat(level);
-					level++;
-				}
-				insideElements[j].setAttribute('data-tmp-level', level);
-			}
-
-			var endElement = insideElements.length + i;
-			if(!selectElements[endElement].hasAttribute('data-tmp-jump')) {
-				selectElements[endElement].setAttribute('data-tmp-jump', i);
-			}
-		}
-	}
-}
-
-/**
- * Removes elements that are children of an 'input' or 'button' tag.
- * @param {object[]} elements Elements to potentially remove
- * @returns {object[]} Returns elements param with removed children of leaves.
- */
-function setLeaves(elements) {
-	for(var i = 0; i < elements.length;) {
-		if(isChildOfElType(elements[i].parentNode, 'INPUT') || isChildOfElType(elements[i].parentNode, 'BUTTON')) {
-			elements.splice(i, 1);
-		} else {
-			i++;
-		}
-	}
-	return elements;
-}
-
-/**
- * Creates data-tmp-flowfrom tags to complement aria-flowto tags (so not looking each time + slowing down).
- * Basically caching.
- */
-function load_flowfrom() {
-	for(var i = 0; i < selectElements.length; i++) {
-		if(allowReorder && selectElements[i].hasAttribute('aria-flowto')) {
-			var flowId = selectElements[i].getAttribute('aria-flowto').split(' ')[0]; // In case multiple exist, grab first
-			for(var j = 0; j < selectElements.length; j++) {
-				if(selectElements[j].id == flowId) {
-					selectElements[j].setAttribute('data-tmp-flowfrom', i);
-					break;
-				}
-			}
-		}
-	}
-}
 
 /**
  * Stops EZ Access navigation, hides EZ Access selector and resets variables.
@@ -670,7 +1002,7 @@ function load_flowfrom() {
 function stopEZ() {
 	ez_navigateToggle = false;
 	idle_loop();
-	currIndex = 0;
+    selectEl = null;
 	voice("");
 	sessionStorage.setItem("EZ_Toggle", "0");
 	var old = document.getElementById(ezSelectorId);
