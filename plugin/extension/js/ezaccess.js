@@ -178,7 +178,8 @@ function isFocusable(o, source) {
     'use strict';
 
     // Look for nodes and elements only; return false otherwise
-    if(isElement(o));
+    if(o === document.doctype) return false; // For some reason this isn't caught below + can cause exceptions
+    else if(isElement(o));
     else if(isNode(o)) o = o.parentElement;
     else return false;
 
@@ -609,6 +610,24 @@ function data_of( txt ) {
 }
 
 /**
+ *
+ * @param wrap
+ */
+function getInnerGrouping(wrap) {
+    var first = wrap.first;
+    var last = wrap.last;
+
+    // Get inner-most grouping (if possible)
+    while(first === last) {
+        if(first_child(first) === null || last_child(last) === null) break;
+        first = first_child(first);
+        last = last_child(last);
+    }
+
+    return {first: first, last: last};
+}
+
+/**
  * Version of |data| that doesn't include whitespace at the beginning
  * and end and normalizes all whitespace to a single space.  (Normally
  * |data| is a property of text nodes that gives the text of the node.)
@@ -646,14 +665,7 @@ function getNextNodes(startEl, source) {
         }
     }
 
-    // Get inner-most grouping if possible
-    while(first === last) {
-        if(first_child(first) === null || last_child(last) === null) break;
-        first = first_child(first);
-        last = last_child(last);
-    }
-
-    return {'first': first, 'last': last};
+    return getInnerGrouping({first: first, last: last});
 }
 
 /**
@@ -694,14 +706,7 @@ function getPrevNodes(startEl, source) {
         }
     }
 
-    // Get inner-most grouping if possible
-    while(first === last) {
-        if(first_child(first) === null || last_child(last) === null) break;
-        first = first_child(first);
-        last = last_child(last);
-    }
-
-    return {'first': first, 'last': last};
+    return getInnerGrouping({first: first, last: last});
 }
 
 /**
@@ -719,14 +724,15 @@ function getFirstElement(start, source) {
         while(isInlineElement(node_after(last, source), source)) {
             last = node_after(last);
         }
-        return {'first': start, 'last': last};
+
+        return getInnerGrouping({first: start, last: last});
+
     }
     else return getFirstElement(first, source);
 }
 
 function orphanTxtNode( nod ) {
     return node_before(nod) === null && node_after(nod) === null && nod.nodeType === 3;
-
 }
 
 /**
@@ -744,7 +750,7 @@ function getLastElement(start, source) {
         while(isInlineElement(node_before(first, source), source)) {
             first = node_before(first);
         }
-        return {'first': first, 'last': start}
+        return getInnerGrouping({first: first, last: start});
     }
     else return getLastElement(last, source);
 }
