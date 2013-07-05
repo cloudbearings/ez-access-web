@@ -209,6 +209,20 @@ function getActionableElement(e, source) {
 }
 
 /**
+ * Returns block-level element for drawing box algo
+ * @param {HTMLElement} e The element to check for
+ * @param {'nav'|'point'} source The navigation mechanism
+ * @returns {HTMLElement} The child block (if it is)
+ */
+function getBlock(e, source) {
+    var children = getChildNodes(e, source);
+    if(children.length === 1 && !isInlineElement(children[0])) {
+        return children[0];
+    }
+    return e;
+}
+
+/**
  * Main EZ Navigation function: Moves selector up or down selectElements, and calls all relevant functions (speech,
  * tooltips etc.)
  * @param {'up'|'down'} move Direction of navigation.
@@ -219,11 +233,29 @@ function ez_navigate(move) {
         selectEl = getNextSelection('nav');
     } else if(move === 'up') {
         selectEl = getPrevSelection('nav');
+    } else if(move === 'top') {
+        selectEl = getFirstSelection('nav');
+        move = 'down';
+    } else if(move === 'bottom') {
+        selectEl = getLastSelection('nav');
+        move = 'up';
     } else {
         throw new Error("Parameter *move* must be 'up'|'down'.")
     }
-    var actionable = getActionableElement(selectEl, 'nav');
-    if(!drawSelected(actionable)) {
+
+    if(selectEl === null) {
+        if(move === 'down') {
+            ez_navigate('bottom');
+            return;
+        }
+        else if(move === 'up'){
+            ez_navigate('top');
+            return;
+        } else {
+            return;
+        }
+    }
+    if(!drawSelected(getBlock(selectEl))) {
         ez_navigate(move);
         return;
     }
@@ -235,7 +267,7 @@ function ez_navigate(move) {
         ez_navigate(move);
         return;
     }
-    //drawSelected(actionable);
+    var actionable = getActionableElement(selectEl, 'nav');
     sounds[getElementAudio(actionable)].feed.play();
     actionable.focus();
     voice(selectEl, 'nav');
