@@ -190,6 +190,24 @@ function key_event(e) {
 	return true;
 }
 
+function getActionableElement(e, source) {
+    var childNod = getChildNodes(e, source);
+
+    // Get the element if multiple nodes and one element are navagable.
+    var els = 0;
+    var lastEl;
+    for(i = 0; i < childNod.length; i++) {
+        if(isElement(childNod[i])) {
+            els++;
+            lastEl = childNod[i];
+        }
+    }
+    if(els === 1) {
+        return lastEl;
+    }
+    return e;
+}
+
 /**
  * Main EZ Navigation function: Moves selector up or down selectElements, and calls all relevant functions (speech,
  * tooltips etc.)
@@ -199,47 +217,28 @@ function key_event(e) {
 function ez_navigate(move) {
     if(move === 'down') {
         selectEl = getNextSelection('nav');
-        if(getChildNodes(selectEl, 'nav').length === 1) {
-            if(!drawSelected(first_child(selectEl, 'nav'))) {
-                ez_navigate('down');
-                return;
-            }
-            drawSelected(first_child(selectEl, 'nav'));
-            sounds[getElementAudio(first_child(selectEl))].feed.play();
-            first_child(selectEl).focus();
-            voice(first_child(selectEl), 'nav');
-        } else {
-            if(!drawSelected(selectEl)) {
-                ez_navigate('down');
-                return;
-            }
-            drawSelected(selectEl);
-            sounds[getElementAudio(first_child(selectEl))].feed.play();
-            selectEl.focus();
-            voice(selectEl, 'nav');
-        }
     } else if(move === 'up') {
         selectEl = getPrevSelection('nav');
-        if(getChildNodes(selectEl, 'nav').length === 1) {
-            if(!drawSelected(last_child(selectEl, 'nav'))) {
-                ez_navigate('up');
-                return;
-            }
-            drawSelected(last_child(selectEl, 'nav'));
-            sounds[getElementAudio(first_child(selectEl))].feed.play();
-            last_child(selectEl).focus();
-            voice(last_child(selectEl), 'nav');
-        } else {
-            if(!drawSelected(selectEl)) {
-                ez_navigate('up');
-                return;
-            }
-            drawSelected(selectEl);
-            sounds[getElementAudio(first_child(selectEl))].feed.play();
-            selectEl.focus();
-            voice(selectEl, 'nav');
-        }
+    } else {
+        throw new Error("Parameter *move* must be 'up'|'down'.")
     }
+    var actionable = getActionableElement(selectEl, 'nav');
+    if(!drawSelected(actionable)) {
+        ez_navigate(move);
+        return;
+    }
+    // Check to make sure it's not a short, weird selection
+    var children = getChildNodes(selectEl, 'nav');
+    if(areAllChildrenInline(selectEl, 'nav')
+        && children.length === 1
+        && is_all_punct(children[0])) {
+        ez_navigate(move);
+        return;
+    }
+    //drawSelected(actionable);
+    sounds[getElementAudio(actionable)].feed.play();
+    actionable.focus();
+    voice(selectEl, 'nav');
 }
 
 /**
