@@ -440,6 +440,17 @@ function is_all_ws( nod ) {
     return !(/[^\t\n\r ]/.test(nod.data));
 }
 
+/**
+ * Determine if too short
+ * @param nod A node implementing the |CharacterData| interface (i.e.,
+ *            a |Text|, |Comment|, or |CDATASection| node
+ * @returns {boolean} Returns true if length <= 1 indicating that it probably shouldn't be navigable.
+ */
+function is_all_punct( nod ) {
+    if(nod.data === undefined) return false;
+    return nod.data.length <= 1;
+}
+
 
 /**
  * Determine if a node should be ignored by the iterator functions.
@@ -457,7 +468,7 @@ function is_all_ws( nod ) {
  */
 function is_ignorable( nod ) {
     return ( nod.nodeType == 8) || // A comment node
-        ( (nod.nodeType == 3) && is_all_ws(nod) ); // a text node, all ws
+        ( (nod.nodeType == 3) && is_all_ws(nod)); // a text node, all ws
 }
 
 /**
@@ -528,6 +539,9 @@ function node_after( sib, source ) {
  *               2) null if no such node exists.
  */
 function last_child( par, source ) {
+    // If interactive == leaf node; no children
+    if(isInteractive(par)) return null;
+
     var res=par.lastChild;
     while (res) {
         if (!is_ignorable(res) && isFocusable(res, source)) {
@@ -625,13 +639,13 @@ function getNextNodes(startEl, source) {
     }
 
     var last = first;
-    while(node_after(last, source) !== null && isInlineElement(node_after(last), source)) {
-        last = node_after(last, source);
+
+    if(isInlineElement(first, source)) {
+        while(node_after(last, source) !== null && isInlineElement(node_after(last, source), source)) {
+            last = node_after(last, source);
+        }
     }
 
-    if(first === last) {
-        return first;
-    }
     return {'first': first, 'last': last};
 }
 
@@ -647,7 +661,7 @@ function getNextNodes(startEl, source) {
  * you).
  * @param startEl  The text node whose data should be returned
  * @param source ['nav'|'point'} Navigation method passed from calling function
- * @return {object|[object, object]|null} Returns node, element, an element to-from, or null (for end of document)
+ * @return {{first: Node, last: Node}|null} Returns an element to-from, or null (for end of document)
  */
 function getLastNodes(startEl, source) {
     // Through recursion, reached end of document.
@@ -666,13 +680,13 @@ function getLastNodes(startEl, source) {
     }
 
     var first = last;
-    while(node_before(first, source) !== null && isInlineElement(node_before(first), source)) {
-        first = node_before(first, source);
+
+    if(isInlineElement(first, source)) {
+        while(node_before(first, source) !== null && isInlineElement(node_before(first, source), source)) {
+            first = node_before(first, source);
+        }
     }
 
-    if(last === first) {
-        return last;
-    }
     return {'first': first, 'last': last};
 }
 
@@ -680,7 +694,7 @@ function getLastNodes(startEl, source) {
  * Gets the first node (or range of nodes) that is navigable
  * @param start The starting element. If wanting first node, start === document.body.
  * @param {'nav'|'point'} source Method of navigating initiated from.
- * @returns {Element|{first: Element, last: Element}} Reference to first (or range) of navigable nodes
+ * @returns {Element|{first: Node, last: Node}} Reference to first (or range) of navigable nodes
  */
 function getFirstElement(start, source) {
 
@@ -691,12 +705,29 @@ function getFirstElement(start, source) {
         while(isInlineElement(node_after(last, source), source)) {
             last = node_after(last);
         }
-        if(start === last) {
-            return mask_DOMObjs(start);
-        }
-        return mask_DOMObjs(start, last);
+        return {'first': start, 'last': last};
     }
-    else return getFirstElement(first);
+    else return getFirstElement(first, source);
+}
+
+/**
+ * Gets the last node (or range of nodes) that is navigable
+ * @param start The starting element. If wanting last node, start === document.body.
+ * @param {'nav'|'point'} source Method of navigating initiated from.
+ * @returns {Element|{first: Node, last: Node}} Reference to first (or range) of navigable nodes
+ */
+function getLastElement(start, source) {
+
+    var last = last_child(start, source);
+
+    if(last === null) {
+        var first = start;
+        while(isInlineElement(node_before(first, source), source)) {
+            first = node_after(first);
+        }
+        return {'first': first, 'last': start}
+    }
+    else return getLastElement(last, source);
 }
 
 /**
@@ -711,10 +742,7 @@ function getNextSelection(source) {
 
     var selectedNodes = getNextNodes(fromEl, source);
     if (selectedNodes === null) return null;
-    else if (selectedNodes.last !== undefined) {
-        return mask_DOMObjs(selectedNodes.first, selectedNodes.last);
-    }
-    return mask_DOMObjs(selectedNodes);
+    else return mask_DOMObjs(selectedNodes);
 }
 
 /**
@@ -729,21 +757,18 @@ function getPrevSelection(source) {
 
     var selectedNodes = getLastNodes(fromEl, source);
     if (selectedNodes === null) return null;
-    else if (selectedNodes.last !== undefined) {
-        return mask_DOMObjs(selectedNodes.first, selectedNodes.last);
-    }
-    return mask_DOMObjs(selectedNodes);
+    else return mask_DOMObjs(selectedNodes);
 }
 
 /**
  * Masks either a range of nodes (with the same parents) inclusively from first to last, or one node
- * @param {Element} first Inclusive start of wrap
- * @param {Element} last Inclusive end of wrap -- can be same as first to wrap one node, or left undefined.
+ * @param {Element|{first: Node, last Node}} wrap The range of nodes (or just node)
  * @returns {HTMLElement} The masked element reference with the nodes masked inside
  */
-function mask_DOMObjs(first, last) {
+function mask_DOMObjs(wrap) {
 
-    if(last === undefined) last = first; // Only mask one object
+    var first = wrap.first;
+    var last = wrap.last;
 
     if(first.parentElement !== last.parentElement) throw new Error('DOM Objects must have same parent');
 
@@ -811,7 +836,7 @@ function ez_navigate_start(propagated) {
 	// TODO auto_advance_set(); // Find if autoadvancing element
 
     if(selectEl === null) {
-        selectEl = getFirstElement(document.body, 'nav');
+        selectEl = mask_DOMObjs(getFirstElement(document.body, 'nav'));
     }
 
 	if(!propagated) {
