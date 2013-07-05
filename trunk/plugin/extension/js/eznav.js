@@ -225,7 +225,7 @@ function getBlock(e, source) {
 /**
  * Main EZ Navigation function: Moves selector up or down selectElements, and calls all relevant functions (speech,
  * tooltips etc.)
- * @param {'up'|'down'} move Direction of navigation.
+ * @param {'up'|'down'|'top'|'bottom'} move Direction/position of navigation.
  * skipping hidden elements, this should be disabled because it takes too much time.
  */
 function ez_navigate(move) {
@@ -240,26 +240,28 @@ function ez_navigate(move) {
         selectEl = getLastSelection('nav');
         move = 'up';
     } else {
-        throw new Error("Parameter *move* must be 'up'|'down'.")
+        throw new Error("Parameter *move* must be 'up'|'down'|'top'|'bottom'.")
     }
 
     if(selectEl === null) {
         if(move === 'down') {
+            pulseSelector();
+            sounds[AUDIO_NOACTION].feed.play();
             ez_navigate('bottom');
-            return;
         }
         else if(move === 'up'){
+            pulseSelector();
+            sounds[AUDIO_NOACTION].feed.play();
             ez_navigate('top');
-            return;
-        } else {
-            return;
         }
+        return;
     }
     if(!drawSelected(getBlock(selectEl))) {
         ez_navigate(move);
         return;
     }
-    // Check to make sure it's not a short, weird selection
+
+    // Check to make sure it's not a short, weird selection TODO: INFLEXIBLE
     var children = getChildNodes(selectEl, 'nav');
     if(areAllChildrenInline(selectEl, 'nav')
         && children.length === 1
@@ -267,7 +269,9 @@ function ez_navigate(move) {
         ez_navigate(move);
         return;
     }
+
     var actionable = getActionableElement(selectEl, 'nav');
+
     sounds[getElementAudio(actionable)].feed.play();
     actionable.focus();
     voice(selectEl, 'nav');
@@ -343,6 +347,13 @@ function ez_enter() {
 		}, 300);
 		voice(obj, 0, true);
 	}
+}
+
+function pulseSelector() {
+    document.getElementById(ezSelectorId).className = 'pulse';
+    setTimeout(function () {
+        document.getElementById(ezSelectorId).className = '';
+    }, 300);
 }
 
 /**
