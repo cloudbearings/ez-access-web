@@ -646,6 +646,13 @@ function getNextNodes(startEl, source) {
         }
     }
 
+    // Get inner-most grouping if possible
+    while(first === last) {
+        if(first_child(first) === null || last_child(last) === null) break;
+        first = first_child(first);
+        last = last_child(last);
+    }
+
     return {'first': first, 'last': last};
 }
 
@@ -663,7 +670,7 @@ function getNextNodes(startEl, source) {
  * @param source ['nav'|'point'} Navigation method passed from calling function
  * @return {{first: Node, last: Node}|null} Returns an element to-from, or null (for end of document)
  */
-function getLastNodes(startEl, source) {
+function getPrevNodes(startEl, source) {
     // Through recursion, reached end of document.
     if(startEl === null) return null;
 
@@ -672,7 +679,7 @@ function getLastNodes(startEl, source) {
     var last = node_before(startEl, source);
     if(last === null) {
         // Fall back onto the parent; no first el exists at this level
-        return getLastNodes(startEl.parentNode, source);
+        return getPrevNodes(startEl.parentNode, source);
     }
     // First el exists, so check if child of first el exists
     while(last_child(last, source) !== null && !areAllChildrenInline(last, source)) {
@@ -685,6 +692,13 @@ function getLastNodes(startEl, source) {
         while(node_before(first, source) !== null && isInlineElement(node_before(first, source), source)) {
             first = node_before(first, source);
         }
+    }
+
+    // Get inner-most grouping if possible
+    while(first === last) {
+        if(first_child(first) === null || last_child(last) === null) break;
+        first = first_child(first);
+        last = last_child(last);
     }
 
     return {'first': first, 'last': last};
@@ -700,7 +714,7 @@ function getFirstElement(start, source) {
 
     var first = first_child(start, source);
 
-    if(first === null) {
+    if(first === null || orphanTxtNode(first)) {
         var last = start;
         while(isInlineElement(node_after(last, source), source)) {
             last = node_after(last);
@@ -708,6 +722,11 @@ function getFirstElement(start, source) {
         return {'first': start, 'last': last};
     }
     else return getFirstElement(first, source);
+}
+
+function orphanTxtNode( nod ) {
+    return node_before(nod) === null && node_after(nod) === null && nod.nodeType === 3;
+
 }
 
 /**
@@ -720,10 +739,10 @@ function getLastElement(start, source) {
 
     var last = last_child(start, source);
 
-    if(last === null) {
+    if(last === null || orphanTxtNode(last)) {
         var first = start;
         while(isInlineElement(node_before(first, source), source)) {
-            first = node_after(first);
+            first = node_before(first);
         }
         return {'first': first, 'last': start}
     }
@@ -755,7 +774,35 @@ function getPrevSelection(source) {
 
     strip_masking();
 
-    var selectedNodes = getLastNodes(fromEl, source);
+    var selectedNodes = getPrevNodes(fromEl, source);
+    if (selectedNodes === null) return null;
+    else return mask_DOMObjs(selectedNodes);
+}
+
+/**
+ * Gets the maskId to select
+ * @param {'nav'|'point'} source Method of navigating initiated from.
+ * @returns {HTMLElement} The maskId reference
+ */
+function getFirstSelection(source) {
+
+    strip_masking();
+
+    var selectedNodes = getFirstElement(document.body, 'nav');
+    if (selectedNodes === null) return null;
+    else return mask_DOMObjs(selectedNodes);
+}
+
+/**
+ * Gets the maskId to select
+ * @param {'nav'|'point'} source Method of navigating initiated from.
+ * @returns {HTMLElement} The maskId reference
+ */
+function getLastSelection(source) {
+
+    strip_masking();
+
+    var selectedNodes = getLastElement(document.body, 'nav');
     if (selectedNodes === null) return null;
     else return mask_DOMObjs(selectedNodes);
 }
@@ -1017,7 +1064,7 @@ function drawSelected(obj) {
  */
 window.onresize = function () {
 	if(ez_navigateToggle) {
-		drawSelected(selectEl);
+		drawSelected(getBlock(selectEl));
 	}
 };
 
