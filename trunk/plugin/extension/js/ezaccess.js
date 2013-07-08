@@ -189,6 +189,12 @@ function isFocusable(o, source) {
         return false;
     }
 
+    if(o.hasAttribute('aria-flowto')) return true;
+
+    if(o.hasAttribute('id')) {
+        if(ariaFlowFrom(o.getAttribute('id')) !== null) return true;
+    }
+
     var attr = '';
 
     /** Check to see if immediate element is focusable or not */
@@ -761,11 +767,25 @@ function getLastElement(start, source) {
  * @returns {HTMLElement} The maskId reference
  */
 function getNextSelection(source) {
+
     var fromEl = last_child(selectEl);
+    var actionable = getActionableElement(selectEl, 'nav');
 
     strip_masking();
 
-    var selectedNodes = getNextNodes(fromEl, source);
+    var selectedNodes;
+
+    var nod = null;
+    if(actionable.hasAttribute('aria-flowto')) {
+        nod = document.getElementById(actionable.getAttribute('aria-flowto'));
+    }
+
+    if(nod !== null) {
+        selectedNodes = getInnerGrouping({first: nod, last: nod});
+    } else {
+        selectedNodes = getNextNodes(fromEl, source);
+    }
+
     if (selectedNodes === null) return null;
     else return mask_DOMObjs(selectedNodes);
 }
@@ -776,13 +796,35 @@ function getNextSelection(source) {
  * @returns {HTMLElement} The maskId reference
  */
 function getPrevSelection(source) {
+
     var fromEl = first_child(selectEl);
+    var actionable = getActionableElement(selectEl, 'nav');
 
     strip_masking();
 
-    var selectedNodes = getPrevNodes(fromEl, source);
+    var selectedNodes;
+
+
+    var nod = null;
+    if(actionable.hasAttribute('id')) nod = ariaFlowFrom(actionable.getAttribute('id'));
+
+    if(nod !== null) {
+        selectedNodes = getInnerGrouping({first: nod, last: nod});
+    } else {
+        selectedNodes = getPrevNodes(fromEl, source);
+    }
+
     if (selectedNodes === null) return null;
     else return mask_DOMObjs(selectedNodes);
+}
+
+/**
+ * Returns node that aria-flowto references from given id
+ * @param id ID to be checked if flow'd-from
+ * @returns {Node} Returns el with aria-flowto = id
+ */
+function ariaFlowFrom(id) {
+    return document.querySelector("[aria-flowto~='" + id + "']");
 }
 
 /**
