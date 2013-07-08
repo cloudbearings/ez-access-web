@@ -193,6 +193,11 @@ function key_event(e) {
 function getActionableElement(e, source) {
     var childNod = getChildNodes(e, source);
 
+    // Nv'd inside an element's text
+    if(childNod.length === 1 && childNod[0].nodeType === 3) {
+        return e.parentElement;
+    }
+
     // Get the element if multiple nodes and one element are navagable.
     var els = 0;
     var lastEl;
