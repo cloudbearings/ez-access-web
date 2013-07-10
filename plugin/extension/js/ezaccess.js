@@ -358,7 +358,7 @@ function isInlineElement(o, source) {
 function areAllChildrenInline(o, source) {
     'use strict';
 
-    var children = getChildNodes(o, source);
+    var children = getChildNodRange(o);
 
     if (children === null) {
         return true;
@@ -768,10 +768,8 @@ function getLastElement(start, source) {
  */
 function getNextSelection(source) {
 
-    var fromEl = last_child(selectEl);
+    var fromEl = selectEl.last;
     var actionable = getActionableElement(selectEl, 'nav');
-
-    strip_masking();
 
     var selectedNodes;
 
@@ -787,7 +785,7 @@ function getNextSelection(source) {
     }
 
     if (selectedNodes === null) return null;
-    else return mask_DOMObjs(selectedNodes);
+    else return selectedNodes;
 }
 
 /**
@@ -797,10 +795,8 @@ function getNextSelection(source) {
  */
 function getPrevSelection(source) {
 
-    var fromEl = first_child(selectEl);
+    var fromEl = selectEl.first;
     var actionable = getActionableElement(selectEl, 'nav');
-
-    strip_masking();
 
     var selectedNodes;
 
@@ -815,7 +811,7 @@ function getPrevSelection(source) {
     }
 
     if (selectedNodes === null) return null;
-    else return mask_DOMObjs(selectedNodes);
+    else return selectedNodes;
 }
 
 /**
@@ -838,7 +834,7 @@ function getFirstSelection(source) {
 
     var selectedNodes = getFirstElement(document.body, 'nav');
     if (selectedNodes === null) return null;
-    else return mask_DOMObjs(selectedNodes);
+    else return selectedNodes;
 }
 
 /**
@@ -852,7 +848,7 @@ function getLastSelection(source) {
 
     var selectedNodes = getLastElement(document.body, 'nav');
     if (selectedNodes === null) return null;
-    else return mask_DOMObjs(selectedNodes);
+    else return selectedNodes; //mask_DOMObjs(selectedNodes)
 }
 
 /**
@@ -931,14 +927,14 @@ function ez_navigate_start(propagated) {
 	// TODO auto_advance_set(); // Find if autoadvancing element
 
     if(selectEl === null) {
-        selectEl = mask_DOMObjs(getFirstElement(document.body, 'nav'));
+        ez_navigate('top');
     }
 
-	if(!propagated) {
+	/*if(!propagated) { // TODO
 		sounds[getElementAudio()].feed.play();
 	}
 	drawSelected(selectEl);
-	voice(selectEl, 'nav');
+	voice(selectEl, 'nav');*/
 }
 
 /**

@@ -190,12 +190,26 @@ function key_event(e) {
 	return true;
 }
 
+function getChildNodRange(range) {
+    var ret = [];
+    var obj = range.first;
+
+    while(obj !== range.last) {
+        ret.push(obj);
+        obj = node_after(obj);
+        if(obj === null) throw new Error("Invalid range object!");
+    }
+    ret.push(obj);
+
+    return ret;
+}
+
 function getActionableElement(e, source) {
-    var childNod = getChildNodes(e, source);
+    var childNod = getChildNodRange(e); // TODO: Source
 
     // Nv'd inside an element's text
     if(childNod.length === 1 && childNod[0].nodeType === 3) {
-        return e.parentElement;
+        return childNod[0].parentElement;
     }
 
     // Get the element if multiple nodes and one element are navagable.
@@ -210,7 +224,7 @@ function getActionableElement(e, source) {
     if(els === 1) {
         return lastEl;
     }
-    return e;
+    return childNod[0];
 }
 
 /**
@@ -220,8 +234,8 @@ function getActionableElement(e, source) {
  * @returns {HTMLElement} The child block (if it is)
  */
 function getBlock(e, source) {
-    var children = getChildNodes(e, source);
-    if(children.length === 1 && !isInlineElement(children[0])) {
+    var children = getChildNodRange(e); // TODO: Source
+    if(children.length === 1 && !isInlineElement(children[0], 'nav')) {
         return children[0];
     }
     return e;
@@ -267,8 +281,19 @@ function ez_navigate(move) {
     }
 
     // Check to make sure it's not a short, weird selection TODO: INFLEXIBLE
-    var children = getChildNodes(selectEl, 'nav');
-    if(areAllChildrenInline(selectEl, 'nav')
+
+    var children = getChildNodRange(selectEl);
+
+    var allInline = true;
+    for(i = 0; i < children.length; i++) {
+        if(!isInlineElement(children[i])) {
+            allInline = false;
+            break;
+        }
+
+    }
+
+    if(allInline
         && children.length === 1
         && is_all_punct(children[0])) {
         ez_navigate(move);
@@ -279,7 +304,7 @@ function ez_navigate(move) {
 
     sounds[getElementAudio(actionable)].feed.play();
     actionable.focus();
-    voice(selectEl, 'nav');
+    voice(actionable, 'nav'); // TODO: Need to look through all possibilities! NOT JUST ACTIONABLE
 }
 
 /**
