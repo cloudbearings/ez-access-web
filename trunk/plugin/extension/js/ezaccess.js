@@ -662,10 +662,9 @@ function getInnerGrouping(e) {
  * @return {object|[object, object]|null} Returns node, element, an element to-from, or null (for end of document)
  */
 function getNextNodes(startEl, source) {
+
     // Through recursion, reached end of document.
     if(startEl === null) return [];
-
-    if(startEl[0] !== undefined) startEl = startEl[startEl.length-1];
 
     var first = node_after(startEl, source);
     if(first === null) {
@@ -706,8 +705,6 @@ function getNextNodes(startEl, source) {
 function getPrevNodes(startEl, source) {
     // Through recursion, reached end of document.
     if(startEl === null) return [];
-
-    if(startEl[0] !== undefined) startEl = startEl[0];
 
     var last = node_before(startEl, source);
     if(last === null) {
@@ -844,7 +841,7 @@ function ariaFlowFrom(id) {
  */
 function getFirstSelection(source) {
 
-    return getFirstElement(document.body, 'nav');
+    return getFirstElement(document.body, source);
 
 }
 
@@ -855,7 +852,7 @@ function getFirstSelection(source) {
  */
 function getLastSelection(source) {
 
-    return getLastElement(document.body, 'nav');
+    return getLastElement(document.body, source);
 
 }
 
