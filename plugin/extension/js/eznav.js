@@ -62,7 +62,7 @@ function key_event(e) {
 			TINY.box.hide();
 		} else {
 			tinyOpen = true;
-			ez_help(selectEl);
+			ez_help(selectedEls);
 		}
 	} else if(e.keyCode == EZ_KEY_UP) {
 		if(tinyOpen) {
@@ -70,7 +70,7 @@ function key_event(e) {
 			TINY.box.hide();
 		} else {
 			if(ez_navigateToggle) {
-				window.scroll(0, findPos(selectEl));
+				window.scroll(0, findPos(selectedEls));
 				ez_navigate('up');
 			} else {
 				ez_navigate_start();
@@ -82,7 +82,7 @@ function key_event(e) {
 			TINY.box.hide();
 		} else {
 			if(ez_navigateToggle) {
-				window.scroll(0, findPos(selectEl));
+				window.scroll(0, findPos(selectedEls));
 				ez_navigate('down');
 			} else {
 				ez_navigate_start();
@@ -118,15 +118,15 @@ function key_event(e) {
 			return false; // Disable any browser actions
 		}
 	} else if(e.keyCode == EZ_KEY_SKIPFORWARD) {
-		if(selectEl.type == 'range') {
-			selectEl.value = parseFloat(selectEl.value) + parseFloat(selectEl.step);
+		if(selectedEls.type == 'range') {
+			selectedEls.value = parseFloat(selectedEls.value) + parseFloat(selectedEls.step);
 			sounds[AUDIO_MOVE].feed.play();
-			voice(selectEl.value);
-		} else if(selectEl.tagName == 'SELECT') {
-			if(selectEl.selectedIndex < selectEl.length - 1) {
-				selectEl.selectedIndex++;
+			voice(selectedEls.value);
+		} else if(selectedEls.tagName == 'SELECT') {
+			if(selectedEls.selectedIndex < selectedEls.length - 1) {
+				selectedEls.selectedIndex++;
 				sounds[AUDIO_MOVE].feed.play();
-				voice(selectEl.value + '... option ' + (selectEl.selectedIndex + 1) + ' of ' + selectEl.length);
+				voice(selectedEls.value + '... option ' + (selectedEls.selectedIndex + 1) + ' of ' + selectedEls.length);
 			} else {
 				document.getElementById(ezSelectorId).className = 'pulse';
 				setTimeout(function () {
@@ -151,15 +151,15 @@ function key_event(e) {
 			}
 		}
 	} else if(e.keyCode == EZ_KEY_SKIPBACKWARD) {
-		if(selectEl.type == 'range') {
-			selectEl.value = parseFloat(selectEl.value) - parseFloat(selectEl.step);
+		if(selectedEls.type == 'range') {
+			selectedEls.value = parseFloat(selectedEls.value) - parseFloat(selectedEls.step);
 			sounds[AUDIO_MOVE].feed.play();
-			voice(selectEl.value);
-		} else if(selectEl.tagName == 'SELECT') {
-			if(selectEl.selectedIndex > 0) {
-				selectEl.selectedIndex--;
+			voice(selectedEls.value);
+		} else if(selectedEls.tagName == 'SELECT') {
+			if(selectedEls.selectedIndex > 0) {
+				selectedEls.selectedIndex--;
 				sounds[AUDIO_MOVE].feed.play();
-				voice(selectEl.value + '... option ' + (selectEl.selectedIndex + 1) + ' of ' + selectEl.length);
+				voice(selectedEls.value + '... option ' + (selectedEls.selectedIndex + 1) + ' of ' + selectedEls.length);
 			} else {
 				document.getElementById(ezSelectorId).className = 'pulse';
 				setTimeout(function () {
@@ -183,86 +183,57 @@ function key_event(e) {
 				voice("Minimum volume");
 			}
 		}
-	} else if(selectEl.type == 'textarea' || selectEl.type == 'text') {
+	} else if(selectedEls.type == 'textarea' || selectedEls.type == 'text') {
 		var key = String.fromCharCode(e.keyCode);
 		if(!key.match(/[^A-Za-z0-9\-_]/)) voice(key);
 	}
 	return true;
 }
 
-function getChildNodRange(range) {
-    var ret = [];
-    var obj = range.first;
-
-    while(obj !== range.last) {
-        ret.push(obj);
-        obj = node_after(obj);
-        if(obj === null) throw new Error("Invalid range object!");
-    }
-    ret.push(obj);
-
-    return ret;
-}
-
 function getActionableElement(e, source) {
-    var childNod = getChildNodRange(e); // TODO: Source
 
     // Nv'd inside an element's text
-    if(childNod.length === 1 && childNod[0].nodeType === 3) {
-        return childNod[0].parentElement;
+    if(e.length === 1 && e[0].nodeType === 3) {
+        return e[0].parentElement;
     }
 
     // Get the element if multiple nodes and one element are navagable.
     var els = 0;
     var lastEl;
-    for(i = 0; i < childNod.length; i++) {
-        if(isElement(childNod[i])) {
+    for(i = 0; i < e.length; i++) {
+        if(isElement(e[i])) {
             els++;
-            lastEl = childNod[i];
+            lastEl = e[i];
         }
     }
     if(els === 1) {
         return lastEl;
     }
-    return childNod[0];
+    return e[0];
 }
 
 /**
- * Returns block-level element for drawing box algo
- * @param {HTMLElement} e The element to check for
- * @param {'nav'|'point'} source The navigation mechanism
- * @returns {HTMLElement} The child block (if it is)
- */
-function getBlock(e, source) {
-    var children = getChildNodRange(e); // TODO: Source
-    if(children.length === 1 && !isInlineElement(children[0], 'nav')) {
-        return children[0];
-    }
-    return e;
-}
-
-/**
- * Main EZ Navigation function: Moves selector up or down selectElements, and calls all relevant functions (speech,
+ * Main EZ Navigation function: Moves selector up or down selectedElsements, and calls all relevant functions (speech,
  * tooltips etc.)
  * @param {'up'|'down'|'top'|'bottom'} move Direction/position of navigation.
  * skipping hidden elements, this should be disabled because it takes too much time.
  */
 function ez_navigate(move) {
     if(move === 'down') {
-        selectEl = getNextSelection('nav');
+        selectedEls = getNextSelection('nav');
     } else if(move === 'up') {
-        selectEl = getPrevSelection('nav');
+        selectedEls = getPrevSelection('nav');
     } else if(move === 'top') {
-        selectEl = getFirstSelection('nav');
+        selectedEls = getFirstSelection('nav');
         move = 'down';
     } else if(move === 'bottom') {
-        selectEl = getLastSelection('nav');
+        selectedEls = getLastSelection('nav');
         move = 'up';
     } else {
         throw new Error("Parameter *move* must be 'up'|'down'|'top'|'bottom'.")
     }
 
-    if(selectEl === null) {
+    if(selectedEls.length === 0) {
         if(move === 'down') {
             pulseSelector();
             sounds[AUDIO_NOACTION].feed.play();
@@ -275,18 +246,16 @@ function ez_navigate(move) {
         }
         return;
     }
-    if(!drawSelected(getBlock(selectEl))) {
+    /*if(!drawSelected(selectedEls[0])) { // TODO
         ez_navigate(move);
         return;
-    }
+    }*/
 
     // Check to make sure it's not a short, weird selection TODO: INFLEXIBLE
 
-    var children = getChildNodRange(selectEl);
-
     var allInline = true;
-    for(i = 0; i < children.length; i++) {
-        if(!isInlineElement(children[i])) {
+    for(i = 0; i < selectedEls.length; i++) {
+        if(!isInlineElement(selectedEls[i])) {
             allInline = false;
             break;
         }
@@ -294,13 +263,13 @@ function ez_navigate(move) {
     }
 
     if(allInline
-        && children.length === 1
-        && is_all_punct(children[0])) {
+        && selectedEls.length === 1
+        && is_all_punct(selectedEls[0])) {
         ez_navigate(move);
         return;
     }
 
-    var actionable = getActionableElement(selectEl, 'nav');
+    var actionable = getActionableElement(selectedEls, 'nav');
 
     sounds[getElementAudio(actionable)].feed.play();
     actionable.focus();
@@ -313,12 +282,12 @@ function ez_navigate(move) {
  * @param {number} location Valid index to jump to.
  */
 function ez_jump(location) {
-	selectEl.blur();
+	selectedEls.blur();
 	currIndex = parseFloat(location);
-	drawSelected(selectEl);
+	drawSelected(selectedEls);
 	sounds[getElementAudio()].feed.play();
-	selectEl.focus();
-	voice(selectEl, 'nav');
+	selectedEls.focus();
+	voice(selectedEls, 'nav');
 }
 
 /**
@@ -326,7 +295,7 @@ function ez_jump(location) {
  * TODO Will be revamped to handle better speech synthesis on EZ Action.
  */
 function ez_enter() {
-	var obj = selectEl;
+	var obj = selectedEls;
 	if(obj.tagName == "A") {
 		if(obj.href.indexOf("#") != -1) {
 			var hrefBase = obj.href.substring(0, obj.href.indexOf("#"));
@@ -363,7 +332,7 @@ function ez_enter() {
 		voice(obj);
 	} else if(obj.tagName == 'INPUT' && (obj.type == 'submit' || obj.type == 'image')) {
 		obj.click();
-	} else if(selectEl.getAttribute('data-ez-chunking') == 'group' && selectEl.getAttribute('data-ez-subnavtype') == 'nested' || selectEl.getAttribute('data-ez-subnavtype') == 'hierarchical') {
+	} else if(selectedEls.getAttribute('data-ez-chunking') == 'group' && selectedEls.getAttribute('data-ez-subnavtype') == 'nested' || selectedEls.getAttribute('data-ez-subnavtype') == 'hierarchical') {
 		ez_navigate_in_group();
 	} else {
 		document.getElementById(ezSelectorId).className = 'pulse';
@@ -393,16 +362,16 @@ function pulseSelector() {
 function mouseOver(e) {
 	var newElement = true;
 	var found = false;
-	for(var i = 0; i < selectElements.length; i++) {
-		if(e == selectElements[i]) {
+	for(var i = 0; i < selectedElsements.length; i++) {
+		if(e == selectedElsements[i]) {
 			if(currIndex == i) {
 				newElement = false;
 			}
-			if(!selectElements[i].hasAttribute('data-ez-focusable-point') && !selectElements[i].hasAttribute('data-ez-focusable')) {
+			if(!selectedElsements[i].hasAttribute('data-ez-focusable-point') && !selectedElsements[i].hasAttribute('data-ez-focusable')) {
 				// If we're not supposed to navigate here by pointing
-				selectEl.blur(); // Add blur to old element
+				selectedEls.blur(); // Add blur to old element
 				currIndex = i;
-				selectEl.focus(); // Add focus to new element
+				selectedEls.focus(); // Add focus to new element
 				found = true;
 			}
 		}
@@ -411,8 +380,8 @@ function mouseOver(e) {
 		sessionStorage.setItem("EZ_Toggle", "1");
 		ez_navigateToggle = true;
 		sounds[getElementAudio()].feed.play();
-		drawSelected(selectEl);
-		voice(selectEl, 'point');
+		drawSelected(selectedEls);
+		voice(selectedEls, 'point');
 	}
 }
 
@@ -431,8 +400,8 @@ function multikey_event(e) {
 		}
 		if(ez_navigateToggle) {
 			ez_navigate('up');
-			smoothScroll(findPos(selectEl));
-			//window.scroll(0,findPos(selectEl));
+			smoothScroll(findPos(selectedEls));
+			//window.scroll(0,findPos(selectedEls));
 		} else {
 			ez_navigate_start();
 		}
@@ -444,8 +413,8 @@ function multikey_event(e) {
 		}
 		if(ez_navigateToggle) {
 			ez_navigate('down');
-			smoothScroll(findPos(selectEl));
-			//window.scroll(0,findPos(selectEl));
+			smoothScroll(findPos(selectedEls));
+			//window.scroll(0,findPos(selectedEls));
 		} else {
 			ez_navigate_start();
 		}
@@ -459,9 +428,9 @@ function multikey_event(e) {
  */
 function auto_advance_set() {
 	// If this is a new element to start autoadvancing, set the timer
-	if(find_parent_attr(selectEl, 'data-ez-autoadvance') !== undefined) {
-		if(find_parent_attr(selectElements[currIndex - 1], 'data-ez-autoadvance') === undefined) {
-			autoAdvance = find_parent_attr(selectEl, 'data-ez-autoadvance');
+	if(find_parent_attr(selectedEls, 'data-ez-autoadvance') !== undefined) {
+		if(find_parent_attr(selectedElsements[currIndex - 1], 'data-ez-autoadvance') === undefined) {
+			autoAdvance = find_parent_attr(selectedEls, 'data-ez-autoadvance');
 			autoAdvance = parseInt(autoAdvance);
 			if(autoAdvance < 100) {
 				console.log("Please choose a autoadvance pause of 100 ms or greater.");
@@ -484,7 +453,7 @@ function auto_advance_decide() {
 				autoAdvance = 0;
 				window.clearInterval(autoAdvTimer);
 			}
-			if(find_parent_attr(selectEl, 'data-ez-autoadvance') === undefined) {
+			if(find_parent_attr(selectedEls, 'data-ez-autoadvance') === undefined) {
 				autoAdvance = 0;
 				window.clearInterval(autoAdvTimer);
 			}
