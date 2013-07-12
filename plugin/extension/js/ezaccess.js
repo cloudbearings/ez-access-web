@@ -1113,7 +1113,7 @@ function drawSelected(obj) {
  */
 window.onresize = function () {
 	if(ez_navigateToggle) {
-		drawSelected(getBlock(selectedEls));
+		drawSelected(selectedEls);
 	}
 };
 
