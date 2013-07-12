@@ -1,9 +1,8 @@
 /**
- * The DOM object on the page being highlighted.
- * If null, no element is selected yet (usually will get the first navigable one on the page).
- * @type {Element|null}
+ * The DOM node(s), if any, in order, on the page being highlighted.
+ * @type {Array}
  */
-var selectEl = null;
+var selectedEls = [];
 
 /**
  * The ID of the EZ masking span tag.
@@ -349,16 +348,16 @@ function isInlineElement(o, source) {
 }
 
 /**
- * Checks all descendants of the given node to see if all of them are either
+ * Checks all elements of an array to see if all of them are either
  * inline or have "display: none".
  * @author J. Bern Jordan
- * @param o {object} A Node object to be checked.
+ * @param o {Array} Array of nodes to be checked
  * @param source ['nav'|'point'} Navigation method passed from calling function
  */
 function areAllChildrenInline(o, source) {
     'use strict';
 
-    var children = getChildNodRange(o);
+    var children = getChildNodes(o);
 
     if (children === null) {
         return true;
@@ -615,13 +614,28 @@ function data_of( txt ) {
     return data;
 }
 
+function getChildNodRange(first, last) {
+    var ret = [];
+    var obj = first;
+
+    while(obj !== last) {
+        ret.push(obj);
+        obj = node_after(obj);
+        if(obj === null) throw new Error("Invalid range object!" + first + last);
+    }
+    ret.push(obj);
+
+    return ret;
+}
+
 /**
  *
- * @param wrap
+ * @param e
  */
-function getInnerGrouping(wrap) {
-    var first = wrap.first;
-    var last = wrap.last;
+function getInnerGrouping(e) {
+    var first = e[0];
+    var last = e[e.length-1];
+
 
     // Get inner-most grouping (if possible)
     while(first === last) {
@@ -630,7 +644,7 @@ function getInnerGrouping(wrap) {
         last = last_child(last);
     }
 
-    return {first: first, last: last};
+    return getChildNodRange(first, last);
 }
 
 /**
@@ -649,9 +663,9 @@ function getInnerGrouping(wrap) {
  */
 function getNextNodes(startEl, source) {
     // Through recursion, reached end of document.
-    if(startEl === null) return null;
+    if(startEl === null) return [];
 
-    if(startEl.last !== undefined) startEl = startEl.last;
+    if(startEl[0] !== undefined) startEl = startEl[startEl.length-1];
 
     var first = node_after(startEl, source);
     if(first === null) {
@@ -663,15 +677,16 @@ function getNextNodes(startEl, source) {
         first = first_child(first, source);
     }
 
-    var last = first;
+    // By this point, we have the 'first' node
+    var ret = [first];
 
     if(isInlineElement(first, source)) {
-        while(node_after(last, source) !== null && isInlineElement(node_after(last, source), source)) {
-            last = node_after(last, source);
+        while(node_after(ret[ret.length-1], source) !== null && isInlineElement(node_after(ret[ret.length-1], source), source)) {
+            ret.push(node_after(ret[ret.length-1], source));
         }
     }
 
-    return getInnerGrouping({first: first, last: last});
+    return getInnerGrouping(ret);
 }
 
 /**
@@ -686,13 +701,13 @@ function getNextNodes(startEl, source) {
  * you).
  * @param startEl  The text node whose data should be returned
  * @param source ['nav'|'point'} Navigation method passed from calling function
- * @return {{first: Node, last: Node}|null} Returns an element to-from, or null (for end of document)
+ * @return {Array} Returns an element to-from, or null (for end of document)
  */
 function getPrevNodes(startEl, source) {
     // Through recursion, reached end of document.
-    if(startEl === null) return null;
+    if(startEl === null) return [];
 
-    if(startEl.first !== undefined) startEl = startEl.first;
+    if(startEl[0] !== undefined) startEl = startEl[0];
 
     var last = node_before(startEl, source);
     if(last === null) {
@@ -704,34 +719,35 @@ function getPrevNodes(startEl, source) {
         last = last_child(last, source);
     }
 
-    var first = last;
+    // By this point, we have the 'last' node
+    var ret = [last];
 
-    if(isInlineElement(first, source)) {
-        while(node_before(first, source) !== null && isInlineElement(node_before(first, source), source)) {
-            first = node_before(first, source);
+    if(isInlineElement(last, source)) {
+        while(node_before(ret[0], source) !== null && isInlineElement(node_before(ret[0], source), source)) {
+            ret.unshift(node_before(ret[0], source));
         }
     }
 
-    return getInnerGrouping({first: first, last: last});
+    return getInnerGrouping(ret);
 }
 
 /**
  * Gets the first node (or range of nodes) that is navigable
  * @param start The starting element. If wanting first node, start === document.body.
  * @param {'nav'|'point'} source Method of navigating initiated from.
- * @returns {Element|{first: Node, last: Node}} Reference to first (or range) of navigable nodes
+ * @returns {Array} Reference to first (or range) of navigable nodes
  */
 function getFirstElement(start, source) {
 
     var first = first_child(start, source);
 
     if(first === null || orphanTxtNode(first)) {
-        var last = start;
-        while(isInlineElement(node_after(last, source), source)) {
-            last = node_after(last);
+        var ret = [start];
+        while(isInlineElement(node_after(ret[ret.length-1], source), source)) {
+            ret.push(node_after(ret[ret.length-1]));
         }
 
-        return getInnerGrouping({first: start, last: last});
+        return getInnerGrouping(ret);
 
     }
     else return getFirstElement(first, source);
@@ -745,18 +761,18 @@ function orphanTxtNode( nod ) {
  * Gets the last node (or range of nodes) that is navigable
  * @param start The starting element. If wanting last node, start === document.body.
  * @param {'nav'|'point'} source Method of navigating initiated from.
- * @returns {Element|{first: Node, last: Node}} Reference to first (or range) of navigable nodes
+ * @returns {Array} Reference to first (or range) of navigable nodes
  */
 function getLastElement(start, source) {
 
     var last = last_child(start, source);
 
     if(last === null || orphanTxtNode(last)) {
-        var first = start;
-        while(isInlineElement(node_before(first, source), source)) {
-            first = node_before(first);
+        var ret = [start];
+        while(isInlineElement(node_before(ret[0], source), source)) {
+            ret.unshift(node_before(ret[0]));
         }
-        return getInnerGrouping({first: first, last: start});
+        return getInnerGrouping(ret);
     }
     else return getLastElement(last, source);
 }
@@ -764,12 +780,12 @@ function getLastElement(start, source) {
 /**
  * Gets the maskId to select
  * @param {'nav'|'point'} source Method of navigating initiated from.
- * @returns {HTMLElement} The maskId reference
+ * @returns {Array} The maskId reference
  */
 function getNextSelection(source) {
 
-    var fromEl = selectEl.last;
-    var actionable = getActionableElement(selectEl, 'nav');
+    var fromEl = selectedEls[selectedEls.length-1];
+    var actionable = getActionableElement(selectedEls, 'nav');
 
     var selectedNodes;
 
@@ -779,24 +795,23 @@ function getNextSelection(source) {
     }
 
     if(nod !== null) {
-        selectedNodes = getInnerGrouping({first: nod, last: nod});
+        selectedNodes = getInnerGrouping([nod]);
     } else {
         selectedNodes = getNextNodes(fromEl, source);
     }
 
-    if (selectedNodes === null) return null;
-    else return selectedNodes;
+    return selectedNodes;
 }
 
 /**
  * Gets the maskId to select
  * @param {'nav'|'point'} source Method of navigating initiated from.
- * @returns {HTMLElement} The maskId reference
+ * @returns {Array} The maskId reference
  */
 function getPrevSelection(source) {
 
-    var fromEl = selectEl.first;
-    var actionable = getActionableElement(selectEl, 'nav');
+    var fromEl = selectedEls[0];
+    var actionable = getActionableElement(selectedEls, 'nav');
 
     var selectedNodes;
 
@@ -805,13 +820,12 @@ function getPrevSelection(source) {
     if(actionable.hasAttribute('id')) nod = ariaFlowFrom(actionable.getAttribute('id'));
 
     if(nod !== null) {
-        selectedNodes = getInnerGrouping({first: nod, last: nod});
+        selectedNodes = getInnerGrouping([nod]);
     } else {
         selectedNodes = getPrevNodes(fromEl, source);
     }
 
-    if (selectedNodes === null) return null;
-    else return selectedNodes;
+    return selectedNodes;
 }
 
 /**
@@ -826,29 +840,23 @@ function ariaFlowFrom(id) {
 /**
  * Gets the maskId to select
  * @param {'nav'|'point'} source Method of navigating initiated from.
- * @returns {HTMLElement} The maskId reference
+ * @returns {Array} The maskId reference
  */
 function getFirstSelection(source) {
 
-    strip_masking();
+    return getFirstElement(document.body, 'nav');
 
-    var selectedNodes = getFirstElement(document.body, 'nav');
-    if (selectedNodes === null) return null;
-    else return selectedNodes;
 }
 
 /**
  * Gets the maskId to select
  * @param {'nav'|'point'} source Method of navigating initiated from.
- * @returns {HTMLElement} The maskId reference
+ * @returns {Array} The maskId reference
  */
 function getLastSelection(source) {
 
-    strip_masking();
+    return getLastElement(document.body, 'nav');
 
-    var selectedNodes = getLastElement(document.body, 'nav');
-    if (selectedNodes === null) return null;
-    else return selectedNodes; //mask_DOMObjs(selectedNodes)
 }
 
 /**
@@ -926,15 +934,15 @@ function ez_navigate_start(propagated) {
 	}
 	// TODO auto_advance_set(); // Find if autoadvancing element
 
-    if(selectEl === null) {
+    if(selectedEls.length === 0) {
         ez_navigate('top');
     }
 
 	/*if(!propagated) { // TODO
 		sounds[getElementAudio()].feed.play();
 	}
-	drawSelected(selectEl);
-	voice(selectEl, 'nav');*/
+	drawSelected(selectedEls);
+	voice(selectedEls, 'nav');*/
 }
 
 /**
@@ -1011,12 +1019,12 @@ function load_ez() {
 		// On chrome, will not draw until a small amount of time passes for some reason
 		setTimeout(function () {
 			ez_navigate_start();
-			drawSelected(selectEl);
+			drawSelected(selectedEls);
 		}, 10);
 	} else if(parseInt(sessionStorage.getItem("EZ_Toggle")) == true && document.body.getAttribute('data-ez-startingmode') != 'ezoff') {
 		setTimeout(function () {
 			ez_navigate_start(true);
-			drawSelected(selectEl);
+			drawSelected(selectedEls);
 		}, 10);
 	}
 
@@ -1027,11 +1035,11 @@ function load_ez() {
 	if(slideToRead) { // If not allowed, do not initialize
 		var hammer = new Hammer(document.body);
 		hammer.ondrag = function (ev) {
-			var currElement = selectElements[currIndex];
+			var currElement = selectedElsements[currIndex];
 			index_ez();
 			currIndex = 0;
-			for(var i = 0; i < selectElements.length; i++) {
-				if(selectElements[i] == currElement) {
+			for(var i = 0; i < selectedElsements.length; i++) {
+				if(selectedElsements[i] == currElement) {
 					currIndex = i;
 				}
 			}
@@ -1108,7 +1116,7 @@ function drawSelected(obj) {
  */
 window.onresize = function () {
 	if(ez_navigateToggle) {
-		drawSelected(getBlock(selectEl));
+		drawSelected(getBlock(selectedEls));
 	}
 };
 
@@ -1118,7 +1126,7 @@ window.onresize = function () {
 function stopEZ() {
 	ez_navigateToggle = false;
 	idle_loop();
-    selectEl = null;
+    selectedEls = null;
 	voice("");
 	sessionStorage.setItem("EZ_Toggle", "0");
 	var old = document.getElementById(ezSelectorId);
