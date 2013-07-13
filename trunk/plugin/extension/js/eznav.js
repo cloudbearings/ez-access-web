@@ -192,6 +192,8 @@ function key_event(e) {
 
 function getActionableElement(e, source) {
 
+    if(e.length === 0) return null;
+
     // Nv'd inside an element's text
     if(e.length === 1 && e[0].nodeType === 3) {
         return e[0].parentElement;
@@ -219,6 +221,11 @@ function getActionableElement(e, source) {
  * skipping hidden elements, this should be disabled because it takes too much time.
  */
 function ez_navigate(move) {
+
+    // Blur previously selected element
+    var prevFocused = getActionableElement(selectedEls, 'nav');
+    if(prevFocused !== null) prevFocused.blur();
+
     if(move === 'down') {
         selectedEls = getNextSelection('nav');
     } else if(move === 'up') {
@@ -269,11 +276,13 @@ function ez_navigate(move) {
         return;
     }
 
+    drawSelected(selectedEls);
+
     var actionable = getActionableElement(selectedEls, 'nav');
 
     sounds[getElementAudio(actionable)].feed.play();
     actionable.focus();
-    voice(actionable, 'nav'); // TODO: Need to look through all possibilities! NOT JUST ACTIONABLE
+    voice(selectedEls, 'nav'); // TODO: Need to look through all possibilities! NOT JUST ACTIONABLE
 }
 
 /**

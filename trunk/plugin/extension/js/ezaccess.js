@@ -1059,16 +1059,61 @@ function load_ez() {
 }
 
 /**
+ * Gets the node position by either surrounding with a span temporarily to get rect pos, or directly via
+ * getBoundingClientRect().
+ * @param nod Node to find dimensions of.
+ * @returns {*} Look at getBoundingClientRect() specs online (ret.left, right, top, bottom, width, height etc).
+ */
+function getNodPos( nod ) {
+    if(!isElement(nod)) {
+        pos = mask_DOMObjs({first: nod, last: nod}).getBoundingClientRect();
+        strip_masking();
+    } else pos = nod.getBoundingClientRect();
+
+    return pos;
+}
+
+/**
  * Draws selected box around DOM object referenced to. Creates selected box if & inserts into DOM if it doesn't
  * previously exist.
- * @param {object} obj DOM Object to draw box selected box around.
+ * @param {Array} nodArr DOM Object to draw box selected box around.
  * @returns {boolean} If finding dimensions of element failed (such as if hidden).
  */
-function drawSelected(obj) {
-	//var tmp = obj.style.display;  // INLINE BLOCK OUTLINE FIXER
-	//obj.style.display = "inline-block"; // INLINE BLOCK OUTLINE FIXER
-	var pos = getElementAbsolutePos(obj);
-	if(!pos || obj.offsetWidth == 0 || obj.offsetWidth == 0) {
+function drawSelected( nodArr ) {
+
+    var top = 0;
+    var left = 0;
+    var width = 0;
+    var height = 0;
+    var pos;
+
+    if(nodArr.length > 0) {
+        pos = getNodPos(nodArr[0]);
+
+        top = pos.top;
+        left = pos.left;
+
+        width = pos.width;
+        height = pos.height;
+
+    }
+
+    for(i = 1; i < nodArr.length; i++) {
+
+        pos = getNodPos(nodArr[i]);
+
+        if(pos.top < top) top = pos.top;
+        if(pos.left < left) left = pos.left;
+
+        if(pos.bottom > top + height) height = pos.bottom;
+        if(pos.right > left + width) width = pos.right;
+
+    }
+
+    top += window.pageYOffset;
+    left += window.pageXOffset;
+
+	if(width == 0 && height == 0) {
 		// If there is a problem finding the element position
 		return false;
 	}
@@ -1100,11 +1145,11 @@ function drawSelected(obj) {
 		old = document.getElementById(ezSelectorId); // Redefine the new selected div
 	}
 	old.style.visibility = "visible";
-	old.style.left = pos.x - 10 + 'px';
-	old.style.top = pos.y - 10 + 'px';
-	old.style.width = obj.offsetWidth + 10 + 'px';
-	old.style.height = obj.offsetHeight + 10 + 'px';
-	//obj.style.display = tmp; // INLINE BLOCK OUTLINE FIXER
+	old.style.left = left - 10 + 'px';
+	old.style.top = top - 10 + 'px';
+	old.style.width = width + 10 + 'px';
+	old.style.height = height + 10 + 'px';
+
 	return true;
 }
 
