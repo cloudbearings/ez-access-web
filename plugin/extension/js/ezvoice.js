@@ -32,7 +32,7 @@ var SSML = true;
 
 /**
  * Provide easy place to change method of speech synthesis
- * @param {object|string} obj A string to be voiced, or an object to be voiced
+ * @param {Array|string} obj A string to be voiced, or an object to be voiced
  * @param source {'nav'|'point'} Navigation method passed from calling function
  * @param repeat If speech is being repeated (EZ Action + no possible action)
  */
@@ -41,7 +41,11 @@ function voice(obj, source, repeat) {
 	if(typeof (obj) == 'string') {
 		speech = obj;
 	} else {
-		speech = voice_object(obj, source);
+        // Loop through all selected elements
+        for(i = 0; i < obj.length; i++) {
+            if(isElement(obj[i])) speech += voice_element(obj[i], source);
+            else speech += voice_node(obj[i]);
+        }
 	}
 
 	// Global speech appendages
@@ -65,13 +69,17 @@ function voice(obj, source, repeat) {
 	chrome.extension.sendRequest(req);
 }
 
+function voice_node( nod ) {
+    return nod.nodeValue;
+}
+
 /**
  * Voices an object by putting together name, role and value.
  * @param {object} obj The object to be voiced
  * @param {'nav'|'point'} source The navigation method
  * @returns {string} The object voiced text
  */
-function voice_object(obj, source) {
+function voice_element(obj, source) {
 	/**
 	 * The name or label of the interactive object.
 	 */
@@ -528,7 +536,7 @@ function get_inner_alt(obj, source) {
 		if(obj.childNodes[i].nodeType == 3) {
 			speech += obj.childNodes[i].nodeValue;
 		} else if(obj.childNodes[i].nodeType == 1 && obj.tagName !== 'LABEL') {
-			speech += voice_object(obj.childNodes[i], source);
+			speech += voice_element(obj.childNodes[i], source);
 		}
 	}
 	return speech;
