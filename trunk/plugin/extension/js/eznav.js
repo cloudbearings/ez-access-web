@@ -211,7 +211,8 @@ function getActionableElement(e, source) {
     if(els === 1) {
         return lastEl;
     }
-    return e[0];
+    if(isElement(e[0])) return e[0];
+    else return e[0].parentElement;
 }
 
 /**
@@ -281,8 +282,10 @@ function ez_navigate(move) {
     var actionable = getActionableElement(selectedEls, 'nav');
 
     sounds[getElementAudio(actionable)].feed.play();
-    actionable.focus();
-    voice(selectedEls, 'nav'); // TODO: Need to look through all possibilities! NOT JUST ACTIONABLE
+
+    if(actionable !== null) actionable.focus();
+
+    voice(selectedEls, 'nav');
 }
 
 /**
@@ -409,7 +412,6 @@ function multikey_event(e) {
 		}
 		if(ez_navigateToggle) {
 			ez_navigate('up');
-			smoothScroll(findPos(selectedEls));
 			//window.scroll(0,findPos(selectedEls));
 		} else {
 			ez_navigate_start();
@@ -422,7 +424,6 @@ function multikey_event(e) {
 		}
 		if(ez_navigateToggle) {
 			ez_navigate('down');
-			smoothScroll(findPos(selectedEls));
 			//window.scroll(0,findPos(selectedEls));
 		} else {
 			ez_navigate_start();
@@ -468,22 +469,6 @@ function auto_advance_decide() {
 			}
 		}, autoAdvance);
 	}
-}
-
-/**
- * Finds y value of given object -- for automated scrolling
- * @param {object} obj Object in question
- * @returns {Array} Position nested.
- */
-function findPos(obj) {
-	var curtop = -100;
-	if(obj.offsetParent) {
-		do {
-			curtop += obj.offsetTop;
-		} while (obj = obj.offsetParent);
-		return [curtop];
-	}
-    return [null];
 }
 
 /**
