@@ -255,7 +255,7 @@ function isInteractive(o) {
     if (o.hasAttribute('onlick')) {
         return true;
     }
-    var type = o.tagName.toLowerCase();
+    var type = getType(o);
     if (type === 'a') {
         //<a> without href is not interactive
         return o.hasAttribute('href');
@@ -740,10 +740,11 @@ function getFirstElement(start, source) {
 
     if(first === null || orphanTxtNode(first)) {
         var ret = [start];
-        while(isInlineElement(node_after(ret[ret.length-1], source), source)) {
-            ret.push(node_after(ret[ret.length-1]));
+        if(isInlineElement(start, source)) {
+            while(isInlineElement(node_after(ret[ret.length-1], source), source)) {
+                ret.push(node_after(ret[ret.length-1]));
+            }
         }
-
         return getInnerGrouping(ret);
 
     }
@@ -766,8 +767,10 @@ function getLastElement(start, source) {
 
     if(last === null || orphanTxtNode(last)) {
         var ret = [start];
-        while(isInlineElement(node_before(ret[0], source), source)) {
-            ret.unshift(node_before(ret[0]));
+        if(isInlineElement(start, source)) {
+            while(isInlineElement(node_before(ret[0], source), source)) {
+                ret.unshift(node_before(ret[0]));
+            }
         }
         return getInnerGrouping(ret);
     }
