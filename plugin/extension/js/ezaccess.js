@@ -93,7 +93,7 @@ var UNNAVIGABLE_TAGS = [
     'map', 'area',
     'datalist', 'option', 'optgroup',
     'menuitem', 'command',
-    'script', 'noscript'];
+    'script', 'noscript', 'br'];
 
 /**
  * These tags generally contain content that must be rendered using
@@ -179,7 +179,7 @@ function isFocusable(o, source) {
     // Look for nodes and elements only; return false otherwise
     if(o === document.doctype) return false; // For some reason this isn't caught below + can cause exceptions
     else if(isElement(o));
-    else if(isNode(o)) o = o.parentElement;
+    else if(isNode(o)) return true;
     else return false;
 
     if(source === undefined) source = 'nav';
@@ -1102,11 +1102,11 @@ function drawSelected( nodArr ) {
 
         pos = getNodPos(nodArr[i]);
 
+        if(pos.bottom + window.pageYOffset > top + height) height = pos.bottomt;
+        if(pos.right + window.pageXOffset > left + width) width = pos.right;
+
         if(pos.top < top) top = pos.top;
         if(pos.left < left) left = pos.left;
-
-        if(pos.bottom > top + height) height = pos.bottom;
-        if(pos.right > left + width) width = pos.right;
 
     }
 
