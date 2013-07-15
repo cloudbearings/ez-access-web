@@ -1154,6 +1154,8 @@ function drawSelected( nodArr ) {
 	old.style.width = width + 10 + 'px';
 	old.style.height = height + 10 + 'px';
 
+    smoothScroll(top - (document.documentElement.clientHeight/4));
+
 	return true;
 }
 

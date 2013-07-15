@@ -59,6 +59,9 @@ function set_volume() {
  * @returns {number} The audio ID.
  */
 function getElementAudio(obj) {
+
+    if(obj === null) return AUDIO_MOVE;
+
 	for(var tmp = ['p', 'span', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'li'], i = 0; i < tmp.length; i++) {
 		// To simplify comparing to a whole lot of possibilities, use a loop
 		if(getClick(obj) !== undefined || obj.tagName == 'INPUT') {
