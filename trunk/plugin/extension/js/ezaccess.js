@@ -1081,20 +1081,19 @@ function getNodPos( nod ) {
  */
 function drawSelected( nodArr ) {
 
-    var top = 0;
-    var left = 0;
-    var width = 0;
-    var height = 0;
+    var minHoriz = 0;
+    var minVert = 0;
+    var maxHoriz = 0;
+    var maxVert = 0;
     var pos;
 
     if(nodArr.length > 0) {
         pos = getNodPos(nodArr[0]);
 
-        top = pos.top;
-        left = pos.left;
-
-        width = pos.width;
-        height = pos.height;
+        minVert = pos.top + window.pageYOffset;
+        minHoriz = pos.left + window.pageXOffset;
+        maxVert = pos.bottom + window.pageYOffset;
+        maxHoriz = pos.right + window.pageXOffset;
 
     }
 
@@ -1102,16 +1101,18 @@ function drawSelected( nodArr ) {
 
         pos = getNodPos(nodArr[i]);
 
-        if(pos.bottom + window.pageYOffset > top + height) height = pos.bottomt;
-        if(pos.right + window.pageXOffset > left + width) width = pos.right;
-
-        if(pos.top < top) top = pos.top;
-        if(pos.left < left) left = pos.left;
+        if(pos.left + window.pageXOffset < minHoriz) minHoriz = pos.left + window.pageXOffset;
+        if(pos.top + window.pageYOffset < minVert) minVert = pos.top + window.pageYOffset;
+        if(pos.bottom + window.pageYOffset > maxVert) maxVert = pos.bottom + window.pageYOffset;
+        if(pos.right + window.pageXOffset > maxHoriz) maxHoriz = pos.right + window.pageXOffset;
 
     }
 
-    top += window.pageYOffset;
-    left += window.pageXOffset;
+    var top = minVert;
+    var left = minHoriz;
+    var width = maxHoriz - minHoriz;
+    var height = maxVert - minVert;
+
 
 	if(width == 0 && height == 0) {
 		// If there is a problem finding the element position
