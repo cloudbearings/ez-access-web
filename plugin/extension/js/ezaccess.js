@@ -264,6 +264,22 @@ function isInteractive(o) {
 }
 
 /**
+ * Returns true if grouped through being inline or ez attributes.
+ * @param {object} o A Node object or DOM element to be checked.
+ * @param {'nav'|'point'} source Navigation method passed from calling function
+ * @returns {boolean} If grouped o
+ */
+function isGrouped(o) {
+
+    var ezGroup = false;
+    if(isElement(o) && o.hasAttribute('data-ez-chunking')) {
+        ezGroup = o.getAttribute('data-ez-chunking') === 'group';
+    }
+
+    return isInteractive(o) || ezGroup;
+}
+
+/**
  * Checks to see whether the passed node can be inline with other inline
  * nodes (i.e., it can be safely combined with other inline elements when
  * being highlighted and read.
@@ -291,8 +307,8 @@ function isInlineElement(o, source) {
         throw new Error('Node not a DOM or text node.');
     } //Else: o is a DOM element
 
-    /** Interactive elements should not be inline with other elements */
-    if (isInteractive(o)) {
+    /** Grouped elements should not be inline with other elements */
+    if (isGrouped(o)) {
         return false;
     }
 
@@ -545,8 +561,8 @@ function node_after( sib, source ) {
  *               2) null if no such node exists.
  */
 function last_child( par, source ) {
-    // If interactive == leaf node; no children
-    if(isInteractive(par)) return null;
+    // If isGrouped == leaf node; no children
+    if(isGrouped(par)) return null;
 
     var res=par.lastChild;
     while (res) {
@@ -574,8 +590,8 @@ function last_child( par, source ) {
  *               2) null if no such node exists.
  */
 function first_child( par, source ) {
-    // If interactive == leaf node; no children
-    if(isInteractive(par)) return null;
+    // If isGrouped == leaf node; no children
+    if(isGrouped(par)) return null;
 
     var res=par.firstChild;
     while (res) {
