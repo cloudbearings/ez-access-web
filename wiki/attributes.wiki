@@ -1,6 +1,6 @@
 #summary A list of all attributes supported by EZ Access, and those that are not supported.
 
-= NOTE: This page is outdated as of r0.10.0.0. =
+= NOTE: This page is outdated as of v0.10.0.0. =
 
 = Introduction =
 
