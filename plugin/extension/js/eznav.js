@@ -209,6 +209,15 @@ function getActionableElement(e, source) {
 }
 
 /**
+ * Blurs the previous actionable element, if one exists
+ */
+function blurPrev() {
+    // Blur previously selected element
+    var prevFocused = getActionableElement(selectedEls, 'nav');
+    if(prevFocused !== null) prevFocused.blur();
+}
+
+/**
  * Main EZ Navigation function: Moves selector up or down selectedElsements, and calls all relevant functions (speech,
  * tooltips etc.)
  * @param {'up'|'down'|'top'|'bottom'} move Direction/position of navigation.
@@ -216,9 +225,7 @@ function getActionableElement(e, source) {
  */
 function ez_navigate(move) {
 
-    // Blur previously selected element
-    var prevFocused = getActionableElement(selectedEls, 'nav');
-    if(prevFocused !== null) prevFocused.blur();
+    blurPrev();
 
     if(move === 'down') {
         selectedEls = getNextSelection('nav');
@@ -282,17 +289,24 @@ function ez_navigate(move) {
 }
 
 /**
- * Jump directly to a specific element.
- * TODO WARNING: Doesn't check if valid.
- * @param {number} location Valid index to jump to.
+ * Jump to a specific element(s)
+ * @param nodArr List of nodes to select. Must be in order, adjacent + siblings
  */
-function ez_jump(location) {
-	selectedEls.blur();
-	currIndex = parseFloat(location);
-	drawSelected(selectedEls);
-	sounds[getElementAudio()].feed.play();
-	selectedEls.focus();
-	voice(selectedEls, 'nav');
+function ez_jump(nodArr) {
+
+    blurPrev();
+
+	selectedEls = nodArr;
+
+    drawSelected(selectedEls);
+
+    var actionable = getActionableElement(selectedEls, 'nav');
+
+    sounds[getElementAudio(actionable)].feed.play();
+
+    if(actionable !== null) actionable.focus();
+
+    voice(selectedEls, 'nav');
 }
 
 /**

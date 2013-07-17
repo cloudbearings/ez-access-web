@@ -194,6 +194,9 @@ function isFocusable(o, source) {
         if(ariaFlowFrom(o.getAttribute('id')) !== null) return true;
     }
 
+    // If grouped at a higher level
+    if(isParentGrouped(o)) return false;
+
     var attr = '';
 
     /** Check to see if immediate element is focusable or not */
@@ -277,6 +280,14 @@ function isGrouped(o) {
     }
 
     return isInteractive(o) || ezGroup;
+}
+
+function isParentGrouped(o) {
+    while(o !== null) {
+        o = o.parentElement;
+        if(isGrouped(o)) return true;
+    }
+    return false;
 }
 
 /**
@@ -1046,25 +1057,23 @@ function load_ez() {
 
 	//idle_loop(); // TODO/ TEMP
 
-	// Multitouch gesture dragging
-    /* TODO
-	if(slideToRead) { // If not allowed, do not initialize
-		var hammer = new Hammer(document.body);
-		hammer.ondrag = function (ev) {
-			var currElement = selectedElsements[currIndex];
-			index_ez();
-			currIndex = 0;
-			for(var i = 0; i < selectedElsements.length; i++) {
-				if(selectedElsements[i] == currElement) {
-					currIndex = i;
-				}
-			}
-			mouseOver(document.elementFromPoint(parseFloat(ev.position.x) - parseFloat(window.scrollX), parseFloat(ev.position.y) - parseFloat(window.scrollY)));
-		};
-		hammer.ontap = function () {
-			stopEZ();
-		};
-	}*/
+	// Touch gesture dragging
+	if(slideToRead) {
+        document.addEventListener('touchmove', function(e) {
+            e = e || window.event;
+
+            var target = document.elementFromPoint(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+            if(selectedEls.length !== 1 || selectedEls[0] != target) {
+                target = jumpToElFinder(target);
+                if(target !== null) ez_jump([target]);
+            }
+        }, false);
+	}
+
+    document.addEventListener('touchstart', function(e) {
+        console.log('stopped');
+
+    });
 
 	// Load any potential dictionary
 	if(document.body.hasAttribute('data-ez-pronounce')) {
@@ -1075,6 +1084,28 @@ function load_ez() {
 			dictionary = JSON.parse(getDictionary);
 		});
 	}
+}
+
+function jumpToElFinder( e ) {
+
+    if (e === null) return null;
+
+    var children = getChildNodes(e);
+    if(children !== null) {
+        var allInline = true;
+        for(i = 0; i < children.length; i++) {
+            if(!isInlineElement(children[i])) {
+                allInline = false;
+                break;
+            }
+        }
+        if(allInline === true  && isFocusable(e)) return e;
+    }
+
+    if (children === null && isFocusable(e)) return e;
+
+    return null;
+
 }
 
 /**
