@@ -70,7 +70,6 @@ function key_event(e) {
 			TINY.box.hide();
 		} else {
 			if(ez_navigateToggle) {
-				window.scroll(0, findPos(selectedEls));
 				ez_navigate('up');
 			} else {
 				ez_navigate_start();
@@ -82,7 +81,6 @@ function key_event(e) {
 			TINY.box.hide();
 		} else {
 			if(ez_navigateToggle) {
-				window.scroll(0, findPos(selectedEls));
 				ez_navigate('down');
 			} else {
 				ez_navigate_start();
@@ -90,21 +88,16 @@ function key_event(e) {
 		}
 	} else if(e.keyCode == EZ_KEY_BACK || e.keyCode == 66) { // 'b' == 66
 		// TODO
-        var inGroup = findGroupParent();
-		if(inGroup == currIndex) {
-			if(tinyOpen) {
-				tinyOpen = false;
-				TINY.box.hide();
-			} else {
-				if(ez_navigateToggle) {
-					window.history.back();
-				} else {
-					ez_navigate_start();
-				}
-			}
-		} else {
-			// ez_jump(inGroup); // TODO
-		}
+        if(tinyOpen) {
+            tinyOpen = false;
+            TINY.box.hide();
+        } else {
+            if(ez_navigateToggle) {
+                window.history.back();
+            } else {
+                ez_navigate_start();
+            }
+        }
 	} else if(e.keyCode == EZ_KEY_ENTER || e.keyCode == KB_ENTER) {
 		if(tinyOpen) {
 			tinyOpen = false;
@@ -307,7 +300,7 @@ function ez_jump(location) {
  * TODO Will be revamped to handle better speech synthesis on EZ Action.
  */
 function ez_enter() {
-	var obj = selectedEls;
+	var obj = getActionableElement(selectedEls);
 	if(obj.tagName == "A") {
 		if(obj.href.indexOf("#") != -1) {
 			var hrefBase = obj.href.substring(0, obj.href.indexOf("#"));
