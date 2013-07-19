@@ -23,8 +23,7 @@
                  
    Scripts:   A few scripts are used in this program. If not identified, they have been released
               to the public domain:
-                  1. hammer.js - Provides multitouch support
-                  2. speak.js  - Provides speech generation
+                  1. speak.js  - Provides speech generation
                   3. TinyBox   - Modal window script for help
 */
 // Tab keycodes
