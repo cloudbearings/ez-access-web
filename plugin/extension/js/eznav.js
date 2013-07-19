@@ -183,29 +183,36 @@ function key_event(e) {
 	return true;
 }
 
-function getActionableElement(e, source) {
+/**
+ * If there are multiple elements selected, this function does its best to detemine which one is the actionable one
+ * (if any). The should never really be more than one actionable element, as per EZ Access design.
+ * @param nods Nodes in a list to check out.
+ * @param source {'nav'|'point'} Navigation method.
+ * @returns {Element|null} The element that is believed to be actionable, if any
+ */
+function getActionableElement(nods, source) {
 
-    if(e.length === 0) return null;
+    if(nods.length === 0) return null;
 
     // Nv'd inside an element's text
-    if(e.length === 1 && e[0].nodeType === 3) {
-        return e[0].parentElement;
+    if(nods.length === 1 && nods[0].nodeType === 3) {
+        return nods[0].parentElement;
     }
 
     // Get the element if multiple nodes and one element are navagable.
     var els = 0;
     var lastEl;
-    for(i = 0; i < e.length; i++) {
-        if(isElement(e[i])) {
+    for(i = 0; i < nods.length; i++) {
+        if(isElement(nods[i])) {
             els++;
-            lastEl = e[i];
+            lastEl = nods[i];
         }
     }
     if(els === 1) {
         return lastEl;
     }
-    if(isElement(e[0])) return e[0];
-    else return e[0].parentElement;
+    if(isElement(nods[0])) return e[0];
+    else return nods[0].parentElement;
 }
 
 /**
@@ -367,6 +374,9 @@ function ez_enter() {
 	}
 }
 
+/**
+ * Uses CSS3 effects to 'pulse' thhe ezSelectorId element.
+ */
 function pulseSelector() {
     document.getElementById(ezSelectorId).className = 'pulse';
     setTimeout(function () {

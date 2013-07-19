@@ -282,6 +282,11 @@ function isGrouped(o) {
     return isInteractive(o) || ezGroup;
 }
 
+/**
+ * Looks to see if inherits a grouping element. DOES NOT check itself!
+ * @param o Object to check.
+ * @returns {boolean} True if grouped via EZ Access, interactive element, etc.
+ */
 function isParentGrouped(o) {
     while(o !== null) {
         o = o.parentElement;
@@ -641,6 +646,13 @@ function data_of( txt ) {
     return data;
 }
 
+/**
+ * Gives an array of the nodes between the first and last node.
+ * NOTE: Nodes MUST be on the same level (same parent).
+ * @param first First node (inclusive)
+ * @param last Last node (inclusive)
+ * @returns {Array} Array of all sibling nodes betweeen.
+ */
 function getChildNodRange(first, last) {
     var ret = [];
     var obj = first;
@@ -656,7 +668,10 @@ function getChildNodRange(first, last) {
 }
 
 /**
- *
+ * If one element is selected, this function can be helpful to 'navigate' inside it and provide a more detailed
+ * selection.
+ * For example, [nod] is not as helpful as [nod.sibling[0], nod.sibling[1], nod.sibling[n]) in terms of parsing +
+ * drawing the node selection on the screen.
  * @param e
  */
 function getInnerGrouping(e) {
@@ -675,18 +690,14 @@ function getInnerGrouping(e) {
 }
 
 /**
- * Version of |data| that doesn't include whitespace at the beginning
- * and end and normalizes all whitespace to a single space.  (Normally
- * |data| is a property of text nodes that gives the text of the node.)
- *
- * @preserve This function came from:
- * https://developer.mozilla.org/en-US/docs/Web/Guide/DOM/Whitespace_in_the_DOM
- * on 2013-06-14 and is available either under the MIT License or is in the
- * public domain (please check the site if the exact license is important to
- * you).
+ * Gets the next node/nodes, if possible, from a starting element.
+ * By intended bahavior, this function considers the next sibling (if available) at that level,
+ * and then navigates inside to the first child as deep as possible. If not possible, it goes to the parent
+ * and gets the next sibling of the parent.
+ * Lastly, the function checks if that one node is 'groupeable', and if so, if the next node(s) are too.
  * @param startEl  The text node whose data should be returned
  * @param source ['nav'|'point'} Navigation method passed from calling function
- * @return {object|[object, object]|null} Returns node, element, an element to-from, or null (for end of document)
+ * @return {Array|null} Returns an array of node(s), or null (for end of document)
  */
 function getNextNodes(startEl, source) {
 
@@ -716,19 +727,15 @@ function getNextNodes(startEl, source) {
 }
 
 /**
- * Version of |data| that doesn't include whitespace at the beginning
- * and end and normalizes all whitespace to a single space.  (Normally
- * |data| is a property of text nodes that gives the text of the node.)
- *
- * @preserve This function came from:
- * https://developer.mozilla.org/en-US/docs/Web/Guide/DOM/Whitespace_in_the_DOM
- * on 2013-06-14 and is available either under the MIT License or is in the
- * public domain (please check the site if the exact license is important to
- * you).
+ * Gets the previous node/nodes, if possible, from a starting element.
+ * By intended bahavior, this function considers the previous sibling (if available) at that level,
+ * and then navigates inside to the last child as deep as possible. If not possible, it goes to the parent
+ * and gets the previous sibling of the parent.
+ * Lastly, the function checks if that one node is 'groupeable', and if so, if the next node(s) are too.
  * @param startEl  The text node whose data should be returned
  * @param source ['nav'|'point'} Navigation method passed from calling function
- * @return {Array} Returns an element to-from, or null (for end of document)
- */
+ * @return {Array|null} Returns an array of node(s), or null (for end of document)
+**/
 function getPrevNodes(startEl, source) {
     // Through recursion, reached end of document.
     if(startEl === null) return [];
@@ -778,6 +785,14 @@ function getFirstElement(start, source) {
     else return getFirstElement(first, source);
 }
 
+/**
+ * Looks to see if orphan. This is useful if we have something like:
+ * <h1>Hello! Blah</h1>
+ * Where <h1>[text]</h1> is the element containing the oprhan node, and
+ * "Hello! Blah" is the orphaned node.
+ * @param nod
+ * @returns {boolean}
+ */
 function orphanTxtNode( nod ) {
     return node_before(nod) === null && node_after(nod) === null && nod.nodeType === 3;
 }
@@ -1086,6 +1101,11 @@ function load_ez() {
 	}
 }
 
+/**
+ *
+ * @param e Determines if given Element is valid for highlighting (a 'leaf' node or something)
+ * @returns {Element}null} Null if not valid, e if it is.
+ */
 function jumpToElFinder( e ) {
 
     if (e === null) return null;
