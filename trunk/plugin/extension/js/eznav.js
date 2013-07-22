@@ -322,8 +322,8 @@ function ez_jump(nodArr) {
  */
 function ez_enter() {
 	var obj = getActionableElement(selectedEls);
-	if(obj.tagName == "A") {
-		if(obj.href.indexOf("#") != -1) {
+	if(obj.tagName === "A") {
+		if(obj.href.indexOf("#") !== -1) {
 			var hrefBase = obj.href.substring(0, obj.href.indexOf("#"));
 			if(window.location.href.indexOf("#") != -1) {
 				pageBase = window.location.href.substring(0, window.location.href.indexOf("#"));
@@ -332,14 +332,14 @@ function ez_enter() {
 			}
 			if(hrefBase == "" || hrefBase == pageBase) { // If from same URL base
 				var jumpTo = obj.href.substring(obj.href.indexOf("#") + 1);
-				var idLocation = getCurrIndexById(jumpTo);
-				var nameLocation = getCurrIndexByName(jumpTo);
-				if(idLocation != -1) {
-					ez_jump(idLocation);
+				var idLocation = document.getElementById(jumpTo);
+				var nameLocation = document.getElementsByName(jumpTo)[0];
+				if(idLocation !== null) {
+					ez_jump([idLocation]);
 					obj.click();
 					return;
-				} else if(nameLocation != -1) {
-					ez_jump(nameLocation);
+				} else if(nameLocation !== undefined) {
+					ez_jump([nameLocation]);
 					obj.click();
 					return;
 				}
@@ -382,36 +382,6 @@ function pulseSelector() {
     setTimeout(function () {
         document.getElementById(ezSelectorId).className = '';
     }, 300);
-}
-
-/**
- * Check if new element (and exists to be highlighted), and then highlights
- * @param {object} e Object currently mouseover'd
- */
-function mouseOver(e) {
-	var newElement = true;
-	var found = false;
-	for(var i = 0; i < selectedElsements.length; i++) {
-		if(e == selectedElsements[i]) {
-			if(currIndex == i) {
-				newElement = false;
-			}
-			if(!selectedElsements[i].hasAttribute('data-ez-focusable-point') && !selectedElsements[i].hasAttribute('data-ez-focusable')) {
-				// If we're not supposed to navigate here by pointing
-				selectedEls.blur(); // Add blur to old element
-				currIndex = i;
-				selectedEls.focus(); // Add focus to new element
-				found = true;
-			}
-		}
-	}
-	if((newElement && found) || !ez_navigateToggle) { //Override if ez is not enabled
-		sessionStorage.setItem("EZ_Toggle", "1");
-		ez_navigateToggle = true;
-		sounds[getElementAudio()].feed.play();
-		drawSelected(selectedEls);
-		voice(selectedEls, 'point');
-	}
 }
 
 /**

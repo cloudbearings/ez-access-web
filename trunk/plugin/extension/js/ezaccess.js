@@ -22,6 +22,24 @@ var ezSelectorId = 'ezselected';
 var ez_navigateToggle = false;
 
 /**
+ * Whether EZ is loaded
+ * @type {boolean}
+ */
+var ez_loaded = false;
+
+/**
+ * To decide if touched element or nothing happened (drag).
+ * @type {Boolean}
+ */
+var touchTap = true;
+
+/**
+ * Time first 'tapped'
+ * @type {number}
+ */
+var touchStartTime = 0;
+
+/**
  * Wrap elements on the screen
  * @type {boolean}
  */
@@ -956,6 +974,8 @@ function strip_masking() {
 function ez_navigate_start(propagated) {
 	ez_navigateToggle = true;
 	sessionStorage.setItem("EZ_Toggle", "1");
+
+    var obj;
 	if(document.body.hasAttribute('data-ez-startat')) {
         var startid;
 		if(propagated) {
@@ -965,26 +985,23 @@ function ez_navigate_start(propagated) {
 			// Of "#<id> #<id>" of first element
             startid = document.body.getAttribute('data-ez-startat').split(" ")[0].slice(1);
 		}
-		ez_jump(startid);
+        obj = document.getElementById(startid);
+        if(obj !== null) ez_jump([obj]);
 	} else {
 		if(propagated) {
 			if(document.URL.indexOf("#") != -1) {
 				var jumpTo = document.URL.substring(document.URL.indexOf("#") + 1);
-                ez_jump(jumpTo);
+                obj = document.getElementById(jumpTo);
+                if(obj !== null) ez_jump([obj]);
 			}
 		}
 	}
+
 	// TODO auto_advance_set(); // Find if autoadvancing element
 
-    if(selectedEls.length === 0) {
-        ez_navigate('top');
-    }
+    // Start navigation
+    ez_navigate('top');
 
-	/*if(!propagated) { // TODO
-		sounds[getElementAudio()].feed.play();
-	}
-	drawSelected(selectedEls);
-	voice(selectedEls, 'nav');*/
 }
 
 /**
@@ -1075,20 +1092,34 @@ function load_ez() {
 	// Touch gesture dragging
 	if(slideToRead) {
         document.addEventListener('touchmove', function(e) {
+
             e = e || window.event;
 
             var target = document.elementFromPoint(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
-            if(selectedEls.length !== 1 || selectedEls[0] != target) {
+            if((selectedEls.length !== 1 || selectedEls[0] != target) && new Date().getTime() - touchStartTime > 250) {
+                if(!ez_loaded) load_ez();
                 target = jumpToElFinder(target);
                 if(target !== null) ez_jump([target]);
+                touchTap = false;
             }
         }, false);
+
+        document.addEventListener('touchstart', function(e) {
+            touchStartTime = new Date().getTime();
+
+            touchTap = true;
+
+        });
+
+        document.addEventListener('touchend', function(e) {
+            if(touchTap === true) { // If not 'dragged'
+                stopEZ();
+            } else if(new Date().getTime() - touchStartTime < 250) { // If quickly 'dragged'
+                stopEZ();
+            }
+        });
+
 	}
-
-    document.addEventListener('touchstart', function(e) {
-        console.log('stopped');
-
-    });
 
 	// Load any potential dictionary
 	if(document.body.hasAttribute('data-ez-pronounce')) {
@@ -1099,6 +1130,8 @@ function load_ez() {
 			dictionary = JSON.parse(getDictionary);
 		});
 	}
+
+    ez_loaded = true;
 }
 
 /**
@@ -1241,7 +1274,7 @@ window.onresize = function () {
 function stopEZ() {
 	ez_navigateToggle = false;
 	idle_loop();
-    selectedEls = null;
+    selectedEls = [];
 	voice("");
 	sessionStorage.setItem("EZ_Toggle", "0");
 	var old = document.getElementById(ezSelectorId);
