@@ -327,6 +327,7 @@ function getName(obj, source, defaultString) {
 	}
 
 	var label = get_label(obj);
+  var type = getType(obj);
 
 	if(obj.hasAttribute('aria-labelledby')) {
 		ret = '';
@@ -345,11 +346,8 @@ function getName(obj, source, defaultString) {
 			ret = label;
 		}
 	}
-
-    var type = getType(obj);
-
-	// Get generic name for specific input types
-    if(obj.hasAttribute('readonly') || obj.hasAttribute('disabled')) {
+  // Get generic name for specific input types
+    else if(obj.hasAttribute('readonly') || obj.hasAttribute('disabled')) {
         ret = 'Disabled field';
     } else if(type === 'submit') {
         if(obj.hasAttribute('value')) {
