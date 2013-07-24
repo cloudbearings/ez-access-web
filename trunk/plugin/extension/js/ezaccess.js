@@ -970,8 +970,9 @@ function strip_masking() {
  * Starts EZ Access navigation on the current page, whether automatically or from an EZ Access keypress.
  * @param {boolean} propagated Whether or not the EZ Access was enabled previously (startid depends on this, and some other
  * things like a url with a #element reference do as well.
+ * @param {'nav'|'point'} source The navigation method
  */
-function ez_navigate_start(propagated) {
+function ez_navigate_start(propagated, source) {
 	ez_navigateToggle = true;
 	sessionStorage.setItem("EZ_Toggle", "1");
 
@@ -986,13 +987,13 @@ function ez_navigate_start(propagated) {
             startid = document.body.getAttribute('data-ez-startat').split(" ")[0].slice(1);
 		}
         obj = document.getElementById(startid);
-        if(obj !== null) ez_jump([obj]);
+        if(obj !== null) ez_jump([obj], source);
 	} else {
 		if(propagated) {
 			if(document.URL.indexOf("#") != -1) {
 				var jumpTo = document.URL.substring(document.URL.indexOf("#") + 1);
                 obj = document.getElementById(jumpTo);
-                if(obj !== null) ez_jump([obj]);
+                if(obj !== null) ez_jump([obj], source);
 			}
 		}
 	}
@@ -1077,12 +1078,12 @@ function load_ez() {
 	if(document.body.getAttribute('data-ez-startingmode') == 'ezon') {
 		// On chrome, will not draw until a small amount of time passes for some reason
 		setTimeout(function () {
-			ez_navigate_start();
+			ez_navigate_start(false, 'nav');
 			drawSelected(selectedEls);
 		}, 10);
 	} else if(parseInt(sessionStorage.getItem("EZ_Toggle")) == true && document.body.getAttribute('data-ez-startingmode') != 'ezoff') {
 		setTimeout(function () {
-			ez_navigate_start(true);
+			ez_navigate_start(true, 'nav');
 			drawSelected(selectedEls);
 		}, 10);
 	}
@@ -1099,7 +1100,7 @@ function load_ez() {
             if((selectedEls.length !== 1 || selectedEls[0] != target) && new Date().getTime() - touchStartTime > 250) {
                 if(!ez_loaded) load_ez();
                 target = jumpToElFinder(target);
-                if(target !== null) ez_jump([target]);
+                if(target !== null) ez_jump([target], 'point');
                 touchTap = false;
             }
         }, false);

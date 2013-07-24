@@ -24,6 +24,12 @@ var EZ_KEY_ENTER = 131; // is green circle enter key
 var slideToRead = true;
 
 /**
+ * How many times the user tried to navigate up or down
+ * @type {number}
+ */
+var edgeNavAttempt = 0;
+
+/**
  * Determines key autorepeat preperty or not
  * @type {string}
  */
@@ -72,7 +78,7 @@ function key_event(e) {
 			if(ez_navigateToggle) {
 				ez_navigate('up');
 			} else {
-				ez_navigate_start();
+				ez_navigate_start(false, 'nav');
 			}
 		}
 	} else if(e.keyCode == EZ_KEY_DOWN) {
@@ -83,7 +89,7 @@ function key_event(e) {
 			if(ez_navigateToggle) {
 				ez_navigate('down');
 			} else {
-				ez_navigate_start();
+				ez_navigate_start(false, 'nav');
 			}
 		}
 	} else if(e.keyCode == EZ_KEY_BACK || e.keyCode == 66) { // 'b' == 66
@@ -95,7 +101,7 @@ function key_event(e) {
             if(ez_navigateToggle) {
                 window.history.back();
             } else {
-                ez_navigate_start();
+                ez_navigate_start(false, 'nav');
             }
         }
 	} else if(e.keyCode == EZ_KEY_ENTER || e.keyCode == KB_ENTER) {
@@ -106,7 +112,7 @@ function key_event(e) {
 			if(ez_navigateToggle) {
 				ez_enter();
 			} else {
-				ez_navigate_start();
+				ez_navigate_start(false, 'nav');
 			}
 			return false; // Disable any browser actions
 		}
@@ -227,10 +233,24 @@ function blurPrev() {
 /**
  * Main EZ Navigation function: Moves selector up or down selectedElsements, and calls all relevant functions (speech,
  * tooltips etc.)
- * @param {'up'|'down'|'top'|'bottom'} move Direction/position of navigation.
+ * @param move {'up'|'down'|'top'|'bottom'} Direction/position of navigation.
+ * @param [options] {Object} An object that has the following entries:
+ *      voice {Boolean} Whether or not to voice the speech
+ *      alert {Boolean} Whether or not to play alert sound
  * skipping hidden elements, this should be disabled because it takes too much time.
  */
-function ez_navigate(move) {
+function ez_navigate(move, options) {
+
+    // Save original move intention for later
+    var argMove = move;
+
+    // set up default options
+    var defaults = {
+        voice:      true,
+        alert:      true
+    };
+    options = merge_options(defaults, options);
+
 
     blurPrev();
 
@@ -249,28 +269,32 @@ function ez_navigate(move) {
     }
 
     if(selectedEls.length === 0) {
+
+
+
+        var quiet = {voice: false, alert: false};
         if(move === 'down') {
-            pulseSelector();
-            sounds[AUDIO_NOACTION].feed.play();
-            ez_navigate('bottom');
+            ez_navigate('bottom', quiet);
+            alertEdgeNav('bottom');
         }
         else if(move === 'up'){
-            pulseSelector();
-            sounds[AUDIO_NOACTION].feed.play();
-            ez_navigate('top');
+            ez_navigate('top', quiet);
+            alertEdgeNav('top');
         }
+
+        pulseSelector();
+        if(options.alert) sounds[AUDIO_NOACTION].feed.play();
+
         return;
+    } else if(argMove !== 'top' && argMove !== 'bottom') {
+        // Valid selection, so reset edge nav attempts
+        edgeNavAttempt = 0;
     }
-    /*if(!drawSelected(selectedEls[0])) { // TODO
-        ez_navigate(move);
-        return;
-    }*/
 
-    // Check to make sure it's not a short, weird selection TODO: INFLEXIBLE
-
+    // Check to make sure it's not a short, weird selection
     var allInline = true;
     for(i = 0; i < selectedEls.length; i++) {
-        if(!isInlineElement(selectedEls[i])) {
+        if(!isInlineElement(selectedEls[i], 'nav')) {
             allInline = false;
             break;
         }
@@ -288,18 +312,18 @@ function ez_navigate(move) {
 
     var actionable = getActionableElement(selectedEls, 'nav');
 
-    sounds[getElementAudio(actionable)].feed.play();
+    if(options.alert) sounds[getElementAudio(actionable)].feed.play();
 
     if(actionable !== null) actionable.focus();
 
-    voice(selectedEls, 'nav');
+    if(options.voice) voice(selectedEls, 'nav');
 }
 
 /**
  * Jump to a specific element(s)
  * @param nodArr List of nodes to select. Must be in order, adjacent + siblings
  */
-function ez_jump(nodArr) {
+function ez_jump(nodArr, source) {
 
     blurPrev();
 
@@ -307,7 +331,7 @@ function ez_jump(nodArr) {
 
     drawSelected(selectedEls);
 
-    var actionable = getActionableElement(selectedEls, 'nav');
+    var actionable = getActionableElement(selectedEls, source);
 
     sounds[getElementAudio(actionable)].feed.play();
 
@@ -318,10 +342,13 @@ function ez_jump(nodArr) {
 
 /**
  * Decides what to do, if anything, when EZ Action is pressed.
- * TODO Will be revamped to handle better speech synthesis on EZ Action.
+ * @param nodArr Node array to 'enter' on
+ * @param source {'point'|'nav'} THe navigation method
  */
-function ez_enter() {
-	var obj = getActionableElement(selectedEls);
+function ez_enter(nodArr, source) {
+
+	var obj = getActionableElement(nodArr, source);
+
 	if(obj.tagName === "A") {
 		if(obj.href.indexOf("#") !== -1) {
 			var hrefBase = obj.href.substring(0, obj.href.indexOf("#"));
@@ -335,17 +362,18 @@ function ez_enter() {
 				var idLocation = document.getElementById(jumpTo);
 				var nameLocation = document.getElementsByName(jumpTo)[0];
 				if(idLocation !== null) {
-					ez_jump([idLocation]);
+					ez_jump([idLocation], source);
 					obj.click();
 					return;
 				} else if(nameLocation !== undefined) {
-					ez_jump([nameLocation]);
+					ez_jump([nameLocation], source);
 					obj.click();
 					return;
 				}
 			}
 		}
 	}
+
 	if(getClick(obj) !== undefined) {
 		obj.click();
 	} else if(obj.tagName == 'INPUT' && (obj.type == 'radio' || obj.type == 'checkbox')) {
@@ -401,7 +429,7 @@ function multikey_event(e) {
 			ez_navigate('up');
 			//window.scroll(0,findPos(selectedEls));
 		} else {
-			ez_navigate_start();
+			ez_navigate_start(false, 'nav');
 		}
 		return false; // Overwrite default browser functionality
 	} else if(map[KB_TAB] && tabNav != 'none') { //TAB
@@ -413,7 +441,7 @@ function multikey_event(e) {
 			ez_navigate('down');
 			//window.scroll(0,findPos(selectedEls));
 		} else {
-			ez_navigate_start();
+			ez_navigate_start(false, 'nav');
 		}
 		return false;
 	}

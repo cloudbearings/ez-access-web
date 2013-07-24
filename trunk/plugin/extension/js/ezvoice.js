@@ -724,3 +724,20 @@ function fixPronunciation(s, dictionary, caseSensitive) {
 
 	return ret.join('');
 } //End fixPronunciation()
+
+
+function alertEdgeNav(move) {
+
+    edgeNavAttempt++;
+
+    if(move !== 'top' && move !== 'bottom') throw new Error('Invalid value for move parameter.');
+
+    if(edgeNavAttempt > alerts[move].length - 1) {
+        edgeNavAttempt = alerts[move].length - 1;
+    }
+
+    var speak = alerts[move][edgeNavAttempt].value;
+
+    voice(speak);
+
+}
