@@ -27,7 +27,7 @@ var ALPHABET_CHAR = /[a-zA-Z]/;
  * A parameter for whether speech should be generated with SSML markup.
  * @const
  */
-var SSML = true;
+var SSML = false;
 
 
 /**
