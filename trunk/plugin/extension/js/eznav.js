@@ -110,7 +110,7 @@ function key_event(e) {
 			TINY.box.hide();
 		} else {
 			if(ez_navigateToggle) {
-				ez_enter();
+				ez_enter(selectedEls, 'nav');
 			} else {
 				ez_navigate_start(false, 'nav');
 			}
