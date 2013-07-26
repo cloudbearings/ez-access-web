@@ -8,8 +8,10 @@ if(localStorage.ezNavigate === undefined) {
 if(localStorage.ssml === undefined) {
 	// Disable for Macs only
 	if (navigator.userAgent.indexOf('Mac OS X') !== -1) {
-		localstorage.ssml = "false";
-	} else localStorage.ssml = "true";
+		localStorage.ssml = "false";
+	} else {
+		localStorage.ssml = "true";
+	}
 }
 
 // SETTINGS STORAGE

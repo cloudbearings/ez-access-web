@@ -9,7 +9,6 @@
     "128":"icon-128.png" 
   }, 
   "permissions": ["tts"],
-  "background_page": "background.html",
   "background": {
     "scripts": ["background.js"]
   },
