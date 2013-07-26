@@ -5,6 +5,12 @@ if(localStorage.ezHighlightColor === undefined) {
 if(localStorage.ezNavigate === undefined) {
 	localStorage.ezNavigate = "some";
 }
+if(localStorage.ssml === undefined) {
+	// Disable for Macs only
+	if (navigator.userAgent.indexOf('Mac OS X') !== -1) {
+		localstorage.ssml = "false";
+	} else localStorage.ssml = "true";
+}
 
 // SETTINGS STORAGE
 chrome.extension.onRequest.addListener(
@@ -16,6 +22,10 @@ chrome.extension.onRequest.addListener(
 		} else if(request.localstorage == "ezHighlightColor") {
 			sendResponse({
 				ezHighlightColor: localStorage.ezHighlightColor
+			});
+		} else if(request.localstorage == "ssml") {
+			sendResponse({
+				ssml: localStorage.ssml
 			});
 		} else if(request.tts !== undefined) {
 			chrome.tabs.getSelected(null, function (tab) {

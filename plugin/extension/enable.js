@@ -5,6 +5,12 @@ chrome.extension.sendRequest({
 	EzCustomColor = response.ezHighlightColor;
 });
 
+chrome.extension.sendRequest({
+	localstorage: "ssml"
+}, function (response) {
+	SSML = response.ssml === "true";
+});
+
 var ezSessionDisable = sessionStorage["ezSessionDisable"];
 
 function checkingIfEz() {

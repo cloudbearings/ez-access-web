@@ -9,11 +9,16 @@ document.addEventListener('DOMContentLoaded', function () {
 		eraseOptions();
 	};
 });
-
+var checkssml;
 function loadOptions() {
+	if(localStorage['ssml'] === undefined) {
+		if (navigator.userAgent.indexOf('Mac OS X') !== -1) {
+			localstorage.ssml = "false";
+		} else localStorage.ssml = "true";
+	}
 	var ezHighlightColor = localStorage["ezHighlightColor"];
 	var colorSelector = document.getElementById('highlightColor');
-
+	checkssml = document.getElementById('checkssml');
 	// valid colors are red, blue, green and yellow
 	if(ezHighlightColor == undefined) {
 		ezHighlightColor = colorSelector.value;
@@ -23,6 +28,7 @@ function loadOptions() {
 	colorSelector.value = ezHighlightColor;
 
 	var navigate = localStorage["ezNavigate"];
+	var ssml = localStorage["ssml"];
 	var navSome = document.getElementById('some');
 	var navAll = document.getElementById('all');
 	if(navigate == 'all') {
@@ -34,13 +40,15 @@ function loadOptions() {
 	} else {
 		localStorage["ezNavigate"] = 'some';
 	}
+	if(ssml === 'true') checkssml.checked = true;
+	else checkssml.checked = false;
 
 }
 
 function saveOptions() {
 	var colorSelector = document.getElementById('highlightColor');
 	localStorage["ezHighlightColor"] = colorSelector.value;
-
+	localStorage["ssml"] = checkssml.checked;
 	var navSome = document.getElementById('some');
 	var navAll = document.getElementById('all');
 	if(navSome.checked) {
@@ -53,5 +61,6 @@ function saveOptions() {
 function eraseOptions() {
 	localStorage.removeItem("ezHighlightColor");
 	localStorage.removeItem("ezNavigate");
+	localStorage["ssml"] = 'true';
 	location.reload();
 }
