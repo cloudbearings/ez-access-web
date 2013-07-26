@@ -13,8 +13,10 @@ var checkssml;
 function loadOptions() {
 	if(localStorage['ssml'] === undefined) {
 		if (navigator.userAgent.indexOf('Mac OS X') !== -1) {
-			localstorage.ssml = "false";
-		} else localStorage.ssml = "true";
+			localStorage.ssml = "false";
+		} else {
+			localStorage.ssml = "true";
+		}
 	}
 	var ezHighlightColor = localStorage["ezHighlightColor"];
 	var colorSelector = document.getElementById('highlightColor');
