@@ -70,7 +70,8 @@ function voice(obj, source, repeat) {
 }
 
 function voice_node( nod ) {
-    return nod.nodeValue;
+    // Remove line breaks
+    return nod.nodeValue.replace(/(\r\n|\n|\r)/gm," ");
 }
 
 /**
@@ -223,9 +224,7 @@ function voice_element(obj, source) {
 			value = 'is blank';
 		}
 	} else {
-        // If <button>[txtNod]</button> (for example), do not navigate inside.
-        if(obj.hasChildNodes() && !orphanTxtNode(obj.childNodes[0]))
-		    speech = get_inner_alt(obj, source);
+		speech = get_inner_alt(obj, source);
 	}
 
 
