@@ -1100,7 +1100,10 @@ function load_ez() {
             if((selectedEls.length !== 1 || selectedEls[0] != target) && new Date().getTime() - touchStartTime > 250) {
                 if(!ez_loaded) load_ez();
                 target = jumpToElFinder(target);
-                if(target !== null) ez_jump([target], 'point');
+                if(target !== null) {
+                    ez_navigateToggle = true;
+                    ez_jump([target], 'point');
+                }
                 touchTap = false;
             }
         }, false);
