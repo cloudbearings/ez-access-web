@@ -223,7 +223,9 @@ function voice_element(obj, source) {
 			value = 'is blank';
 		}
 	} else {
-		speech = get_inner_alt(obj, source);
+        // If <button>[txtNod]</button> (for example), do not navigate inside.
+        if(obj.hasChildNodes() && !orphanTxtNode(obj.childNodes[0]))
+		    speech = get_inner_alt(obj, source);
 	}
 
 
