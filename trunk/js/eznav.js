@@ -347,6 +347,7 @@ function ez_jump(nodArr, source) {
  */
 function ez_enter(nodArr, source) {
 
+
 	var obj = getActionableElement(nodArr, source);
 
 	if(obj.tagName === "A") {
@@ -386,8 +387,6 @@ function ez_enter(nodArr, source) {
 		voice(obj);
 	} else if(obj.tagName == 'INPUT' && (obj.type == 'submit' || obj.type == 'image')) {
 		obj.click();
-	} else if(selectedEls.getAttribute('data-ez-chunking') == 'group' && selectedEls.getAttribute('data-ez-subnavtype') == 'nested' || selectedEls.getAttribute('data-ez-subnavtype') == 'hierarchical') {
-		ez_navigate_in_group();
 	} else {
 		document.getElementById(ezSelectorId).className = 'pulse';
 		setTimeout(function () {
