@@ -1,0 +1,28 @@
+#summary The items that need to be completed by the first stable release.
+#labels Phase-Requirements
+
+= Introduction =
+
+As EZ Access is pretty stable at the moment, there are a few things that I'd like to finish before calling it a day and releasing the first production build. This list outlines the TODO from r205 on 8/3/13.
+
+I think there are many things left to do, but I would like to avoid feature creep, and many things are not critical to operation and can be left to a further release.
+
+= TODO =
+
+== Need to do ==
+
+  * Complete EZ Enter function with proper checkmarking and interacting with certain elements.
+  * Any open MEDIUM priority or higher issue reports.
+  * TODO tags in code
+  * Code warning cleanup
+  * Comprehensive testing
+
+== Need/want to do ==
+
+  * Complete EZ Help dialogue works.
+
+== Want to do ==
+
+  * Complete international language support.
+  * Wrapping checkboxes/etc with respective label -- WANT, otherwise simply make label not navigable (NEED).
+  * Complete developer/implementer debugging mode, and possibly a page validation checker (?).
