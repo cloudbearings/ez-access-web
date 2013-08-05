@@ -2,10 +2,7 @@
 
 = Main libraries/software =
 
-There are two libraries used: 
-
- #  hammer.js - Provides multitouch support
-     * https://github.com/EightMedia/hammer.js/blob/master/LICENSE - No restrictions
+There is only one library used: 
 
  #  TinyBox   - Modal window script for help
     * http://creativecommons.org/licenses/by/3.0/us/ - Only need to provide attribution. Can be used in commercial works.
