@@ -1,0 +1,37 @@
+#summary Best practices for authoring pages for EZ Accesss.
+#labels Featured
+
+= Introduction =
+
+The EZ Access extension works best on pages that are specifically designed to support the behaviors and features of the extension. The extension may work on "wild" internet content, but there may be some unexpected behaviors.
+
+Following these best practice will help you to create pages that behave as expected with EZ Access.
+
+
+= Authoring Best-Practices =
+
+More best practices will be added in the future...
+
+== Wrap text-only content in paragraphs with hyperlinks ==
+=== Rationale ===
+The EZ Access highlight navigates to elements that are interactive (such as buttons, checkboxes, and hyperlinks) or block-level (such as headings, and paragraphs). This becomes more of an issue when a block-level element contains both interactive elements and plain text nodes--for example, hyperlinks in paragraphs:
+
+==== Bad example ====
+{{{
+<p>Paragraph text
+<a href="#">with some link text</a>
+and some more paragraph text.</p>
+}}}
+
+EZ Access will navigate the above paragraph correctly in three chunks [(1) "Paragraph text" (2) "with some link text" link (3) "and some more paragraph text"], however, the Slide-to-Read feature will not work properly, because Slide-to-Read relies on HTML elements.
+
+=== What to do ===
+There should be no text-only nodes within that parent block-level element. If you have a paragraph or other block-level elements that contain links or other interactive content, ensure that the non-interactive content of the blocks is wrapped with a `<span>` or other element. For example:
+
+==== Good example ====
+{{{
+<p><span>Paragraph text</span>
+<a href="#">with some link text</a>
+<span>and some more paragraph text.</span></p>
+
+This type of code will work well for both navigation and Slide-to-read.
