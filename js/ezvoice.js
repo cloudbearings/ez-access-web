@@ -27,7 +27,7 @@ var ALPHABET_CHAR = /[a-zA-Z]/;
  * A parameter for whether speech should be generated with SSML markup.
  * @const
  */
-var SSML = false;
+var SSML = true;
 
 
 /**
@@ -229,7 +229,7 @@ function voice_element(obj, source) {
 	/**
 	 * Get value which might override the ones found above
 	 */
-	value = getValue(obj, value);
+	//TODO Fix when done with getValueSubstring(): value = getValue(obj, value);
 
 	/**
 	 * Potentially add SSML tags to different speech substrings.
@@ -481,42 +481,158 @@ function getRole(obj, defaultString) {
 } //End function getRole()
 
 /**
- * This function looks for a potential value string and returns it.
+ * This function looks for a potential value string and returns it. This 
+ * value is not necessarily a good representation of the value in speech. For 
+ * that, call getValueSubstring().
  * In precedence order, the value string will be the object's:
- * data-ez-sayvalue > aria-valuetext > aria-valuenow > defaultString
- * This function does NOT look for values specific to different tags.
+ * data-ez-sayvalue > aria-valuetext > aria-valuenow > 
+ * value/status associated with that element type > defaultString
+ * This function does not support aria-role="listbox" currently.
  * @author J. Bern Jordan
  * @param {object} obj The DOM object for which to get role.
- * @param {String} [defaultString=''] A default string for the object's
+ * @param {string} [defaultString=''] A default string for the object's
  * value if a more appropriate one is not found.
- * @return {String} An value for the passed object. The returned string is
- * the defaultString if an overriding value is not found.
+ * @return {string|string[]} The value/s for the passed object. If there are 
+ * multiple values (as with some listboxes), then an array of strings is 
+ * returned. The returned string is the defaultString if an overriding 
+ * value is not found.
  */
 function getValue(obj, defaultString) {
 	'use strict';
-	var ret, temp;
-	if(defaultString === undefined) {
+	var ret, type, value;
+	if (defaultString === undefined) {
 		ret = '';
 	} else {
 		ret = defaultString;
 	}
 
-	if(obj.hasAttribute('data-ez-sayvalue')) {
+	type = getType(obj);
+
+	if (obj.hasAttribute('data-ez-sayvalue')) {
 		ret = obj.getAttribute('data-ez-sayvalue');
-	} else if(obj.hasAttribute('aria-valuetext')) {
-		temp = obj.getAttribute('aria-valuetext');
-		if(temp.length > 0) {
-			ret = 'is ' + temp;
+	} else if (obj.hasAttribute('aria-valuetext')) {
+		ret = obj.getAttribute('aria-valuetext');
+	} else if (obj.hasAttribute('aria-valuenow')) {
+		ret = obj.getAttribute('aria-valuenow');
+	} 
+	//Radio buttons and checkboxes
+	else if (type === 'radio' || type === 'checkbox') {
+		if (obj.hasAttribute('aria-role')) {
+			value = obj.getAttribute('aria-checked');
+			if (value === 'true') { 
+				ret = 'checked'; 
+			} else if (value === 'false') {
+				ret = 'not checked';
+			} else if (value === 'mixed') {
+				ret = 'mixed';
+			} else {
+				ret = 'ERROR';
+			}
+		} else {
+			ret = obj.checked ? 'checked' : 'unchecked';
 		}
-	} else if(obj.hasAttribute('aria-valuenow')) {
-		temp = obj.getAttribute('aria-valuenow');
-		if(temp.length > 0) {
-			ret = 'is ' + temp;
+	}
+	//Numeric data
+	else if (type === 'range' || type === 'number') {
+		ret = obj.value;
+		//if ARIA slider or spinbutton, then ret=aria-valuenow (set above)
+	} 
+	//Various text input fields
+	else if (type === 'text'   || type === 'textarea' || type === 'email' || 
+	         type === 'search' || type === 'url'      || type === 'tel'   || 
+	         type === 'password' ) {
+		ret = obj.value;
+		//if ARIA, then ret=aria-valuetext (set above)
+	}
+	//Toggle buttons (only via ARIA)
+	else if (type === 'button' && obj.hasAttribute('aria-pressed')) {
+		value = obj.getAttribute('aria-pressed');
+		if (value === 'true') { 
+			ret = 'pressed'; 
+		} else if (value === 'false') {
+			ret = 'not pressed';
+		} else if (value === 'mixed') {
+			ret = 'mixed';
+		} else {
+			ret = 'ERROR';
+		}
+	}
+	//HTML <select>
+	else if (type === 'select') {
+		if (obj.hasAttribute('multiple')) {
+			ret = [];
+			for (var i = 0; i < obj.length; i++) {
+				if (obj.options[i].selected) {
+					ret.push(obj.options[i].value + ', option ' + (i + 1));
+				}
+			}
+		} else {
+			if(obj.selectedIndex !== -1) {
+				ret = obj.options[obj.selectedIndex].value;
+			} else {
+				ret = '';
+			}
 		}
 	}
 
 	return ret;
 } //End function getValue()
+
+/**
+ * TODO Incomplete function
+ *
+ * @author J. Bern Jordan
+ * @param {object} obj The DOM object for which to get role.
+ * @param {'nav'|'action'|'type'} [userDid] What the user just did, in order 
+ * to get a more sensible string.
+ * @return {string} 
+ */
+function getValueSubstring(obj, userDid) {
+	'use strict';
+	var ret, type, value;
+	
+	if (userDid !== undefined || userDid !== 'nav' || 
+	    userDid !== 'action'  || userDid !== 'type') {
+		throw new TypeError('Invalid "userDid" passed to getValueSubstring()');
+	}
+	
+	type = getType(obj);
+	value = getValue(obj);
+	
+	//Password
+	if (type === 'password' || ) {
+		ret = 'contains ' + value.length + ' characters';
+	}
+	//Radio buttons and checkboxes
+	else if (type === 'radio' || type === 'checkbox') {
+		ret = 'is ' + value;
+	}
+	//Numeric data
+	else if (type === 'range' || type === 'number') {
+		if (value === '') {
+			ret = 'is blank'
+		} else {
+			ret = 'is ' + value;
+		}
+	}
+	//Various text input fields
+	else if (type === 'text'   || type === 'textarea' || type === 'email' || 
+	         type === 'search' || type === 'url'      || type === 'tel' ) {
+		if (value.length <= 0) {
+			ret = 'is blank'
+		} else if (userDid === 'type') {
+			ret = 'contains ' + getTypedSpeech(value);
+		} else {
+			ret = 'contains ' + value;
+		}
+	}
+	//Toggle buttons (only via ARIA)
+	else if (type === 'button' && obj.hasAttribute('aria-pressed')) {
+		ret = 'is ' + value;
+	}
+	//HTML <select>
+	//TODO complete
+}
 
 /**
  * Gets the inner elements of an object and gets the voice parsing of that element, combining at the end. Needed for
