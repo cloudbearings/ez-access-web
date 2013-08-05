@@ -27,7 +27,7 @@ var ALPHABET_CHAR = /[a-zA-Z]/;
  * A parameter for whether speech should be generated with SSML markup.
  * @const
  */
-var SSML = true;
+var SSML = false;
 
 
 /**
@@ -111,24 +111,18 @@ function voice_element(obj, source) {
 	 * Get name & role
 	 */
 	name = getName(obj, source, name);
+	
+	if (isUserEditable(obj)) {
+		role = getRole(obj, role);
+	} //else role left blank, because user only needs to know the value/status
 
-	role = getRole(obj, role);
 
-	/**
-	 * Get value & extra for different elements
-	 */
-	// obj is a DOM object; parse accordingly
-
+    /**
+     * Get value & extra for different elements
+     */
     var type = getType(obj);
 
-	// Check if an input type
-    if(obj.hasAttribute('readonly') || obj.hasAttribute('disabled')) {
-        if(obj.value) {
-            value = 'is ' + obj.value;
-        } else {
-            value = 'is blank';
-        }
-    } else if(type === 'radio') {
+    if(type === 'radio') {
         value = obj.checked ? 'is checked' : 'is unchecked';
     } else if(type === 'checkbox') {
         value = obj.checked ? 'is checked' : 'is unchecked';
@@ -725,6 +719,27 @@ function fixPronunciation(s, dictionary, caseSensitive) {
 
 	return ret.join('');
 } //End fixPronunciation()
+
+
+/**
+ * Checks to see if the element passed can be edited, changed, or otherwise
+ * interacted with by the user.
+ * @author J. Bern Jordan
+ * @param {object} obj The DOM object to check.
+ * @return {boolean} Whether the element can be edited.
+ */
+function isUserEditable(obj) {
+  if (obj.hasAttribute('readonly') || obj.hasAttribute('disabled')) {
+    return false;
+  }
+  if (obj.hasAttribute('aria-readonly')) {
+    return !Boolean(obj.getAttribute('aria-readonly'));
+  }
+  if (obj.hasAttribute('aria-disabled')) {
+    return !Boolean(obj.getAttribute('aria-disabled'));
+  }
+  else return true;
+}
 
 
 function alertEdgeNav(move) {
