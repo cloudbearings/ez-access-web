@@ -111,6 +111,7 @@ function voice_element(obj, source) {
 	 * Get name & role
 	 */
 	name = getName(obj, source, name);
+
 	role = getRole(obj, role);
 
 	/**
@@ -223,8 +224,11 @@ function voice_element(obj, source) {
 		} else {
 			value = 'is blank';
 		}
+    } else if(obj.tagName === 'BUTTON') {
+        // <button>s are special -- need to read similar to other input type="button"s
+        if(name === '') name = obj.innerText;
 	} else {
-		speech = get_inner_alt(obj, source);
+        speech = get_inner_alt(obj, source);
 	}
 
 
@@ -328,7 +332,7 @@ function getName(obj, source, defaultString) {
 	}
 
 	var label = get_label(obj);
-  var type = getType(obj);
+    var type = getType(obj);
 
 	if(obj.hasAttribute('aria-labelledby')) {
 		ret = '';
@@ -387,8 +391,6 @@ function getName(obj, source, defaultString) {
              */
             ret = obj.getAttribute('placeholder');
         }
-	} else if(type === 'button') {
-		ret = get_inner_alt(obj, source);
 	} else if(type === 'img') { //TODO - check if necessary
 		if(obj.alt) {
 			ret = obj.alt;
