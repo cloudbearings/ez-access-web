@@ -33,5 +33,5 @@ There should be no text-only nodes within that parent block-level element. If yo
 <p><span>Paragraph text</span>
 <a href="#">with some link text</a>
 <span>and some more paragraph text.</span></p>
-
+}}}
 This type of code will work well for both navigation and Slide-to-read.
