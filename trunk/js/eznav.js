@@ -217,7 +217,7 @@ function getActionableElement(nods, source) {
     if(els === 1) {
         return lastEl;
     }
-    if(isElement(nods[0])) return e[0];
+    if(isElement(nods[0])) return nods[0];
     else return nods[0].parentElement;
 }
 
