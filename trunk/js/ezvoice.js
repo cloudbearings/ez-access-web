@@ -108,26 +108,22 @@ function voice_element(obj, source) {
 	var speech = '';
 
 	/**
-	 * Get name & role
+	 * Get name, role, & value
 	 */
 	name = getName(obj, source, name);
-	
+
 	if (isUserEditable(obj)) {
 		role = getRole(obj, role);
 	} //else role left blank, because user only needs to know the value/status
 
+	value = getValueSubstring(obj);
 
     /**
-     * Get value & extra for different elements
+     * Get other speech for different elements
      */
     var type = getType(obj);
 
-    if(type === 'radio') {
-        value = obj.checked ? 'is checked' : 'is unchecked';
-    } else if(type === 'checkbox') {
-        value = obj.checked ? 'is checked' : 'is unchecked';
-    } else if(type === 'range') {
-        value = 'is at ' + obj.value;
+    if (type === 'range') {
         if(obj.hasAttribute('min') && obj.hasAttribute('max')) {
             extra = 'and ranges from ' + obj.min + ' to ' + obj.max;
             //The following are "sort of" error cases
@@ -140,96 +136,7 @@ function voice_element(obj, source) {
         } else {
             extra = 'and ranges from 0 to 100';
         }
-    } else if(type === 'password') {
-        value = 'contains ' + obj.value.length + ' characters';
-    } else if(type === 'text') {
-        if(obj.value) {
-            value = 'contains ' + getTypedSpeech(obj.value);
-        } else {
-            value = 'is blank';
-        }
-    } else if(type === 'email') {
-        if(obj.value) {
-            value = 'contains ' + obj.value;
-        } else {
-            value = 'is blank';
-        }
-    } else if(type === 'search') {
-        if(obj.value) {
-            value = 'contains ' + obj.value;
-        } else {
-            value = 'is blank';
-        }
-    } else if(type === 'url') {
-        if(obj.value) {
-            value = 'contains ' + obj.value;
-        } else {
-            value = 'is blank';
-        }
-    } else if(type === 'tel') {
-        if(obj.value) {
-            value = 'contains ' + obj.value;
-        } else {
-            value = 'is blank';
-        }
-    } else if(type === 'number') {
-        if(obj.value) {
-            value = 'is ' + obj.value;
-        } else {
-            value = 'is blank';
-        }
-    } else if(type === 'select') {
-		if(obj.hasAttribute('multiple')) {
-			var total = 0;
-			var selected = [];
-			for(var i = 0; i < obj.length; i++) {
-				if(obj.options[i].selected) {
-					selected.push(obj.options[i].value + "option " + (i + 1));
-					total++;
-				}
-			}
-			var options = '';
-			for(i = 0; i < selected.length; i++) {
-				if(i == selected.length - 1 && selected.length > 1) {
-					options += ' and ' + selected[i];
-				} else if(i == 0) {
-					options += selected[i];
-				} else {
-					options += ", " + selected[i];
-				}
-			}
-			if(total == 1) {
-				value += 'selected is ' + options;
-			} else if(total != 0) {
-				value += 'selected are ' + options;
-			} else {
-				value += 'is blank';
-			}
-		} else {
-			if(obj.selectedIndex != -1) {
-				value = 'is ' + obj.options[obj.selectedIndex].value;
-			} else {
-				value = 'is blank';
-			}
-		}
-	} else if(type === 'textarea') {
-		if(obj.value) {
-			value = "contains " + getTypedSpeech(obj.value);
-		} else {
-			value = 'is blank';
-		}
-    } else if(obj.tagName === 'BUTTON') {
-        // <button>s are special -- need to read similar to other input type="button"s
-        if(name === '') name = obj.innerText;
-	} else {
-        speech = get_inner_alt(obj, source);
-	}
-
-
-	/**
-	 * Get value which might override the ones found above
-	 */
-	//TODO Fix when done with getValueSubstring(): value = getValue(obj, value);
+    }
 
 	/**
 	 * Potentially add SSML tags to different speech substrings.
@@ -326,7 +233,7 @@ function getName(obj, source, defaultString) {
 	}
 
 	var label = get_label(obj);
-    var type = getType(obj);
+	var type = getType(obj);
 
 	if(obj.hasAttribute('aria-labelledby')) {
 		ret = '';
@@ -345,7 +252,7 @@ function getName(obj, source, defaultString) {
 			ret = label;
 		}
 	}
-  // Get generic name for specific input types
+    // Get generic name for specific input types
     else if(obj.hasAttribute('readonly') || obj.hasAttribute('disabled')) {
         ret = 'Disabled field';
     } else if(type === 'submit') {
@@ -363,6 +270,12 @@ function getName(obj, source, defaultString) {
     } else if(type === 'button') {
         if(obj.hasAttribute('value')) {
             ret = obj.value;
+        } 
+        if (obj.tagName === 'BUTTON') {
+            // <button>s are special -- need to read similar to other input type="button"s
+            if (ret === '') {
+                ret = obj.innerText;
+            }
         }
     } else if(type === 'image') {
         //alt is preferred, title is second choice
@@ -400,6 +313,8 @@ function getName(obj, source, defaultString) {
 			 */
 			ret = obj.getAttribute('placeholder');
 		}
+	} else {
+        ret = get_inner_alt(obj, source);
 	}
 
 	return ret;
@@ -579,33 +494,53 @@ function getValue(obj, defaultString) {
 } //End function getValue()
 
 /**
- * TODO Incomplete function
- *
+ * Gets a value substring for the particular DOM object. The string depends on 
+ * the type of DOM object and may be its value or status.
  * @author J. Bern Jordan
  * @param {object} obj The DOM object for which to get role.
- * @param {'nav'|'action'|'type'} [userDid] What the user just did, in order 
- * to get a more sensible string.
- * @return {string} 
+ * @param {'nav'|'action'|'type'} [userDid='nav'] What the user just did, in order 
+ * to get a more sensible string. 
+ *     nav    = user just navigated
+ *     action = user just pressed EZ Action
+ *     type   = user just typed a character and waited
+ * @return {string} The value substring to concatenate with other substrings 
  */
 function getValueSubstring(obj, userDid) {
 	'use strict';
 	var ret, type, value;
 	
-	if (userDid !== undefined || userDid !== 'nav' || 
-	    userDid !== 'action'  || userDid !== 'type') {
-		throw new TypeError('Invalid "userDid" passed to getValueSubstring()');
+	// Check to see if a valid userDid value
+	if (userDid === undefined) {
+		userDid = 'nav';
+	}
+	if (userDid !== 'nav' && userDid !== 'action' && userDid !== 'type') {
+		throw new TypeError('Invalid "userDid=' + userDid + 
+		  '" passed to getValueSubstring()');
 	}
 	
+	/** {string} The string to return */
+	ret = '';
+	/** {string} type The type of DOM object */
 	type = getType(obj);
+	/** {string|string[]} value The stringified value of obj */
 	value = getValue(obj);
 	
+	
 	//Password
-	if (type === 'password' || ) {
-		ret = 'contains ' + value.length + ' characters';
+	if (type === 'password') {
+		if (userDid === 'type') {
+			ret = 'you have typed ' + value.length + ' characters';
+		} else {
+			ret = 'contains ' + value.length + ' characters';
+		}
 	}
 	//Radio buttons and checkboxes
 	else if (type === 'radio' || type === 'checkbox') {
-		ret = 'is ' + value;
+		if (userDid === 'action') {
+			ret = 'is now ' + value;
+		} else {
+			ret = 'is ' + value;
+		}
 	}
 	//Numeric data
 	else if (type === 'range' || type === 'number') {
@@ -621,17 +556,52 @@ function getValueSubstring(obj, userDid) {
 		if (value.length <= 0) {
 			ret = 'is blank'
 		} else if (userDid === 'type') {
-			ret = 'contains ' + getTypedSpeech(value);
+			ret = 'you have typed ' + getTypedSpeech(value);
 		} else {
 			ret = 'contains ' + value;
 		}
 	}
 	//Toggle buttons (only via ARIA)
 	else if (type === 'button' && obj.hasAttribute('aria-pressed')) {
-		ret = 'is ' + value;
+		if (userDid === 'action') {
+			ret = 'is now ' + value;
+		} else {
+			ret = 'is ' + value;
+		}
 	}
 	//HTML <select>
-	//TODO complete
+	else if (type === 'select') {
+		if (typeof value === 'string' || value instanceof String) {
+			if (value.length <= 0) {
+				ret = 'is blank'
+			} else if (userDid === 'action') {
+				ret = 'is now ' + value;
+			} else {
+				ret = 'is ' + value;
+			}
+		} else { //string[], which means multiple options selected
+			var options = '';
+			var length = value.length;
+			for (var i=0; i<length; i++) {
+				if (i === length - 1 && length > 1) {
+					options += ', and ' + value[i];
+				} else if (i === 0) {
+					options += value[i];
+				} else {
+					options += ", " + value[i];
+				}
+			}
+			if (length === 1) {
+				ret += 'is ' + options;
+			} else if (length !== 0) {
+				ret += 'options ' + options + ' are selected';
+			} else {
+				ret += 'is blank';
+			}
+		}
+	}
+	
+	return ret;
 }
 
 /**
