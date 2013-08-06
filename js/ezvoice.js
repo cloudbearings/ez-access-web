@@ -289,7 +289,7 @@ function getName(obj, source, defaultString) {
     } else if(type === 'password' || type === 'text' ||
         type === 'email' || type === 'search' ||
         type === 'url' || type === 'tel' ||
-        type === 'number') {
+        type === 'number' || type === 'textarea') {
         if(obj.hasAttribute('placeholder')) {
             /**
              * Using a placeholder as a label is NOT generally recommended,
@@ -304,17 +304,11 @@ function getName(obj, source, defaultString) {
 		}
 	} else if(type === 'a' && obj.hasAttribute('href')) {
 		ret = get_inner_alt(obj, source);
-	} else if(type === 'textarea') {
-		if(obj.hasAttribute('placeholder')) {
-			/**
-			 * Using a placeholder as a label is NOT generally recommended,
-			 * but it is probably better than nothing in this case (because
-			 * no other more appropriate label/name can be found).
-			 */
-			ret = obj.getAttribute('placeholder');
-		}
+	} else if (type === 'select') {
+		//do nothing
+		//don't want to get_inner_alt, which would read all of the <option>s
 	} else {
-        ret = get_inner_alt(obj, source);
+		ret = get_inner_alt(obj, source);
 	}
 
 	return ret;
