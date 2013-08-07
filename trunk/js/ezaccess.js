@@ -217,7 +217,14 @@ function isFocusable(o, source) {
 
     var attr = '';
 
-    /** Check to see if immediate element is focusable or not */
+    /** 
+     * Check to see if immediate element is focusable or not.
+     * More specific attributes should override less specific ones.
+     * data-ez-focusable* attributes should override aria-hidden. 
+     */
+    if (o.hasAttribute('aria-hidden') {
+        attr = o.getAttribute('aria-hidden');
+    }
     if (o.hasAttribute('data-ez-focusable')) {
         attr = o.getAttribute('data-ez-focusable');
     }
