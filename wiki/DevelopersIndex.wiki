@@ -15,6 +15,7 @@ To start, familiarize yourself with the basic concept, good practices and tips f
   * [gettingStarted Getting started & examples]
   * [attributes Attributes reference]
   * [softwareUsed Different code used in this project and their licenses]
+  * [BestPractices Best practices for creating pages for EZ Access]
 
 = EZ Access dev stuff =
   * [V1Roadmap TODO for V1 release]
