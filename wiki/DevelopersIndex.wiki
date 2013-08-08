@@ -16,6 +16,7 @@ To start, familiarize yourself with the basic concept, good practices and tips f
   * [attributes Attributes reference]
   * [softwareUsed Different code used in this project and their licenses]
   * [BestPractices Best practices for creating pages for EZ Access]
+  * [DebugMode Activate the EZ Access debug mode to troubleshoot EZ Access parsing]
 
 = EZ Access dev stuff =
   * [V1Roadmap TODO for V1 release]
