@@ -11,6 +11,13 @@ chrome.extension.sendRequest({
 	SSML = response.ssml === "true";
 });
 
+chrome.extension.sendRequest({
+    localstorage: "debug"
+}, function (response) {
+    debugMode = response.debug === "true";
+    if(debugMode) console.log("EZ Access Debug Mode Enabled.");
+});
+
 var ezSessionDisable = sessionStorage["ezSessionDisable"];
 
 function checkingIfEz() {

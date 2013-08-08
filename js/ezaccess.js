@@ -9,6 +9,7 @@ var selectedEls = [];
  * @type {string}
  */
 var maskId = 'EZ_mask';
+
 /**
  * Selector ID to use on the page
  * @type {string}
@@ -26,6 +27,12 @@ var ez_navigateToggle = false;
  * @type {boolean}
  */
 var ez_loaded = false;
+
+/**
+ * Whether the EZ Access Debug Mode is enabled from the options
+ * @type {boolean}
+ */
+var debugMode = false;
 
 /**
  * To decide if touched element or nothing happened (drag).
@@ -1017,6 +1024,7 @@ function ez_navigate_start(propagated, source) {
  * Determines if EZ Access should be started by default (or just loaded).
  */
 function load_ez() {
+
 	if(document.body.hasAttribute('data-ez-allowreorder')) {
 		allowReorder = true;
 	}

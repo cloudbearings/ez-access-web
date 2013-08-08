@@ -18,9 +18,13 @@ function loadOptions() {
 			localStorage.ssml = "true";
 		}
 	}
+    if(localStorage['ssml'] === undefined) {
+        localStorage.debug = "false";
+    }
 	var ezHighlightColor = localStorage["ezHighlightColor"];
 	var colorSelector = document.getElementById('highlightColor');
 	checkssml = document.getElementById('checkssml');
+    checkdebug = document.getElementById('checkdebug');
 	// valid colors are red, blue, green and yellow
 	if(ezHighlightColor == undefined) {
 		ezHighlightColor = colorSelector.value;
@@ -31,6 +35,7 @@ function loadOptions() {
 
 	var navigate = localStorage["ezNavigate"];
 	var ssml = localStorage["ssml"];
+    var debug = localStorage["debug"];
 	var navSome = document.getElementById('some');
 	var navAll = document.getElementById('all');
 	if(navigate == 'all') {
@@ -45,12 +50,15 @@ function loadOptions() {
 	if(ssml === 'true') checkssml.checked = true;
 	else checkssml.checked = false;
 
+    if(debug === 'true') checkdebug.checked = true;
+    else checkdebug.checked = false;
 }
 
 function saveOptions() {
 	var colorSelector = document.getElementById('highlightColor');
 	localStorage["ezHighlightColor"] = colorSelector.value;
 	localStorage["ssml"] = checkssml.checked;
+    localStorage["debug"] = checkdebug.checked;
 	var navSome = document.getElementById('some');
 	var navAll = document.getElementById('all');
 	if(navSome.checked) {
@@ -63,6 +71,13 @@ function saveOptions() {
 function eraseOptions() {
 	localStorage.removeItem("ezHighlightColor");
 	localStorage.removeItem("ezNavigate");
-	localStorage["ssml"] = 'true';
+
+    if (navigator.userAgent.indexOf('Mac OS X') !== -1) {
+        localStorage.ssml = "false";
+    } else {
+        localStorage.ssml = "true";
+    }
+
+    localStorage["debug"] = 'false';
 	location.reload();
 }
