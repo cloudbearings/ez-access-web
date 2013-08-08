@@ -229,7 +229,7 @@ function isFocusable(o, source) {
      * More specific attributes should override less specific ones.
      * data-ez-focusable* attributes should override aria-hidden. 
      */
-    if (o.hasAttribute('aria-hidden') {
+    if (o.hasAttribute('aria-hidden')) {
         attr = o.getAttribute('aria-hidden');
     }
     if (o.hasAttribute('data-ez-focusable')) {
