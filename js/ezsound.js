@@ -41,7 +41,7 @@ function find_audio(audio_name) {
 			return i;
 		}
 	}
-	console.log('No audio file named "' + audio_name + '" found (below error for more info).'); // Debugging
+	if(debugMode) console.log('No audio file named "' + audio_name + '" found (below error for more info).');
 	return -1;
 }
 
@@ -71,6 +71,6 @@ function getElementAudio(obj) {
 			return AUDIO_MOVE;
 		}
 	}
-	console.log('No specific sound for "' + obj.tagName + '" HTML tag.');
+	if(debugMode) console.log('No specific sound for "' + obj.tagName + '" HTML tag.');
 	return AUDIO_MOVE;
 }

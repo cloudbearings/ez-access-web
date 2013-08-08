@@ -269,10 +269,8 @@ function ez_navigate(move, options) {
     }
 
     if(selectedEls.length === 0) {
-
-
-
         var quiet = {voice: false, alert: false};
+
         if(move === 'down') {
             ez_navigate('bottom', quiet);
             alertEdgeNav('bottom');
@@ -317,6 +315,8 @@ function ez_navigate(move, options) {
     if(actionable !== null) actionable.focus();
 
     if(options.voice) voice(selectedEls, 'nav');
+
+    if(debugMode) console.log(selectedEls);
 }
 
 /**
@@ -338,6 +338,8 @@ function ez_jump(nodArr, source) {
     if(actionable !== null) actionable.focus();
 
     voice(selectedEls, 'nav');
+
+    if(debugMode) console.log(selectedEls);
 }
 
 /**
