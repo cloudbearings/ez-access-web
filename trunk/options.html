@@ -47,9 +47,14 @@
 <br>
 Enable EZ Access on:
 <form>
-<input type="radio" name="ez-where" value="some" checked="checked" id="some">Pages designed for EZ Access<br>
-<input type="radio" name="ez-where" value="all" id="all">All pages (may cause problems with the page + unexpected behavior)
-<br><input type="checkbox" name="checkssml" id="checkssml" value="ssml">Include SSML in speech output (can cause unparsed SSML to be spoken in some OSes, like Mac OS X)<br>
+<input type="radio" name="ez-where" value="some" checked="checked" id="some"><label for="some">Pages designed for EZ Access</label><br>
+<input type="radio" name="ez-where" value="all" id="all"><label for="all">All pages (may cause problems with the page + unexpected behavior)</label>
+<br><br>
+<input type="checkbox" name="checkssml" id="checkssml" value="ssml"><label for="checkssml">Include SSML in speech output (can cause unparsed SSML to be spoken in some OSes, like Mac OS X)</label><br>
+<br><br>
+<input type="checkbox" name="checkdebug" id="checkdebug" value="debug"><label for="checkdebug">Enable debug mode</label>
+    <a href="https://code.google.com/p/ez-access-web/wiki/DebugMode" target="_blank">(more info)</a>
+<br><br>
 </form>
 Highlight Color:
 <input type="color" name="highlightColor" id="highlightColor" value="#0000FF">

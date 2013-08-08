@@ -13,6 +13,9 @@ if(localStorage.ssml === undefined) {
 		localStorage.ssml = "true";
 	}
 }
+if(localStorage.debug === undefined) {
+    localStorage.debug = "false";
+}
 
 // SETTINGS STORAGE
 chrome.extension.onRequest.addListener(
@@ -29,7 +32,11 @@ chrome.extension.onRequest.addListener(
 			sendResponse({
 				ssml: localStorage.ssml
 			});
-		} else if(request.tts !== undefined) {
+		} else if(request.localstorage == "debug") {
+            sendResponse({
+                debug: localStorage.debug
+            });
+        } else if(request.tts !== undefined) {
 			chrome.tabs.getSelected(null, function (tab) {
 				sessionStorage.setItem("tabid", tab.id);
 			});
