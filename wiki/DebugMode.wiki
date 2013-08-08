@@ -9,6 +9,8 @@ EZ Access has a debug mode that allows developers to troubleshoot EZ Access pars
 
 To enable, go to Tools-->Extensions-->EZ Access Browser-->Options, and check the checkbox 'Enable Debug Mode'.
 
+When on your EZ Access enabled page, open the developer tools (F11) and click the tab 'console'.
+
 = Information in Debug Mode =
 
 Many different things are displayed in debug mode, including:
