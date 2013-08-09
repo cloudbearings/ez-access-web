@@ -391,10 +391,10 @@ function getRole(obj, defaultString) {
 } //End function getRole()
 
 /**
- * This function looks for a potential value string and returns it. This 
+ * This function looks for a potential value and returns it. This 
  * value is not necessarily a good representation of the value in speech. For 
  * that, call getValueSubstring().
- * In precedence order, the value string will be the object's:
+ * In precedence order, the value will be the object's:
  * data-ez-sayvalue > aria-valuetext > aria-valuenow > 
  * value/status associated with that element type > defaultString
  * This function does not support aria-role="listbox" currently.
@@ -402,19 +402,15 @@ function getRole(obj, defaultString) {
  * @param {object} obj The DOM object for which to get role.
  * @param {string} [defaultString=''] A default string for the object's
  * value if a more appropriate one is not found.
- * @return {string|string[]} The value/s for the passed object. If there are 
- * multiple values (as with some listboxes), then an array of strings is 
- * returned. The returned string is the defaultString if an overriding 
- * value is not found.
+ * @return {boolean|number|string|string[]} The value/s for the passed object, 
+ * the type of which depends on the object. Checkboxes, radio buttons, and 
+ * aria toggle buttons return boolean values or the string "mixed". Numeric 
+ * inputs return numbers. Other inputs return strings or if there are multiple 
+ * values (as with some listboxes), then an array of strings is returned.
  */
-function getValue(obj, defaultString) {
+function getValue(obj) {
 	'use strict';
 	var ret, type, value;
-	if (defaultString === undefined) {
-		ret = '';
-	} else {
-		ret = defaultString;
-	}
 
 	type = getType(obj);
 
@@ -430,21 +426,21 @@ function getValue(obj, defaultString) {
 		if (obj.hasAttribute('aria-role')) {
 			value = obj.getAttribute('aria-checked');
 			if (value === 'true') { 
-				ret = 'checked'; 
+				ret = true; 
 			} else if (value === 'false') {
-				ret = 'not checked';
+				ret = false;
 			} else if (value === 'mixed') {
 				ret = 'mixed';
 			} else {
 				ret = 'ERROR';
 			}
 		} else {
-			ret = obj.checked ? 'checked' : 'unchecked';
+			ret = obj.checked;
 		}
 	}
 	//Numeric data
 	else if (type === 'range' || type === 'number') {
-		ret = obj.value;
+		ret = Number(obj.value);
 		//if ARIA slider or spinbutton, then ret=aria-valuenow (set above)
 	} 
 	//Various text input fields
@@ -458,9 +454,9 @@ function getValue(obj, defaultString) {
 	else if (type === 'button' && obj.hasAttribute('aria-pressed')) {
 		value = obj.getAttribute('aria-pressed');
 		if (value === 'true') { 
-			ret = 'pressed'; 
+			ret = true; 
 		} else if (value === 'false') {
-			ret = 'not pressed';
+			ret = false;
 		} else if (value === 'mixed') {
 			ret = 'mixed';
 		} else {
@@ -531,6 +527,8 @@ function getValueSubstring(obj, userDid) {
 	}
 	//Radio buttons and checkboxes
 	else if (type === 'radio' || type === 'checkbox') {
+		//turn boolean into friendlier string
+		value = value ? 'checked': 'unchecked';
 		if (userDid === 'action') {
 			ret = 'is now ' + value;
 		} else {
@@ -558,6 +556,8 @@ function getValueSubstring(obj, userDid) {
 	}
 	//Toggle buttons (only via ARIA)
 	else if (type === 'button' && obj.hasAttribute('aria-pressed')) {
+		//turn boolean into friendlier string
+		value = value ? 'pressed': 'unpressed';
 		if (userDid === 'action') {
 			ret = 'is now ' + value;
 		} else {
