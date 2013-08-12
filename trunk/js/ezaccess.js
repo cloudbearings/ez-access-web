@@ -275,6 +275,8 @@ function isElement(o){
 
 /**
  * Checks to see if the DOM Object o is a supported interactive element.
+ * This function does not check to see if o is a disabled input or not.
+ * (For that, use isUserEditable().)
  * @author J. Bern Jordan, Alexander Harding
  * @param {object} o The DOM object to be checked.
  * @return {boolean} Whether o is a supported interactive element.
@@ -296,6 +298,31 @@ function isInteractive(o) {
         return o.hasAttribute('href');
     }
     return INTERACTIVE_TYPES.indexOf(type) > -1;
+}
+
+/**
+ * Checks to see if the element passed can be edited, changed, or otherwise
+ * interacted with by the user.
+ * @author J. Bern Jordan
+ * @param {object} obj The DOM object to check.
+ * @return {boolean} Whether the element can be edited.
+ */
+function isUserEditable(obj) {
+  //Non-interactive elements cannot be edited
+  if (!isInteractive(obj)) {
+    return false;
+  }
+
+  if (obj.hasAttribute('readonly') || obj.hasAttribute('disabled')) {
+    return false;
+  }
+  if (obj.hasAttribute('aria-readonly')) {
+    return !Boolean(obj.getAttribute('aria-readonly'));
+  }
+  if (obj.hasAttribute('aria-disabled')) {
+    return !Boolean(obj.getAttribute('aria-disabled'));
+  }
+  else return true;
 }
 
 /**
@@ -1303,5 +1330,16 @@ function stopEZ() {
 		old.style.top = 0 + "px";
 		old.style.width = 0 + "px";
 		old.style.height = 0 + "px";
+	}
+}
+
+/**
+ * Prints the string s to the console log if the system is in debug mode
+ * @private
+ * @param {*} The object (usually a string) to be logged.
+ */
+function _debug(s) {
+	if (debugMode) {
+		console.log(s);
 	}
 }

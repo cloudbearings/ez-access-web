@@ -107,22 +107,24 @@ function voice_element(obj, source) {
 	 */
 	var speech = '';
 
+	/** A string representation of the type of object */
+	var type = getType(obj);
+	
 	/**
-	 * Get name, role, & value
+	 * Get speech strings for concatenation
 	 */
-	name = getName(obj, source, name);
-
-	if (isUserEditable(obj)) {
-		role = getRole(obj, role);
-	} //else role left blank, because user only needs to know the value/status
-
+	name = getName(obj, source);
 	value = getValueSubstring(obj);
+	
+	if (isUserEditable(obj)) {
+		role = getRole(obj);
+	} else if (type === 'button') {
+		role = 'unavailable ' + getRole(obj);
+	} //else role should be left blank
 
     /**
      * Get other speech for different elements
      */
-    var type = getType(obj);
-
     if (type === 'range') {
         if(obj.hasAttribute('min') && obj.hasAttribute('max')) {
             extra = 'and ranges from ' + obj.min + ' to ' + obj.max;
@@ -318,7 +320,8 @@ function getName(obj, source, defaultString) {
 /**
  * This function looks for a potential role string and returns it.
  * In precedence order, the role string will be the object's:
- * data-ez-sayrole > aria-role > input-specific roles > defaultString
+ * data-ez-sayrole > aria-role > input-specific roles > defaultString.
+ * If obj does not have a role, defaultString will be returned.
  * @author J. Bern Jordan
  * @param {object} obj The DOM object for which to get role.
  * @param {String} [defaultString=''] A default string for the object's
@@ -433,6 +436,7 @@ function getValue(obj) {
 				ret = 'mixed';
 			} else {
 				ret = 'ERROR';
+				_debug('Bad HTML attribute: aria-checked=' + value);
 			}
 		} else {
 			ret = obj.checked;
@@ -461,6 +465,7 @@ function getValue(obj) {
 			ret = 'mixed';
 		} else {
 			ret = 'ERROR';
+			_debug('Bad HTML attribute: aria-pressed=' + value);
 		}
 	}
 	//HTML <select>
@@ -528,7 +533,11 @@ function getValueSubstring(obj, userDid) {
 	//Radio buttons and checkboxes
 	else if (type === 'radio' || type === 'checkbox') {
 		//turn boolean into friendlier string
-		value = value ? 'checked': 'unchecked';
+		if (value === true) {
+			value = 'checked';
+		} else if (value === false) {
+			value = 'unchecked';
+		} //else value typeof string stays as it is
 		if (userDid === 'action') {
 			ret = 'is now ' + value;
 		} else {
@@ -557,7 +566,11 @@ function getValueSubstring(obj, userDid) {
 	//Toggle buttons (only via ARIA)
 	else if (type === 'button' && obj.hasAttribute('aria-pressed')) {
 		//turn boolean into friendlier string
-		value = value ? 'pressed': 'unpressed';
+		if (value === true) {
+			value = 'pressed';
+		} else if (value === false) {
+			value = 'unpressed';
+		} //else value typeof string stays as it is
 		if (userDid === 'action') {
 			ret = 'is now ' + value;
 		} else {
@@ -800,27 +813,6 @@ function fixPronunciation(s, dictionary, caseSensitive) {
 
 	return ret.join('');
 } //End fixPronunciation()
-
-
-/**
- * Checks to see if the element passed can be edited, changed, or otherwise
- * interacted with by the user.
- * @author J. Bern Jordan
- * @param {object} obj The DOM object to check.
- * @return {boolean} Whether the element can be edited.
- */
-function isUserEditable(obj) {
-  if (obj.hasAttribute('readonly') || obj.hasAttribute('disabled')) {
-    return false;
-  }
-  if (obj.hasAttribute('aria-readonly')) {
-    return !Boolean(obj.getAttribute('aria-readonly'));
-  }
-  if (obj.hasAttribute('aria-disabled')) {
-    return !Boolean(obj.getAttribute('aria-disabled'));
-  }
-  else return true;
-}
 
 
 function alertEdgeNav(move) {
