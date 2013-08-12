@@ -405,10 +405,10 @@ function getRole(obj, defaultString) {
  * @param {object} obj The DOM object for which to get role.
  * @param {string} [defaultString=''] A default string for the object's
  * value if a more appropriate one is not found.
- * @return {boolean|number|string|string[]} The value/s for the passed object, 
+ * @return {boolean|number|NaN|string|string[]} The value/s for the passed object, 
  * the type of which depends on the object. Checkboxes, radio buttons, and 
  * aria toggle buttons return boolean values or the string "mixed". Numeric 
- * inputs return numbers. Other inputs return strings or if there are multiple 
+ * inputs return numbers or NaN. Other inputs return strings or if there are multiple 
  * values (as with some listboxes), then an array of strings is returned.
  */
 function getValue(obj) {
@@ -444,7 +444,11 @@ function getValue(obj) {
 	}
 	//Numeric data
 	else if (type === 'range' || type === 'number') {
-		ret = Number(obj.value);
+		if (obj.value.length === 0) {
+			ret = Number.NaN;
+		} else {
+			ret = Number(obj.value);
+		}
 		//if ARIA slider or spinbutton, then ret=aria-valuenow (set above)
 	} 
 	//Various text input fields
@@ -500,6 +504,14 @@ function getValue(obj) {
  *     action = user just pressed EZ Action
  *     type   = user just typed a character and waited
  * @return {string} The value substring to concatenate with other substrings 
+ *
+ * @TODO need to have another userDid added and checked for, b/c there are 
+ * two things that can result when a user presses EZ Action: 
+ * (1) the user enters a heirarchical control (such as number, or select), 
+ * in which case the user needs to know details about obj and its current value
+ * (2) the user "submits" or makes a change to a control (activate a checkbox 
+ * or activate an option within a heirarchical <select>), in which case the 
+ * user might want to know the value they set.
  */
 function getValueSubstring(obj, userDid) {
 	'use strict';
@@ -546,10 +558,18 @@ function getValueSubstring(obj, userDid) {
 	}
 	//Numeric data
 	else if (type === 'range' || type === 'number') {
-		if (value === '') {
-			ret = 'is blank'
+		if (Number.isNaN(value)) {
+			if (userDid === 'action') {
+				ret = 'currently blank';
+			} else {
+				ret = 'is blank';
+			}
 		} else {
-			ret = 'is ' + value;
+			if (userDid === 'action') {
+				ret = 'current value is ' + value;
+			} else {
+				ret = 'is ' + value;
+			}
 		}
 	}
 	//Various text input fields
@@ -611,6 +631,140 @@ function getValueSubstring(obj, userDid) {
 	
 	return ret;
 }
+
+/**
+ * Returns the substring that tells the user about the data domain of the
+ * interactive DOM Object. 
+ * The substring is intended to be read after the name/label of the
+ * element when the user has activated that element.
+ * @author J. Bern Jordan
+ * @param {object} obj The DOM object for which to get the data domain 
+ * substring.
+ * @return {string} The data domain substring to concatenate with other 
+ * substrings 
+ */
+function getDataDomainSubstring(obj) {
+	'use strict';
+	var type = getType(obj);
+	var ret = '';
+
+	if (type === 'range') {
+		var min = getMin(obj);
+		var max = getMax(obj);
+		if (min !== null && max !== null) {
+			ret = 'ranges from ' + min + ' to ' + max;
+			//The following are "sort of" error cases
+		} else if (min !== null) {
+			//With no max, Chrome returns '' but uses 100
+			ret = 'ranges from ' + min + ' to 100';
+			_debug('No max value specified');
+		} else if (max !== null) {
+			//With no min, Chrome returns '' but uses 0
+			ret = 'ranges from 0 to ' + max;
+			_debug('No min value specified');
+		} else {
+			ret = 'ranges from 0 to 100';
+			_debug('Neither min nor max values specified');
+		}
+	} else if (type === 'number') {
+		var min = getMin(obj);
+		var max = getMax(obj);
+		if(min !== null && max !== null) {
+			ret = 'ranges from ' + min + ' to ' + max;
+		} else if (min !== null) {
+			ret = 'has a minimum of ' + min;
+		} else if (max !== null) {
+			ret = 'has a maximum of ' + max;
+		} else {
+			ret = ''; //no range specified
+		}
+	} else if (type === 'select') {
+		var num = getNumOptions(obj);
+		if (num !== null) {
+			ret = 'has ' + num + ' options';
+		} else {
+			ret = '';
+			_debug('No options within select element');
+		}
+	}
+
+	return ret;
+} //end getDataDomainSubstring()
+
+
+/**
+ * Returns the minimum value specified by the DOM obj.
+ * @author J. Bern Jordan
+ * @param {object} obj The DOM object for which to get the minimum value.
+ * @return {null|number} The minimum value or null if no minimum value.
+ */
+function getMin(obj) {
+	'use strict';
+	var ret, type;
+	type = getType(obj);
+
+	if (type !== 'number' || type !== 'range') { 
+		return null; 
+	}
+
+	if (obj.hasAttribute('aria-valuemin')) {
+		ret = Number(obj.getAttribute('aria-valuemin')); 
+	}
+	if (obj.hasAttribute('min')) { //native attribute takes precedence
+		ret = Number(obj.min); 
+	}
+
+	return ret;
+}
+/**
+ * Returns the maximum value specified by the DOM obj.
+ * @author J. Bern Jordan
+ * @param {object} obj The DOM object for which to get the maximum value.
+ * @return {null|number} The maximum value or null if no maximum value.
+ */
+function getMax(obj) {
+	'use strict';
+	var ret, type;
+	type = getType(obj);
+
+	if (type !== 'number' || type !== 'range') { 
+		return null; 
+	}
+
+	if (obj.hasAttribute('aria-valuemax')) {
+		ret = Number(obj.getAttribute('aria-valuemax')); 
+	}
+	if (obj.hasAttribute('max')) { //native attribute takes precedence
+		ret = Number(obj.max); 
+	}
+
+	return ret;
+}
+/**
+ * Returns the number of options specified by the DOM obj.
+ * This function does not yet support aria-role="listbox"
+ * @author J. Bern Jordan
+ * @param {object} obj The DOM object for which to get the number of options.
+ * @return {null|number} The number of options or null if not applicable.
+ */
+function getNumOptions(obj) {
+	'use strict';
+	var ret, type;
+	type = getType(obj);
+
+	if (type !== 'select' || type !== 'listbox') { 
+		return null; 
+	}
+
+	//FUTURE WORK: Add ARIA support
+
+	if (obj.tagname === 'SELECT') {
+		ret = Number(obj.options.length); 
+	}
+
+	return ret;
+}
+
 
 /**
  * Gets the inner elements of an object and gets the voice parsing of that element, combining at the end. Needed for
