@@ -170,16 +170,3 @@ function playSFX(arg, source) {
 	sounds[sfxRef].feed.play()
 	return true;
 }
-
-
-/**
- * TODO: Move elsewhere
- * Prints the string s to the console log if the system is in debug mode
- * @private
- * @param {*} The object (usually a string) to be logged.
- */
-function _debug(s) {
-	if (debugMode) {
-		console.log(s);
-	}
-}
