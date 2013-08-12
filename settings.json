@@ -47,5 +47,9 @@ var sounds = [
   {
     "name": "button",
     "src": "earcons/button.wav"
+  },
+  {
+    "name": "page",
+    "src": "earcons/pagechange.wav"
   }
 ]
