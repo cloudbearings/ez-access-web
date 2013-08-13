@@ -355,6 +355,26 @@ function isParentGrouped(o) {
 }
 
 /**
+ * Returns true iff o contains one child element.
+ *
+ * @param o
+ * @returns {boolean}
+ */
+function oneChild(o) {
+    return (first_child(o) === last_child(o)) && isElement(first_child(o));
+}
+
+/**
+ * Returns the childmost element that is the only child.
+ * @param o
+ * @returns {Element}
+ */
+function singleChildMost(o) {
+    if(!oneChild(o)) return o;
+    return singleChildMost(first_child(o));
+}
+
+/**
  * Checks to see whether the passed node can be inline with other inline
  * nodes (i.e., it can be safely combined with other inline elements when
  * being highlighted and read.
@@ -381,6 +401,9 @@ function isInlineElement(o, source) {
         } //else
         throw new Error('Node not a DOM or text node.');
     } //Else: o is a DOM element
+
+    // If "alone", get "deepest" element
+    o = singleChildMost(o);
 
     /** Grouped elements should not be inline with other elements */
     if (isGrouped(o)) {
