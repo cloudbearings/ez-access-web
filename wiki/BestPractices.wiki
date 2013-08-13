@@ -11,6 +11,23 @@ Following these best practice will help you to create pages that behave as expec
 
 More best practices will be added in the future...
 
+== For public devices, turn off autocomplete ==
+=== Rationale ===
+Many browsers have an autocomplete function that remembers text that has been typed into text fields of various types. While this functionality may be good for personal devices, this is not good for public devices, such as kiosks, because data from previous users may be exposed.
+
+=== What to do ===
+Turn off autocomplete on individual `<input>` elements with `autocomplete="off"`.
+
+{{{
+<label for="firstname">First Name:</label>
+<input id="firstname" type="text" autocomplete="off" />
+...
+<label for="email">E-mail Address:</label>
+<input id="email" type="email" autocomplete="off" />
+}}}
+
+Alternatively, you may turn off Autofill in Chrome by going to the settings page (chrome://settings/) and unchecking the checkbox labeled "Enable Autofill to fill out web forms in a single click."
+
 == Add key bindings for some EZ Access keys ==
 === Rationale ===
 The EZ Access keypad has from 5 to 8 buttons depending on the model. Several of the buttons have well-defined behaviors specific to EZ Access, but several of the other buttons can have application-specific behaviors.
