@@ -379,43 +379,67 @@ function ez_jump(nodArr, source) {
 }
 
 /**
+ * Checks if a traditional <a href="#id"> element exists to 'jump' to.
+ *
+ * @param obj Object to check if jump-eable from
+ * @return {Element|null} Returns element to jump to, if one exists.
+ */
+function hrefJump(obj) {
+    if(obj.tagName === "A") {
+        if(obj.href.indexOf("#") !== -1) {
+            var hrefBase = obj.href.substring(0, obj.href.indexOf("#"));
+            if(window.location.href.indexOf("#") != -1) {
+                pageBase = window.location.href.substring(0, window.location.href.indexOf("#"));
+            } else {
+                pageBase = window.location.href;
+            }
+            if(hrefBase == "" || hrefBase == pageBase) { // If from same URL base
+                var jumpTo = obj.href.substring(obj.href.indexOf("#") + 1);
+                var idLocation = document.getElementById(jumpTo);
+                var nameLocation = document.getElementsByName(jumpTo)[0];
+                if(idLocation !== null) {
+                    return idLocation;
+                } else if(nameLocation !== undefined) {
+                    return nameLocation;
+                }
+            }
+        }
+    }
+    return null;
+}
+
+/**
  * Decides what to do, if anything, when EZ Action is pressed.
  * @param nodArr Node array to 'enter' on
  * @param source {'point'|'nav'} THe navigation method
  */
 function ez_enter(nodArr, source) {
 
-
 	var obj = getActionableElement(nodArr, source);
 
-	if(obj.tagName === "A") {
-		if(obj.href.indexOf("#") !== -1) {
-			var hrefBase = obj.href.substring(0, obj.href.indexOf("#"));
-			if(window.location.href.indexOf("#") != -1) {
-				pageBase = window.location.href.substring(0, window.location.href.indexOf("#"));
-			} else {
-				pageBase = window.location.href;
-			}
-			if(hrefBase == "" || hrefBase == pageBase) { // If from same URL base
-				var jumpTo = obj.href.substring(obj.href.indexOf("#") + 1);
-				var idLocation = document.getElementById(jumpTo);
-				var nameLocation = document.getElementsByName(jumpTo)[0];
-				if(idLocation !== null) {
-					ez_jump([idLocation], source);
-					obj.click();
-					return;
-				} else if(nameLocation !== undefined) {
-					ez_jump([nameLocation], source);
-					obj.click();
-					return;
-				}
-			}
-		}
-	}
+    var sound = AUDIO_NOACTION;
+    var spoken = "";
+    var clicked = true;
+    var repeat = false;
 
-	if(getClick(obj) !== undefined) {
+    /*
+     * ACTION
+     */
+
+    // Check for possible jump
+    var jumpTo = hrefJump(obj);
+
+
+    if(jumpTo !== null) {
+        ez_jump([jumpTo], source);
+        clicked = false;
+        nodArr = [jumpTo];
+        sound = AUDIO_SELECT;
+    } else if(getClick(obj) !== null) {
 		obj.click();
-	} else if(obj.tagName == 'INPUT' && (obj.type == 'radio' || obj.type == 'checkbox')) {
+        sound = AUDIO_SELECT;
+	} else if(isInteractive(obj)) {
+        // TODO: Basis for clicking interactive elements prompts
 		obj.click();
 		if(obj.checked) {
 			sounds[AUDIO_SELECT].feed.play();
@@ -426,17 +450,25 @@ function ez_enter(nodArr, source) {
 	} else if(obj.tagName == 'INPUT' && (obj.type == 'submit' || obj.type == 'image')) {
 		obj.click();
 	} else {
-		document.getElementById(ezSelectorId).className = 'pulse';
-		setTimeout(function () {
-			document.getElementById(ezSelectorId).className = '';
-		}, 300);
-		sounds[AUDIO_NOACTION].feed.play();
-		document.getElementById(ezSelectorId).className = 'pulse';
-		setTimeout(function () {
-			document.getElementById(ezSelectorId).className = '';
-		}, 300);
-		voice(obj, 0, true);
+        pulseSelector();
+        clicked = false;
+        repeat = true;
 	}
+
+    /*
+     * AUDIO ICON
+     */
+    sounds[sound].feed.play();
+
+    /*
+     * VOICE
+     */
+    if(clicked) {
+        spoken = getValueSubstring(obj, "action");
+        voice(spoken, {source: source});
+    } else {
+        voice(nodArr, {source: source, repeat: repeat});
+    }
 }
 
 /**
