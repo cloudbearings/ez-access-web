@@ -33,23 +33,33 @@ var SSML = true;
 /**
  * Provide easy place to change method of speech synthesis
  * @param {Array|string} obj A string to be voiced, or an object to be voiced
- * @param source {'nav'|'point'} Navigation method passed from calling function
- * @param repeat If speech is being repeated (EZ Action + no possible action)
+ * @param [options] {Object} Various optional configurations:
+ *  1. source: Navigation mathod ('nav'|'point')
+ *  2. repeat: Whether the speech is 'repeated'.
  */
-function voice(obj, source, repeat) {
+function voice(obj, options) {
+
+    // set up default options
+    var defaults = {
+        source:      'nav',
+        repeat:      false
+    };
+    options = merge_options(defaults, options);
+
+
 	var speech = "";
 	if(typeof (obj) == 'string') {
 		speech = obj;
 	} else {
         // Loop through all selected elements
         for(i = 0; i < obj.length; i++) {
-            if(isElement(obj[i])) speech += voice_element(obj[i], source);
+            if(isElement(obj[i])) speech += voice_element(obj[i], options.source);
             else speech += voice_node(obj[i]);
         }
 	}
 
 	// Global speech appendages
-	if(repeat == true) {
+	if(options.repeat == true) {
 		speech = "Repeating... " + speech;
 	}
 	if(globalSayBefore != "") {
@@ -503,7 +513,7 @@ function getValue(obj) {
  *     nav    = user just navigated
  *     action = user just pressed EZ Action
  *     type   = user just typed a character and waited
- * @return {string} The value substring to concatenate with other substrings 
+ * @return {string} The value substring to concatenate with other substrings
  *
  * @TODO need to have another userDid added and checked for, b/c there are 
  * two things that can result when a user presses EZ Action: 

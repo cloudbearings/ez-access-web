@@ -88,9 +88,9 @@ function find_parent_attr(obj, attr) {
 }
 
 /**
- * Gets first clickeable parent element from obj
+ * Gets first clickable parent element from obj
  * @param {object} obj The object to check from
- * @returns {object|undefined} The object, if one is found clickeable
+ * @returns {object|null} The object, if one is found clickable
  */
 function getClick(obj) {
 	while(obj !== null) {
@@ -101,7 +101,7 @@ function getClick(obj) {
 		}
 		obj = obj.parentNode;
 	}
-	return undefined;
+	return null;
 }
 
 /**
