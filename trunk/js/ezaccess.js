@@ -249,6 +249,9 @@ function isFocusable(o, source) {
         return false;
     }
 
+    // If hidden
+    if(o.hasAttribute('hidden')) return false;
+
     //Check recursively to see if the parents are focusable
     var parent = o.parentElement;
     if (parent === null || parent.tagName === 'BODY') {
