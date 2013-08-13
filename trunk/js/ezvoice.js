@@ -171,7 +171,7 @@ function voice_element(obj, source) {
             '</speak>';
     }
 
-    if(debugMode) console.log(speech);
+    _debug(speech);
 	return speech;
 }
 
