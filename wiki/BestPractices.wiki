@@ -1,5 +1,4 @@
 #summary Best practices for authoring pages for EZ Accesss.
-#labels Featured
 
 = Introduction =
 
@@ -11,6 +10,25 @@ Following these best practice will help you to create pages that behave as expec
 = Authoring Best-Practices =
 
 More best practices will be added in the future...
+
+== Add key bindings for some EZ Access keys ==
+=== Rationale ===
+The EZ Access keypad has from 5 to 8 buttons depending on the model. Several of the buttons have well-defined behaviors specific to EZ Access, but several of the other buttons can have application-specific behaviors.
+
+The `data-ez-keybinding` attribute supports the following values for the respective EZ Access keys:
+ * `KEY_EZ_BACK`
+ * `KEY_EZ_NEXT`
+
+=== What to do ===
+Add the `data-ez-keybinding` attribute to buttons on the screen that go to back and next pages. For example:
+==== Example ====
+{{{
+<button type="button" onClick="goBack()" 
+data-ez-keybinding="KEY_EZ_BACK">Back</button>
+...
+<button type="submit" 
+data-ez-keybinding="KEY_EZ_NEXT">Continue</button>
+}}}
 
 == Wrap text-only content in paragraphs with hyperlinks ==
 === Rationale ===
