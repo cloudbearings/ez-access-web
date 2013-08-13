@@ -206,16 +206,16 @@ function key_event(e) {
  * @author J. Bern Jordan
  * @param {string} key A key name. Supported key names are in the constant 
  * array SUPPORTED_KEY_NAMES.
- * @return {element|null} Returns the first DOM element with the keybinding
+ * @return {Element|null} Returns the first DOM element with the keybinding
  * or null otherwise.
  */
-function getKeyBinding(key)
+function getKeyBinding(key) {
 	'use strict'
 	var SUPPORTED_KEY_NAMES = ['EZ_KEY_BACK','EZ_KEY_NEXT'];
 
 	if (SUPPORTED_KEY_NAMES.indexOf(key.toString()) < 0) {
+        _debug('getKeyBinding(): key=' + key + ' is not supported.');
 		return null;
-		_debug('getKeyBinding(): key=' + key + ' is not supported.');
 	}
 
 	return document.querySelector("[data-ez-keybinding~='" + key + "']");
@@ -348,7 +348,7 @@ function ez_navigate(move, options) {
 
     if(options.voice) voice(selectedEls, 'nav');
 
-    if(debugMode) console.log(selectedEls);
+    _debug(selectedEls);
 }
 
 /**
@@ -371,7 +371,7 @@ function ez_jump(nodArr, source) {
 
     voice(selectedEls, 'nav');
 
-    if(debugMode) console.log(selectedEls);
+    _debug(selectedEls);
 }
 
 /**

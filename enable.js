@@ -15,7 +15,7 @@ chrome.extension.sendRequest({
     localstorage: "debug"
 }, function (response) {
     debugMode = response.debug === "true";
-    if(debugMode) console.log("EZ Access Debug Mode Enabled.");
+    _debug("Debug Mode Enabled.");
 });
 
 var ezSessionDisable = sessionStorage["ezSessionDisable"];

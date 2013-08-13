@@ -1,7 +1,7 @@
 /**
  * Volume of the audio elements (0-100)
  */
-var audioValume;
+var audioVolume;
 if(sessionStorage.getItem("EZ_Volume") !== null) {
 	audioVolume = parseInt(sessionStorage.getItem("EZ_Volume"));
 } else {
@@ -41,7 +41,7 @@ function find_audio(audio_name) {
 			return i;
 		}
 	}
-	if(debugMode) console.log('No audio file named "' + audio_name + '" found (below error for more info).');
+	_debug('No audio file named "' + audio_name + '" found (below error for more info).');
 	return -1;
 }
 
@@ -71,7 +71,7 @@ function getElementAudio(obj) {
 			return AUDIO_MOVE;
 		}
 	}
-	if(debugMode) console.log('No specific sound for "' + obj.tagName + '" HTML tag.');
+	_debug('No specific sound for "' + obj.tagName + '" HTML tag.');
 	return AUDIO_MOVE;
 }
 
@@ -134,39 +134,41 @@ function playSFX(arg, source) {
 		} else {
 			sfxRef = AUDIO_BUTTON;
 		}
-		
-		//Override above if there are data-ez-sfx* attributes
-		if (arg.hasAttribute('data-ez-sfx') {
-			sfxRef = arg.getAttribute('data-ez-sfx');
-			if (sfxRev < 0) {
-				sfxRef = DEFAULT_SOUND;
-				_debug('data-ez-sfx=' + arg.getAttribute('data-ez-sfx') + 
-				' not found in sounds[]'); 
-			}
-		}
-		if (source ==='nav' && arg.hasAttribute('data-ez-sfx-nav') {
-			sfxRef = arg.getAttribute('data-ez-sfx-nav');
-			if (sfxRev < 0) {
-				sfxRef = DEFAULT_SOUND;
-				_debug('data-ez-sfx-nav=' 
-				+ arg.getAttribute('data-ez-sfx-nav') + 
-				' not found in sounds[]'); 
-			}
-		}
-		if (source ==='point' && arg.hasAttribute('data-ez-sfx-point') {
-			sfxRef = arg.getAttribute('data-ez-sfx-point');
-			if (sfxRev < 0) {
-				sfxRef = DEFAULT_SOUND;
-				_debug('data-ez-sfx-point=' 
-				+ arg.getAttribute('data-ez-sfx-point') + 
-				' not found in sounds[]'); 
-			}
-		}
+
+        if(isElement(arg)) {
+            //Override above if there are data-ez-sfx* attributes
+            if (arg.hasAttribute('data-ez-sfx')) {
+                sfxRef = arg.getAttribute('data-ez-sfx');
+                if (sfxRev < 0) {
+                    sfxRef = DEFAULT_SOUND;
+                    _debug('data-ez-sfx=' + arg.getAttribute('data-ez-sfx') +
+                    ' not found in sounds[]');
+                }
+            }
+            if (source ==='nav' && arg.hasAttribute('data-ez-sfx-nav')) {
+                sfxRef = arg.getAttribute('data-ez-sfx-nav');
+                if (sfxRev < 0) {
+                    sfxRef = DEFAULT_SOUND;
+                    _debug('data-ez-sfx-nav='
+                    + arg.getAttribute('data-ez-sfx-nav') +
+                    ' not found in sounds[]');
+                }
+            }
+            if (source ==='point' && arg.hasAttribute('data-ez-sfx-point')) {
+                sfxRef = arg.getAttribute('data-ez-sfx-point');
+                if (sfxRev < 0) {
+                    sfxRef = DEFAULT_SOUND;
+                    _debug('data-ez-sfx-point='
+                    + arg.getAttribute('data-ez-sfx-point') +
+                    ' not found in sounds[]');
+                }
+            }
+        }
 	} else {
 		return false;
 	}
 
 	//Play the sound
-	sounds[sfxRef].feed.play()
+	sounds[sfxRef].feed.play();
 	return true;
 }
