@@ -130,6 +130,19 @@ function get_label(obj) {
 }
 
 /**
+ * Returns if label is orphaned or not. Assumes label for="" is valid.
+ * @param label Label to be checked
+ * @returns {boolean} If valid or not. Error thrown if not passed label.
+ */
+function orphanedLabel(label) {
+    if(label.tagName !== 'LABEL') {
+        throw new Error('orphanedLabel() MUST be passed a label!');
+    }
+    return label.hasAttribute('for') || label.hasChildNodes();
+
+}
+
+/**
  * Looks for if obj is a child of a specific element type
  * @param {object} obj Object to start from
  * @param {string} type Object type to look for

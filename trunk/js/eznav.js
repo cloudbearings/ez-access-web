@@ -342,9 +342,17 @@ function ez_navigate(move, options) {
         return;
     }
 
-    drawSelected(selectedEls);
-
     var actionable = getActionableElement(selectedEls, 'nav');
+
+    // Check to make sure not label
+    if(actionable.tagName === 'LABEL' && orphanedLabel(actionable)) {
+        ez_navigate(move);
+        return;
+    }
+
+    var label = get_label(actionable);
+    if(label !== null) drawSelected(selectedEls.concat([label]));
+    else drawSelected(selectedEls);
 
     if(options.alert) sounds[getElementAudio(actionable)].feed.play();
 
