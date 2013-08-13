@@ -94,16 +94,27 @@ function key_event(e) {
 		}
 	} else if(e.keyCode == EZ_KEY_BACK || e.keyCode == 66) { // 'b' == 66
 		// TODO
-        if(tinyOpen) {
-            tinyOpen = false;
-            TINY.box.hide();
-        } else {
-            if(ez_navigateToggle) {
-                window.history.back();
-            } else {
-                ez_navigate_start(false, 'nav');
-            }
-        }
+		if(tinyOpen) {
+			tinyOpen = false;
+			TINY.box.hide();
+		} else {
+			var el = getKeyBinding('EZ_KEY_BACK');
+			if (el === null) {
+				window.history.back();
+			} else {
+				el.click();
+			}
+		}
+	} else if (e.keyCode === EZ_KEY_NEXT) {
+		if(tinyOpen) {
+			tinyOpen = false;
+			TINY.box.hide();
+		} else {
+			var el = getKeyBinding('EZ_KEY_NEXT');
+			if (el !== null) {
+				el.click();
+			}
+		}
 	} else if(e.keyCode == EZ_KEY_ENTER || e.keyCode == KB_ENTER) {
 		if(tinyOpen) {
 			tinyOpen = false;
@@ -187,6 +198,27 @@ function key_event(e) {
 		if(!key.match(/[^A-Za-z0-9\-_]/)) voice(key);
 	}
 	return true;
+}
+
+
+/**
+ * Finds the DOM element where key matches the data-ez-keybinding attribute.
+ * @author J. Bern Jordan
+ * @param {string} key A key name. Supported key names are in the constant 
+ * array SUPPORTED_KEY_NAMES.
+ * @return {element|null} Returns the first DOM element with the keybinding
+ * or null otherwise.
+ */
+function getKeyBinding(key)
+	'use strict'
+	var SUPPORTED_KEY_NAMES = ['EZ_KEY_BACK','EZ_KEY_NEXT'];
+
+	if (SUPPORTED_KEY_NAMES.indexOf(key.toString()) < 0) {
+		return null;
+		_debug('getKeyBinding(): key=' + key + ' is not supported.');
+	}
+
+	return document.querySelector("[data-ez-keybinding~='" + key + "']");
 }
 
 /**
