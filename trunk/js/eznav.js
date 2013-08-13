@@ -211,6 +211,10 @@ function key_event(e) {
  */
 function getKeyBinding(key) {
 	'use strict'
+
+    // Allow any case (consistent w/ HTML)
+    key = key.toUpperCase();
+
 	var SUPPORTED_KEY_NAMES = ['EZ_KEY_BACK','EZ_KEY_NEXT'];
 
 	if (SUPPORTED_KEY_NAMES.indexOf(key.toString()) < 0) {
