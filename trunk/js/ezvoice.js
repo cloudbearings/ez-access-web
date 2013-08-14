@@ -283,12 +283,11 @@ function getName(obj, source, defaultString) {
     } else if(type === 'button') {
         if(obj.hasAttribute('value')) {
             ret = obj.value;
-        } 
-        if (obj.tagName === 'BUTTON') {
-            // <button>s are special -- need to read similar to other input type="button"s
-            if (ret === '') {
-                ret = obj.innerText;
-            }
+        }
+
+        // <button>s are special -- need to read similar to other input type="button"s
+        if (ret === '') {
+            ret = obj.innerText;
         }
     } else if(type === 'image') {
         //alt is preferred, title is second choice
