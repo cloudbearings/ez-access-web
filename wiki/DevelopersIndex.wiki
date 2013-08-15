@@ -20,7 +20,7 @@ To start, familiarize yourself with the basic concept, good practices and tips f
   * [http://www.youtube.com/watch?v=UgavxGTZjMw YouTube video outlining functionality]
 
 = Demos =
-Here are demos that are create to help show how to create EZ-acces compatable pages:
+Here are demos that are create to help show how to create EZ access -compatible pages:
   * [https://code.google.com/p/ez-access-web-demos/ Train Demo]
 
 = EZ Access dev stuff =
