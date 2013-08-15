@@ -19,5 +19,9 @@ To start, familiarize yourself with the basic concept, good practices and tips f
   * [DebugMode Activate the EZ Access debug mode]
   * [http://www.youtube.com/watch?v=UgavxGTZjMw YouTube video outlining functionality]
 
+= Demos =
+Here are demos that are create to help show how to create EZ-acces compatable pages:
+  * [https://code.google.com/p/ez-access-web-demos/ Train Demo]
+
 = EZ Access dev stuff =
   * [V1Roadmap TODO for V1 release]
