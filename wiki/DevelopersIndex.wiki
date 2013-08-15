@@ -17,6 +17,7 @@ To start, familiarize yourself with the basic concept, good practices and tips f
   * [softwareUsed Different code used in this project and their licenses]
   * [BestPractices Best practices for creating pages for EZ Access]
   * [DebugMode Activate the EZ Access debug mode]
+  * [http://www.youtube.com/watch?v=UgavxGTZjMw YouTube video outlining functionality]
 
 = EZ Access dev stuff =
   * [V1Roadmap TODO for V1 release]
