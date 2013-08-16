@@ -52,7 +52,7 @@ function voice(obj, options) {
 		speech = obj;
 	} else {
         // Loop through all selected elements
-        for(i = 0; i < obj.length; i++) {
+        for(var i = 0; i < obj.length; i++) {
             if(isElement(obj[i])) speech += voice_element(obj[i], options.source);
             else speech += voice_node(obj[i]);
         }
@@ -164,7 +164,7 @@ function voice_element(obj, source) {
 		speech = name + ', ' + role + ', ' + value + ' ' + extra + '.';
 	}
 
-	if(obj.tagname === 'A' && obj.hasAttribute('href')) {
+	if(obj.tagName === 'A' && obj.hasAttribute('href')) {
 		speech = role + ': ' + name;
 	}
 
@@ -201,7 +201,7 @@ function getType(obj) {
     // Check for aria-role, and return iff valid
     if(obj.hasAttribute('aria-role')) {
         var type = obj.getAttribute('aria-role').toLowerCase();
-        for(i = 0; i < ariaRoles.length; i++) {
+        for(var i = 0; i < ariaRoles.length; i++) {
             if(type === ariaRoles[i]) {
                  return type;
             }
@@ -412,8 +412,6 @@ function getRole(obj, defaultString) {
  * This function does not support aria-role="listbox" currently.
  * @author J. Bern Jordan
  * @param {object} obj The DOM object for which to get role.
- * @param {string} [defaultString=''] A default string for the object's
- * value if a more appropriate one is not found.
  * @return {boolean|number|NaN|string|string[]} The value/s for the passed object, 
  * the type of which depends on the object. Checkboxes, radio buttons, and 
  * aria toggle buttons return boolean values or the string "mixed". Numeric 
@@ -720,7 +718,7 @@ function getMin(obj) {
 		ret = Number(obj.getAttribute('aria-valuemin')); 
 	}
 	if (obj.hasAttribute('min')) { //native attribute takes precedence
-		ret = Number(obj.min); 
+		ret = Number(obj.getAttribute('min'));
 	}
 
 	return ret;
@@ -744,7 +742,7 @@ function getMax(obj) {
 		ret = Number(obj.getAttribute('aria-valuemax')); 
 	}
 	if (obj.hasAttribute('max')) { //native attribute takes precedence
-		ret = Number(obj.max); 
+		ret = Number(obj.getAttribute('max'));
 	}
 
 	return ret;
@@ -767,7 +765,7 @@ function getNumOptions(obj) {
 
 	//FUTURE WORK: Add ARIA support
 
-	if (obj.tagname === 'SELECT') {
+	if (obj.tagName === 'SELECT') {
 		ret = Number(obj.options.length); 
 	}
 
