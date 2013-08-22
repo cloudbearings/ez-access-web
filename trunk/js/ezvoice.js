@@ -88,10 +88,21 @@ function voice_node( nod ) {
  * Voices an object by putting together name, role and value.
  * @param {object} obj The object to be voiced
  * @param {'nav'|'point'} source The navigation method
+ * @param [options] {Object} An object that has the following entries:
+ *      voice {Boolean} Whether or not to voice the speech
+ *      alert {Boolean} Whether or not to play alert sound
  * @returns {string} The object voiced text
  */
-function voice_element(obj, source) {
-	/**
+function voice_element(obj, source, options) {
+
+    // set up default options
+    var defaults = {
+        ssml:      SSML
+    };
+    options = merge_options(defaults, options);
+
+
+    /**
 	 * The name or label of the interactive object.
 	 */
 	var name = '';
@@ -153,7 +164,7 @@ function voice_element(obj, source) {
 	/**
 	 * Potentially add SSML tags to different speech substrings.
 	 */
-	if(SSML) {
+	if(options.ssml) {
 		role = '<prosody pitch="low" rate="fast">' + role + '</prosody>';
 	}
 
@@ -174,7 +185,7 @@ function voice_element(obj, source) {
     /**
      * Adding SSML wrapper markup if required.
      */
-    if (SSML) {
+    if (options.ssml) {
         speech = '<?xml version="1.0"?>' +
             '<speak>' +
             speech +
