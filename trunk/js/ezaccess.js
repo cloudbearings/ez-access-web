@@ -230,9 +230,6 @@ function isFocusable(o, source) {
      * More specific attributes should override less specific ones.
      * data-ez-focusable* attributes should override aria-hidden. 
      */
-    if (o.hasAttribute('aria-hidden')) {
-        attr = o.getAttribute('aria-hidden');
-    }
     if (o.hasAttribute('data-ez-focusable')) {
         attr = o.getAttribute('data-ez-focusable');
     }
@@ -250,8 +247,30 @@ function isFocusable(o, source) {
         return false;
     }
 
+
+    attr = '';
+
+    if (o.hasAttribute('aria-hidden')) {
+        attr = o.getAttribute('aria-hidden');
+    }
+    if(attr === 'true') {
+        return false;
+    }
+
+
     // If hidden
     if(o.hasAttribute('hidden')) return false;
+
+    // If css hidden
+    if(o.style.display === 'none') return false;
+
+    // If css invisible
+    if(o.style.visibility === 'hidden') return false;
+
+    // If hidden input tag
+    if(o.tagName === 'INPUT' && o.type === 'hidden') {
+        return false;
+    }
 
     //Check recursively to see if the parents are focusable
     var parent = o.parentElement;
