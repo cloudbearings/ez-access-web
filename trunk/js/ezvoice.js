@@ -128,6 +128,11 @@ function voice_element(obj, source, options) {
 	 */
 	var speech = '';
 
+    // Skip any unsupported tags, and do not read them.
+    if (SKIPPED_TAGS.indexOf(obj.tagName.toLowerCase()) !== -1) {
+        return '';
+    }
+
 	/** A string representation of the type of object */
 	var type = getType(obj);
 	
