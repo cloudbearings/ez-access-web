@@ -83,7 +83,7 @@ var INLINE_TAGS = [
     'data', //experimental in HTML spec
     'del', 'dfn', 'em',
     'figcaption', //To be lumped together with everything else in the <caption>
-    'font', 'hr', 'i',
+    'font', 'i',
     'img', //<img> alt-text generally included with other content
     'ins', 'kbd', 'mark', 'q', 's',
     'samp', 'small', 'span', 'strike',
@@ -115,6 +115,7 @@ var UNSUPPORTED_TAGS = [
  * @const
  */
 var UNNAVIGABLE_TAGS = [
+    'hr',
     'map', 'area',
     'datalist', 'option', 'optgroup',
     'menuitem', 'command',
