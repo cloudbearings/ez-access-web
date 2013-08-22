@@ -257,6 +257,7 @@ function isFocusable(o, source) {
         return false;
     }
 
+    // Punctuation mumbo-jumbo is not highlighteable.
     var voiced = voice_element(o, source);
     voiced = voiced.replace(/<(?:.|\n)*?>/gm, '');
     voiced = voiced.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
