@@ -122,8 +122,6 @@ function key_event(e) {
 		} else {
 			if(ez_navigateToggle) {
 				ez_enter(selectedEls, 'nav');
-			} else {
-				ez_navigate_start(false, 'nav');
 			}
 			return false; // Disable any browser actions
 		}
