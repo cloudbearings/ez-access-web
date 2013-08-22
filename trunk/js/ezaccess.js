@@ -205,7 +205,7 @@ function isFocusable(o, source) {
     // Look for nodes and elements only; return false otherwise
     if(o === document.doctype) return false; // For some reason this isn't caught below + can cause exceptions
     else if(isElement(o));
-    else if(isNode(o)) return true;
+    else if(isNode(o)) return !isMumboJumbo(o.data);
     else return false;
 
     if(source === undefined) source = 'nav';
@@ -257,12 +257,8 @@ function isFocusable(o, source) {
         return false;
     }
 
-    // Punctuation mumbo-jumbo is not highlighteable.
     var voiced = voice_element(o, source);
-    voiced = voiced.replace(/<(?:.|\n)*?>/gm, '');
-    voiced = voiced.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
-    voiced = voiced.replace(/\s{2,}/g," ");
-    if(voiced.length <= 1) return false;
+    if(isMumboJumbo(voiced)) return false;
 
     // If hidden
     if(o.hasAttribute('hidden')) return false;
@@ -284,6 +280,19 @@ function isFocusable(o, source) {
         return true; //by default element is focusable if nothing to inherit
     }
     return isFocusable(parent);
+}
+
+/**
+ *  Punctuation mumbo-jumbo is not highlighteable.
+ * @param str String to check
+ * @returns {boolean} If mumbo jumbo or not
+ */
+function isMumboJumbo(str) {
+    str = str.replace(/<(?:.|\n)*?>/gm, '');
+    str = str.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+    str = str.replace('|','');
+    str = str.replace(/\s{2,}/g," ");
+    return str.length <= 1;
 }
 
 //Returns true if it is a DOM node
