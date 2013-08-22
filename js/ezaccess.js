@@ -257,6 +257,11 @@ function isFocusable(o, source) {
         return false;
     }
 
+    var voiced = voice_element(o, source);
+    voiced = voiced.replace(/<(?:.|\n)*?>/gm, '');
+    voiced = voiced.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+    voiced = voiced.replace(/\s{2,}/g," ");
+    if(voiced.length <= 1) return false;
 
     // If hidden
     if(o.hasAttribute('hidden')) return false;
