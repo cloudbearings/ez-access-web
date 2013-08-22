@@ -98,7 +98,7 @@ function key_event(e) {
 			tinyOpen = false;
 			TINY.box.hide();
 		} else {
-			var el = getKeyBinding('EZ_KEY_BACK');
+			var el = getKeyBinding('back');
 			if (el === null) {
 				window.history.back();
 			} else {
@@ -110,7 +110,7 @@ function key_event(e) {
 			tinyOpen = false;
 			TINY.box.hide();
 		} else {
-			var el = getKeyBinding('EZ_KEY_NEXT');
+			var el = getKeyBinding('next');
 			if (el !== null) {
 				el.click();
 			}
@@ -213,9 +213,9 @@ function getKeyBinding(key) {
 	'use strict'
 
     // Allow any case (consistent w/ HTML)
-    key = key.toUpperCase();
+    key = key.toLowerCase();
 
-	var SUPPORTED_KEY_NAMES = ['EZ_KEY_BACK','EZ_KEY_NEXT'];
+	var SUPPORTED_KEY_NAMES = ['back','next'];
 
 	if (SUPPORTED_KEY_NAMES.indexOf(key.toString()) < 0) {
         _debug('getKeyBinding(): key=' + key + ' is not supported.');
