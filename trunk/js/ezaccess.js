@@ -1068,7 +1068,7 @@ function ez_navigate_start(propagated, source) {
 	// TODO auto_advance_set(); // Find if autoadvancing element
 
     // Start navigation
-    ez_navigate('top');
+    ez_navigate('top', {alert: !propagated});
 
 }
 
