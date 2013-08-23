@@ -71,6 +71,8 @@ function voice(obj, options) {
 		speech = fixPronunciation(speech, dictionary);
 	}
 
+    _debug(speech);
+
 	var req = {
 		"tts": speech,
 		"volume": String(audioVolume / 100)
@@ -216,7 +218,6 @@ function voice_element(obj, source, options) {
             '</speak>';
     }
 
-    _debug(speech);
 	return speech;
 }
 
