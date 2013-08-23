@@ -68,7 +68,7 @@ function key_event(e) {
 			TINY.box.hide();
 		} else {
 			tinyOpen = true;
-			ez_help(selectedEls);
+			ez_help(getActionableElement(selectedEls, 'nav'));
 		}
 	} else if(e.keyCode == EZ_KEY_UP) {
 		if(tinyOpen) {
