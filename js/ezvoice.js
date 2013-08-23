@@ -169,7 +169,7 @@ function voice_element(obj, source, options) {
 	/**
 	 * Potentially add SSML tags to different speech substrings.
 	 */
-	if(options.ssml) {
+	if(options.ssml && role !== '') {
 		role = '<prosody pitch="low" rate="fast">' + role + '</prosody>';
 	}
 
@@ -177,7 +177,26 @@ function voice_element(obj, source, options) {
 	 * Concatenation for the speech string to be returned.
 	 */
 	if(speech === '') { //default concatenation
-		speech = name + ', ' + role + ', ' + value + ' ' + extra + '.';
+		//speech = name + ', ' + role + ', ' + value + ' ' + extra + '.';
+		speech += name;
+		if (speech !== '' && role !== '') {
+			speech += ', ' + role;
+		} else {
+			speech += role;
+		}
+		if (speech !== '' && value !== '') {
+			 speech += ', ' + value;
+		} else {
+			speech += value;
+		}
+		if (speech !== '' && extra !== '') {
+			speech += ' ' + extra;
+		} else {
+			speech += extra;
+		}
+		if (speech !== '') {
+			speech += '.';
+		}
 	}
 
 	if(obj.tagName === 'A' && obj.hasAttribute('href')) {
@@ -190,7 +209,7 @@ function voice_element(obj, source, options) {
     /**
      * Adding SSML wrapper markup if required.
      */
-    if (options.ssml) {
+    if (options.ssml && speech !== '') {
         speech = '<?xml version="1.0"?>' +
             '<speak>' +
             speech +
