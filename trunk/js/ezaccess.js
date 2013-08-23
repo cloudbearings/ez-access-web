@@ -257,7 +257,7 @@ function isFocusable(o, source) {
         return false;
     }
 
-    var voiced = voice_element(o, source, {debug: false});
+    var voiced = voice_element(o, source);
     if(isMumboJumbo(voiced)) return false;
 
     // If hidden
