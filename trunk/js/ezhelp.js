@@ -8,12 +8,13 @@ var tinyOpen = false;
  * @param {string|object} alert A string to display or object to get help info about.
  */
 function ez_help(alert) {
+
 	var helptext = "";
 
 	if(typeof alert === 'string') {
 		helptext = String(alert);
 	} else if(typeof alert === 'object') {
-		helptext = getHelpArray(alert)[0]; // TODO
+		helptext = getHelpArray(alert)[0][0].innerHTML; // TODO
 	}
 	TINY.box.show("<span style='font-size:150%'>" + helptext + "</span>", 0, 400, 0, 0);
 	voice(String(helptext));
@@ -205,7 +206,10 @@ function getHelpFromObj(obj, url, id) {
 			if(sections.length == 0) {
 				console.log("Error: No sections in ID '" + id + "' with data-ez-help attribute in '" + url + "' for help layers");
 			} else {
-				for(var i = 0; i < sections.length; i++) sections[i] = sections[i].textContent;
+				for(var i = 0; i < sections.length; i++) {
+                    sections[i] = sections[i].innerHTML;
+                    console.log(sections[i]);
+                }
 				return sections;
 			}
 		}
@@ -226,16 +230,17 @@ var xmlhttp = new XMLHttpRequest();
  * Gets
  * TODO DOM Parser can break! No error message provided if it does.
  * @param {string} url Location (relative to current page) of help layers reference file.
- * @returns {document} Returns DOM of URL requested.
+ * @returns {HTMLDocument|null} Returns DOM of URL requested.
  */
 function getDocument(url) {
 	xmlhttp.open("GET", url + '?t=' + new Date().getTime(), false); // TODO : Disable caching for troubleshooting
 	xmlhttp.send();
 	if(xmlhttp.status == 200) {
 		var xmlString = xmlhttp.responseText,
-			parser = new DOMParser();
+        doc = document.implementation.createHTMLDocument("");
+        doc.body.innerHTML = xmlString;
         // returns a HTMLDocument, which also is a Document.
-		return parser.parseFromString(xmlString, "text/html");
+		return doc;
 	} else {
 		return null;
 	}
