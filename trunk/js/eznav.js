@@ -63,17 +63,26 @@ var autoAdvTimer;
 function key_event(e) {
 	// 'if' keycode statements
 	if(e.keyCode == EZ_KEY_HELP || e.keyCode == 72) { // 72 == 'h'
+        sounds[AUDIO_MOVE].feed.play();
+
 		if(tinyOpen) {
-			tinyOpen = false;
-			TINY.box.hide();
+			closeTiny(true);
 		} else {
-			tinyOpen = true;
 			ez_help(getActionableElement(selectedEls, 'nav'));
 		}
+
+        // Set when closing the lightbox
+        document.getElementById('tinymask').addEventListener('click', function() {
+            closeTiny(false);
+        });
+
 	} else if(e.keyCode == EZ_KEY_UP) {
 		if(tinyOpen) {
-			tinyOpen = false;
-			TINY.box.hide();
+            if(tinyOpen && helpObj !== null) {
+                ez_help_goto_section(-1);
+            } else {
+                closeTiny(true);
+            }
 		} else {
 			if(ez_navigateToggle) {
 				ez_navigate('up');
@@ -83,8 +92,11 @@ function key_event(e) {
 		}
 	} else if(e.keyCode == EZ_KEY_DOWN) {
 		if(tinyOpen) {
-			tinyOpen = false;
-			TINY.box.hide();
+            if(tinyOpen && helpObj !== null) {
+                ez_help_goto_section(1);
+            } else {
+                closeTiny(true);
+            }
 		} else {
 			if(ez_navigateToggle) {
 				ez_navigate('down');
@@ -95,8 +107,7 @@ function key_event(e) {
 	} else if(e.keyCode == EZ_KEY_BACK || e.keyCode == 66) { // 'b' == 66
 		// TODO
 		if(tinyOpen) {
-			tinyOpen = false;
-			TINY.box.hide();
+            closeTiny(true);
 		} else {
 			var el = getKeyBinding('back');
 			if (el === null) {
@@ -107,8 +118,7 @@ function key_event(e) {
 		}
 	} else if (e.keyCode === EZ_KEY_NEXT) {
 		if(tinyOpen) {
-			tinyOpen = false;
-			TINY.box.hide();
+            closeTiny(true);
 		} else {
 			var el = getKeyBinding('next');
 			if (el !== null) {
@@ -117,8 +127,7 @@ function key_event(e) {
 		}
 	} else if(e.keyCode == EZ_KEY_ENTER || e.keyCode == KB_ENTER) {
 		if(tinyOpen) {
-			tinyOpen = false;
-			TINY.box.hide();
+            closeTiny(true);
 		} else {
 			if(ez_navigateToggle) {
 				ez_enter(selectedEls, 'nav');
@@ -143,20 +152,20 @@ function key_event(e) {
 				sounds[AUDIO_NOACTION].feed.play();
 			}
 		} else {
-			if(audioVolume <= 90) {
-				audioVolume += 10;
-				sessionStorage.setItem("EZ_Volume", audioVolume);
-				set_volume();
-				sounds[AUDIO_MOVE].feed.play();
-				voice("Volume... " + audioVolume + " percent");
-			} else {
-				document.getElementById(ezSelectorId).className = 'pulse';
-				setTimeout(function () {
-					document.getElementById(ezSelectorId).className = '';
-				}, 300);
-				sounds[AUDIO_NOACTION].feed.play();
-				voice("Maximum volume");
-			}
+            if(audioVolume <= 90) {
+                audioVolume += 10;
+                sessionStorage.setItem("EZ_Volume", audioVolume);
+                set_volume();
+                sounds[AUDIO_MOVE].feed.play();
+                voice("Volume... " + audioVolume + " percent");
+            } else {
+                document.getElementById(ezSelectorId).className = 'pulse';
+                setTimeout(function () {
+                    document.getElementById(ezSelectorId).className = '';
+                }, 300);
+                sounds[AUDIO_NOACTION].feed.play();
+                voice("Maximum volume");
+            }
 		}
 	} else if(e.keyCode == EZ_KEY_SKIPBACKWARD) {
 		if(selectedEls.type == 'range') {
@@ -176,20 +185,20 @@ function key_event(e) {
 				sounds[AUDIO_NOACTION].feed.play();
 			}
 		} else {
-			if(audioVolume >= 10) {
-				sessionStorage.setItem("EZ_Volume", audioVolume);
-				audioVolume -= 10;
-				set_volume();
-				sounds[AUDIO_MOVE].feed.play();
-				voice("Volume... " + audioVolume + " percent");
-			} else {
-				document.getElementById(ezSelectorId).className = 'pulse';
-				setTimeout(function () {
-					document.getElementById(ezSelectorId).className = '';
-				}, 300);
-				sounds[AUDIO_NOACTION].feed.play();
-				voice("Minimum volume");
-			}
+            if(audioVolume >= 10) {
+                sessionStorage.setItem("EZ_Volume", audioVolume);
+                audioVolume -= 10;
+                set_volume();
+                sounds[AUDIO_MOVE].feed.play();
+                voice("Volume... " + audioVolume + " percent");
+            } else {
+                document.getElementById(ezSelectorId).className = 'pulse';
+                setTimeout(function () {
+                    document.getElementById(ezSelectorId).className = '';
+                }, 300);
+                sounds[AUDIO_NOACTION].feed.play();
+                voice("Minimum volume");
+            }
 		}
 	} else if(selectedEls.type == 'textarea' || selectedEls.type == 'text') {
 		var key = String.fromCharCode(e.keyCode);
@@ -417,9 +426,10 @@ function hrefJump(obj) {
 /**
  * Decides what to do, if anything, when EZ Action is pressed.
  * @param nodArr Node array to 'enter' on
- * @param source {'point'|'nav'} THe navigation method
+ * @param source {'point'|'nav'} The navigation method
+ * @param userDid {'selectControl'|'changeValue'} What
  */
-function ez_enter(nodArr, source) {
+function ez_enter(nodArr, source, userDid) {
 
 	var obj = getActionableElement(nodArr, source);
 
@@ -497,10 +507,12 @@ function multikey_event(e) {
 	map[e.keyCode] = !!(e.type == 'keydown');
 	if(map[KB_TAB] && map[KB_SHIFT] && tabNav != 'none') { //SHIFT+TAB
 		if(tinyOpen) {
-			tinyOpen = false;
-			TINY.box.hide();
-		}
-		if(ez_navigateToggle) {
+            if(tinyOpen && helpObj !== null) {
+                ez_help_goto_section(-1);
+            } else {
+                closeTiny(true);
+            }
+		} else if(ez_navigateToggle) {
 			ez_navigate('up');
 			//window.scroll(0,findPos(selectedEls));
 		} else {
@@ -509,10 +521,12 @@ function multikey_event(e) {
 		return false; // Overwrite default browser functionality
 	} else if(map[KB_TAB] && tabNav != 'none') { //TAB
 		if(tinyOpen) {
-			tinyOpen = false;
-			TINY.box.hide();
-		}
-		if(ez_navigateToggle) {
+            if(tinyOpen && helpObj !== null) {
+                ez_help_goto_section(1);
+            } else {
+                closeTiny(true);
+            }
+		}else if(ez_navigateToggle) {
 			ez_navigate('down');
 			//window.scroll(0,findPos(selectedEls));
 		} else {

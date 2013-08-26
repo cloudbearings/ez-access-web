@@ -1219,10 +1219,8 @@ function load_ez() {
         });
 
         document.addEventListener('touchend', function(e) {
-            if(touchTap === true) { // If not 'dragged'
-                stopEZ();
-            } else if(new Date().getTime() - touchStartTime < 250) { // If quickly 'dragged'
-                stopEZ();
+            if(touchTap === true || new Date().getTime() - touchStartTime < 250) { // If not 'dragged' or quickly 'dragged'
+                if(!tinyOpen) stopEZ();
             }
         });
 
@@ -1335,7 +1333,7 @@ function drawSelected( nodArr ) {
 		var rgb = "rgba(" + hexToRgb(EzCustomColor).r + "," + hexToRgb(EzCustomColor).g + "," + hexToRgb(EzCustomColor).b + ",";
 		var rgbinverse = "rgba(" + (255 - hexToRgb(EzCustomColor).r) + "," + (255 - hexToRgb(EzCustomColor).g) + "," + (255 - hexToRgb(EzCustomColor).b) + ",";
 		// Load the CSS pulsing Stuff
-		var cssAnimation = document.createElement('style');
+		var cssAnimation = document.createElement('hstyle');
 		cssAnimation.type = 'text/css';
 		var rules = document.createTextNode('@-webkit-keyframes pulse {' +
 			'from { border:5px solid ' + rgb + '1); }' +
@@ -1360,6 +1358,9 @@ function drawSelected( nodArr ) {
 	old.style.top = top - 10 + 'px';
 	old.style.width = width + 10 + 'px';
 	old.style.height = height + 10 + 'px';
+
+    // Un-hide highlight, if once hidden
+    old.style.visibility = '';
 
     smoothScroll(top - (document.documentElement.clientHeight/4));
 
