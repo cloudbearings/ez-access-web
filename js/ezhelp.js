@@ -4,6 +4,19 @@
 var tinyOpen = false;
 
 /**
+ * The current object in which ez help is describing.
+ * If none, place null.
+ * @type {Object|null}
+ */
+var helpObj = null;
+
+/**
+ * The ordered section in which the prompt is currently on, as per DOM structure.
+ * @type {Number}
+ */
+var helpCounter = 0;
+
+/**
  * Default EZ Help HTML File. Might make more flexible later,
  * but for now, replace ' with \' and remove linebreaks and replace here.
  * @type {string}
@@ -16,15 +29,68 @@ var DEFAULT_HELP = '<!doctype html> <html lang="en"> <head> <meta charset="utf-8
  */
 function ez_help(alert) {
 
-	var helptext = "";
+    // If null, EZ Access is not started, so default to body help text.
+    if(alert === null) alert = document.body;
+
+    tinyOpen = true;
+
+    helpCounter = 0;
+    helpObj = null;
+
+    // Hide EZ Highlight
+    if(document.getElementById(ezSelectorId)) document.getElementById(ezSelectorId).style.visibility = 'hidden';
+
+	var helpText = "";
 
 	if(typeof alert === 'string') {
-		helptext = String(alert);
+        helpText = String(alert);
 	} else if(typeof alert === 'object') {
-		helptext = getHelpArray(alert)[0]; // TODO
+        helpObj = alert;
+        helpText = getHelpArray(alert)[0];
 	}
-	TINY.box.show("<span style='font-size:150%'>" + helptext + "</span>", 0, 400, 0, 0);
-	voice(String(helptext));
+	TINY.box.show("<span style='font-size:150%'>" + helpText + "</span>", 0, 400, 0, 0);
+	voice(String(helpText));
+}
+
+/**
+ * Skips to the next help screen, if one exists.
+ * @param skip Relative order of sections to skip. Should usually be -1 or 1.
+ */
+function ez_help_goto_section(skip) {
+
+    var helpText = "";
+
+    if(helpObj !== null) {
+        var helpPrompts = getHelpArray(helpObj);
+        if(helpCounter !== Math.round(helpCounter)) {
+            throw new Error('Invalid section! Check passed parameters.')
+        } else if(helpCounter + skip < 0 || helpCounter + skip >= helpPrompts.length) {
+            // Out of range, beep as if reached ond of page.
+            sounds[AUDIO_NOACTION].feed.play();
+            voice("Repeating help text: " + helpPrompts[helpCounter]);
+        } else {
+            helpCounter += skip;
+            helpText = helpPrompts[helpCounter];
+            TINY.box.show("<span style='font-size:150%'>" + helpText + "</span>", 0, 400, 0, 0);
+            sounds[AUDIO_MOVE].feed.play();
+            voice(String(helpText));
+        }
+    }
+}
+
+/**
+ * Cleanup in closing a Tiny Box (lightbox)
+ * @param close Actually close the lightbox, or if it will be done automatically (and we just need to cleanup
+ */
+function closeTiny(close) {
+    voice("EZ Help closed");
+
+    // Hide EZ Highlight
+    if(document.getElementById(ezSelectorId)) document.getElementById(ezSelectorId).style.visibility = '';
+
+    sounds[AUDIO_MOVE].feed.play();
+    if(close) TINY.box.hide();
+    tinyOpen = false;
 }
 
 /**
