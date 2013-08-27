@@ -1372,7 +1372,10 @@ function drawSelected( nodArr ) {
  */
 window.onresize = function () {
 	if(ez_navigateToggle) {
-		drawSelected(selectedEls);
+        var actionable = getActionableElement(selectedEls, 'nav');
+        var label = get_label(actionable);
+        if(label !== null) drawSelected(selectedEls.concat([label]));
+        else drawSelected(selectedEls);
 	}
 };
 
