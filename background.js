@@ -42,6 +42,7 @@ chrome.extension.onRequest.addListener(
 			});
 			chrome.tts.speak(request.tts, {
 				'volume': parseFloat(request.volume),
+                'enqueue': request.enqueue,
 				requiredEventTypes: ['end'],
 				onEvent: function (event) {
 					if(event.type === 'end') {

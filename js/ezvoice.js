@@ -42,7 +42,8 @@ function voice(obj, options) {
     // set up default options
     var defaults = {
         source:      'nav',
-        repeat:      false
+        repeat:      false,
+        enqueue:     false
     };
     options = merge_options(defaults, options);
 
@@ -75,7 +76,8 @@ function voice(obj, options) {
 
 	var req = {
 		"tts": speech,
-		"volume": String(audioVolume / 100)
+		"volume": String(audioVolume / 100),
+        "enqueue": options.enqueue
 	};
 
 	chrome.extension.sendRequest(req);

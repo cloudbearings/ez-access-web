@@ -435,6 +435,7 @@ function ez_enter(nodArr, source, userDid) {
 
     var sound = AUDIO_NOACTION;
     var spoken = "";
+    var action = "";
     var clicked = true;
     var repeat = false;
 
@@ -462,7 +463,6 @@ function ez_enter(nodArr, source, userDid) {
 		} else {
 			sounds[AUDIO_DESELECT].feed.play();
 		}
-		voice(obj);
 	} else if(obj.tagName == 'INPUT' && (obj.type == 'submit' || obj.type == 'image')) {
 		obj.click();
 	} else {
@@ -480,8 +480,10 @@ function ez_enter(nodArr, source, userDid) {
      * VOICE
      */
     if(clicked) {
-        spoken = getValueSubstring(obj, "action");
-        voice(spoken, {source: source});
+        voice(nodArr, {source: source});
+
+        action = getValueSubstring(obj, "action");
+        //voice(action, {source: source, enqueue: true});
     } else {
         voice(nodArr, {source: source, repeat: repeat});
     }
