@@ -5,7 +5,7 @@
 var repeatAlert = 0;
 
 /**
- * Global text to be read before next speech synthesis; can be set anywhere
+ * A dictionary that can replace speech output to make it easier for the TTS engine to understand
  */
 var dictionary = null;
 
