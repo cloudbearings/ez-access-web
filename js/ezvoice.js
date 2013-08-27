@@ -6,12 +6,6 @@ var repeatAlert = 0;
 
 /**
  * Global text to be read before next speech synthesis; can be set anywhere
- * @type {string}
- */
-var globalSayBefore = "";
-
-/**
- * Global text to be read before next speech synthesis; can be set anywhere
  */
 var dictionary = null;
 
@@ -62,10 +56,6 @@ function voice(obj, options) {
 	// Global speech appendages
 	if(options.repeat == true) {
 		speech = "Repeating... " + speech;
-	}
-	if(globalSayBefore != "") {
-		speech = globalSayBefore + speech;
-		globalSayBefore = "";
 	}
 
 	if(dictionary !== null) {
