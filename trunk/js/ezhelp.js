@@ -43,13 +43,13 @@ function ez_help(alert) {
 	var helpText = "";
 
 	if(typeof alert === 'string') {
-        helpText = String(alert);
+        helpText = alert + append_footnote(true, true);
 	} else if(typeof alert === 'object') {
         helpObj = alert;
-        helpText = getHelpArray(alert)[0];
+        helpText = getHelpArray(alert)[0] + append_footnote(true, false);
 	}
-	TINY.box.show("<span style='font-size:150%'>" + helpText + "</span>", 0, 400, 0, 0);
-	voice(String(helpText));
+	TINY.box.show(helpText, 0, 400, 0, 0);
+	voice(helpText);
 }
 
 /**
@@ -67,15 +67,48 @@ function ez_help_goto_section(skip) {
         } else if(helpCounter + skip < 0 || helpCounter + skip >= helpPrompts.length) {
             // Out of range, beep as if reached ond of page.
             sounds[AUDIO_NOACTION].feed.play();
-            voice("Repeating help text: " + helpPrompts[helpCounter]);
+            helpText = helpPrompts[helpCounter] + append_footnote(helpCounter === 0, helpCounter >= helpPrompts.length);
+            voice("Repeating help text: " + helpText);
         } else {
             helpCounter += skip;
-            helpText = helpPrompts[helpCounter];
-            TINY.box.show("<span style='font-size:150%'>" + helpText + "</span>", 0, 400, 0, 0);
+            helpText = helpPrompts[helpCounter] + append_footnote(helpCounter === 0, helpCounter >= helpPrompts.length);
+
+            TINY.box.show(helpText, 0, 400, 0, 0);
+
             sounds[AUDIO_MOVE].feed.play();
-            voice(String(helpText));
+            voice(helpText);
         }
     }
+}
+
+/**
+ * Based on params, this function returns a string of an HTML EZ Access Help Footnote
+ * @param isFirst If the first EZ Help dialogue
+ * @param isLast If the last (or last 'warning of falling off help') dialogue
+ * @returns {string} HTML EZ Access Help Footnote, containing <hr>, and relevant <p>s.
+ */
+function append_footnote(isFirst, isLast) {
+
+    var ret = '';
+
+    var repeat = "To repeat this message, press the round EZ Action button.";
+    var more = "For more Help, touch the EZ Down arrow button.";
+    var leave = "To leave Help, touch the EZ Help button.";
+
+    ret += '<hr>';
+
+    if(isFirst) {
+        ret += '<p style="text-align:center">' + repeat + '</p>';
+    }
+
+    ret += '<p style="text-align:center">' + more + '</p>';
+
+    if(isLast) {
+        ret += '<p style="text-align:center">' + leave + '</p>';
+    }
+
+
+    return ret;
 }
 
 /**
