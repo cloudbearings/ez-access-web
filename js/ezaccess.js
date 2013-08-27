@@ -110,16 +110,16 @@ var UNSUPPORTED_TAGS = [
     'menu'];
 
 /**
- * An array/list of tags that encapsulate data that does not make sense to be
- * navigated by the user.
+ * An array/list of tags that encapsulate data (or encapsulate nothing)
+ * that does not make sense to be navigated by the user.
  * @const
  */
 var UNNAVIGABLE_TAGS = [
-    'hr',
+    'hr', 'br',
     'map', 'area',
     'datalist', 'option', 'optgroup',
     'menuitem', 'command',
-    'script', 'noscript', 'br'];
+    'script', 'noscript'];
 
 /**
  * These tags generally contain content that must be rendered using
