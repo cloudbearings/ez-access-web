@@ -438,6 +438,7 @@ function ez_enter(nodArr, source, userDid) {
     var action = "";
     var clicked = true;
     var repeat = false;
+    var speak = true;
 
     /*
      * ACTION
@@ -446,15 +447,15 @@ function ez_enter(nodArr, source, userDid) {
     // Check for possible jump
     var jumpTo = hrefJump(obj);
 
-
     if(jumpTo !== null) {
         ez_jump([jumpTo], source);
         clicked = false;
         nodArr = [jumpTo];
         sound = AUDIO_SELECT;
-    } else if(getClick(obj) !== null) {
-		obj.click();
+    } else if(getClick(obj) !== null || getType(obj) === 'submit' || getType(obj) === 'button') {
         sound = AUDIO_SELECT;
+        speak = false;
+		obj.click();
 	} else if(isInteractive(obj)) {
         // TODO: Basis for clicking interactive elements prompts
 		obj.click();
@@ -479,13 +480,15 @@ function ez_enter(nodArr, source, userDid) {
     /*
      * VOICE
      */
-    if(clicked) {
-        voice(nodArr, {source: source});
+    if(speak) {
+        if(clicked) {
+            voice(nodArr, {source: source});
 
-        action = getValueSubstring(obj, "action");
-        //voice(action, {source: source, enqueue: true});
-    } else {
-        voice(nodArr, {source: source, repeat: repeat});
+            action = getValueSubstring(obj, "action");
+            //voice(action, {source: source, enqueue: true});
+        } else {
+            voice(nodArr, {source: source, repeat: repeat});
+        }
     }
 }
 
