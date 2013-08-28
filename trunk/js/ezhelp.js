@@ -48,11 +48,11 @@ function ez_help(alert) {
     // Hide EZ Highlight
     if(document.getElementById(ezSelectorId)) document.getElementById(ezSelectorId).style.visibility = 'hidden';
 
-	var helpText = "";
+    var helpText = "";
 
-	if(typeof alert === 'string') {
+    if(typeof alert === 'string') {
         helpText = alert + append_footnote(true, true);
-	} else if(typeof alert === 'object') {
+    } else if(typeof alert === 'object') {
         helpObj = alert;
         var helpArr = getHelpArray(alert);
         if(helpArr.length === 0) {
@@ -60,10 +60,10 @@ function ez_help(alert) {
         } else {
             helpText = helpArr[0] + append_footnote(true, false);
         }
-	}
-	TINY.box.show(helpText, 0, 400, 0, 0);
+    }
+    TINY.box.show(helpText, 0, 400, 0, 0);
     tinyContent = document.getElementById('tinycontent');
-	voice([tinyContent]);
+    voice([tinyContent]);
 }
 
 /**
@@ -175,19 +175,19 @@ function closeTiny(close, source) {
  * @param {boolean} display If false, start timer for idle loop. Otherwise, display lightbox + reset.
  */
 function idle_loop(display) {
-	if(!display) {
-		if(alerts.idle.wait != -1) {
-			idleLoop = self.setInterval(function () {
-				idle_loop(true)
-			}, alerts.idle.wait);
-		}
-	} else {
-		if(!tinyOpen && !ez_navigateToggle) {
-			idleLoop = self.clearInterval(idleLoop);
-			tinyOpen = true;
-			ez_help(alerts.idle.value);
-		}
-	}
+    if(!display) {
+        if(alerts.idle.wait != -1) {
+            idleLoop = self.setInterval(function () {
+                idle_loop(true)
+            }, alerts.idle.wait);
+        }
+    } else {
+        if(!tinyOpen && !ez_navigateToggle) {
+            idleLoop = self.clearInterval(idleLoop);
+            tinyOpen = true;
+            ez_help(alerts.idle.value);
+        }
+    }
 }
 
 /**
@@ -213,74 +213,74 @@ TERMINATOR = '||';
  * @return {null|string[]} The help layers (or null if there are no help layers).
  */
 function getHelpArray(obj) {
-	'use strict';
-	/**
-	 * The return, which is either an array of strings with each help layer or
-	 * null if there are no help layers associated with obj.
-	 */
-	var ret;
-	/**
-	 * The value of the data-ez-help attribute.
-	 * @type {string}
-	 */
-	var attr = '';
-	/**
-	 * Whether the function should end or not.
-	 * @type {boolean}
-	 */
-	var end;
+    'use strict';
+    /**
+     * The return, which is either an array of strings with each help layer or
+     * null if there are no help layers associated with obj.
+     */
+    var ret;
+    /**
+     * The value of the data-ez-help attribute.
+     * @type {string}
+     */
+    var attr = '';
+    /**
+     * Whether the function should end or not.
+     * @type {boolean}
+     */
+    var end;
 
-	if(obj.hasAttribute('data-ez-help')) {
-		attr = obj.getAttribute('data-ez-help');
+    if(obj.hasAttribute('data-ez-help')) {
+        attr = obj.getAttribute('data-ez-help');
     } else if(obj.tagName === 'BODY') {
         attr = 'default#keypad8';
     }
 
     if(attr !== '') {
 
-		//See if this function needs to make a recursive call
+        //See if this function needs to make a recursive call
         end = attr.slice(-TERMINATOR.length) === TERMINATOR;
 
-		ret = attr.split(DELIMITER);
+        ret = attr.split(DELIMITER);
 
-		for(var i = 0; i < ret.length;) {
-			if(ret[i] == '' || ret[i] === null) {
-				ret.splice(i, 1);
-			} else {
-				var parsedRet = parseHelpPageString(ret[i]);
-				// Merge this array at pos; delete ret[i]
-				ret.splice(i, 1);
-				ret.splice.apply(ret, [i, 0].concat(parsedRet));
-				i += parsedRet.length;
-			}
-		}
-	} else {
-		ret = null;
-	}
+        for(var i = 0; i < ret.length;) {
+            if(ret[i] == '' || ret[i] === null) {
+                ret.splice(i, 1);
+            } else {
+                var parsedRet = parseHelpPageString(ret[i]);
+                // Merge this array at pos; delete ret[i]
+                ret.splice(i, 1);
+                ret.splice.apply(ret, [i, 0].concat(parsedRet));
+                i += parsedRet.length;
+            }
+        }
+    } else {
+        ret = null;
+    }
 
-	/**
-	 * This function may be called recursively on parent elements.
-	 */
-	if(!end) {
-		var parent = obj.parentNode;
+    /**
+     * This function may be called recursively on parent elements.
+     */
+    if(!end) {
+        var parent = obj.parentNode;
 
-		//End the recursion because there are no more parent elements
-		if(parent === null || parent.tagName === 'HTML') {
-			return ret;
-		}
+        //End the recursion because there are no more parent elements
+        if(parent === null || parent.tagName === 'HTML') {
+            return ret;
+        }
 
-		var recursive = getHelpArray(parent);
+        var recursive = getHelpArray(parent);
 
-		if(isArray({o: recursive}) && recursive !== null) {
-			if(ret === null) {
-				ret = [];
-			}
-			ret = ret.concat(recursive);
-		} else if(recursive !== null) {
-			throw new Error('Array not passed to getHelpArray()');
-		} //else (thus recursive === null) ret does not change (ret = ret;)
-	}
-	return ret;
+        if(isArray({o: recursive}) && recursive !== null) {
+            if(ret === null) {
+                ret = [];
+            }
+            ret = ret.concat(recursive);
+        } else if(recursive !== null) {
+            throw new Error('Array not passed to getHelpArray()');
+        } //else (thus recursive === null) ret does not change (ret = ret;)
+    }
+    return ret;
 } //End function getHelpArray()
 
 /**
@@ -292,53 +292,53 @@ function getHelpArray(obj) {
  * @return {string[]} The resulting layer(s) from the parsing.
  */
 function parseHelpPageString(s) {
-	/**
-	 * The string to be returned.
-	 */
-	var ret;
+    /**
+     * The string to be returned.
+     */
+    var ret;
 
-	//First check if the string is a reference to another string
-	if(s.indexOf('#') !== -1) {
+    //First check if the string is a reference to another string
+    if(s.indexOf('#') !== -1) {
 
-		// Potentially ID-referencing
-		var ref = s.split('#');
+        // Potentially ID-referencing
+        var ref = s.split('#');
 
-		if(ref[0].trim().length === 0) {
-			//Referencing ID of el on current page
+        if(ref[0].trim().length === 0) {
+            //Referencing ID of el on current page
 
-			//Hashes are *not* allowed in IDs (http://goo.gl/YgTLi), but get 
-			//rest just to be safe.
-			id = s.slice(s.indexOf('#') + 1);
+            //Hashes are *not* allowed in IDs (http://goo.gl/YgTLi), but get
+            //rest just to be safe.
+            id = s.slice(s.indexOf('#') + 1);
 
-			div = document.getElementById(id);
+            div = document.getElementById(id);
 
-			ret = getHelpFromObj(div, 'current page', id);
+            ret = getHelpFromObj(div, 'current page', id);
 
-			if(ret !== null) return ret;
+            if(ret !== null) return ret;
 
-		} else {
-			// (Potentially) referencing an external file
-			var url = ref[0];
-			var ext = url.slice(url.lastIndexOf('.') + 1);
+        } else {
+            // (Potentially) referencing an external file
+            var url = ref[0];
+            var ext = url.slice(url.lastIndexOf('.') + 1);
 
-			if(ext == 'htm' || ext == 'html') {
-				// Forms URL: HTM or HTML. Still don't know if exists
-				var externalDocument = getDocument(url);
-				if(externalDocument !== null) {
-					// Document exists. Still don't know if specific ID exists
+            if(ext == 'htm' || ext == 'html') {
+                // Forms URL: HTM or HTML. Still don't know if exists
+                var externalDocument = getDocument(url);
+                if(externalDocument !== null) {
+                    // Document exists. Still don't know if specific ID exists
 
-					var id = s.slice(s.indexOf('#') + 1);
-					var div = externalDocument.getElementById(id);
+                    var id = s.slice(s.indexOf('#') + 1);
+                    var div = externalDocument.getElementById(id);
 
-					ret = getHelpFromObj(div, url, id);
+                    ret = getHelpFromObj(div, url, id);
 
-					if(ret !== null) return ret;
+                    if(ret !== null) return ret;
 
-				} else {
-					// Document doesn't exist; is an error
-					console.log("Error: Could not find file '" + url + "' for help layers");
-				}
-			} else if(url === 'default') { // Default file
+                } else {
+                    // Document doesn't exist; is an error
+                    console.log("Error: Could not find file '" + url + "' for help layers");
+                }
+            } else if(url === 'default') { // Default file
                 var doc = document.implementation.createHTMLDocument("");
                 doc.body.innerHTML = DEFAULT_HELP;
 
@@ -350,11 +350,11 @@ function parseHelpPageString(s) {
                 if(ret !== null) return ret;
 
             } // ELSE: Invalid URL; not an error: Could just be a normal file
-		}
-	} // ELSE: Content is string (as-is)
+        }
+    } // ELSE: Content is string (as-is)
 
-	ret = new Array(s);
-	return ret;
+    ret = new Array(s);
+    return ret;
 }
 
 /**
@@ -365,24 +365,24 @@ function parseHelpPageString(s) {
  * @returns {string[]} Returns array of strings of 'help layers' that can be used from a given object.
  */
 function getHelpFromObj(obj, url, id) {
-	if(obj !== null) {
-		if(obj.hasAttribute('data-ez-help')) {
-			var sections = obj.getElementsByTagName('section');
-			if(sections.length == 0) {
-				console.log("Error: No sections in ID '" + id + "' with data-ez-help attribute in '" + url + "' for help layers");
-			} else {
+    if(obj !== null) {
+        if(obj.hasAttribute('data-ez-help')) {
+            var sections = obj.getElementsByTagName('section');
+            if(sections.length == 0) {
+                console.log("Error: No sections in ID '" + id + "' with data-ez-help attribute in '" + url + "' for help layers");
+            } else {
                 var tempSecs = [];
-				for(var i = 0; i < sections.length; i++) {
+                for(var i = 0; i < sections.length; i++) {
                     tempSecs[i] = sections[i].innerHTML;
                 }
-				return tempSecs;
-			}
-		}
-		return new Array(obj.innerHTML);
-	} else {
-		console.log("Error: Could not find ID '" + id + "' in '" + url + "' for help layers");
-	}
-	return null;
+                return tempSecs;
+            }
+        }
+        return new Array(obj.innerHTML);
+    } else {
+        console.log("Error: Could not find ID '" + id + "' in '" + url + "' for help layers");
+    }
+    return null;
 }
 
 /**
@@ -398,15 +398,15 @@ var xmlhttp = new XMLHttpRequest();
  * @returns {HTMLDocument|null} Returns DOM of URL requested.
  */
 function getDocument(url) {
-	xmlhttp.open("GET", url + '?t=' + new Date().getTime(), false); // TODO : Disable caching for troubleshooting
-	xmlhttp.send();
-	if(xmlhttp.status == 200) {
-		var xmlString = xmlhttp.responseText,
-        doc = document.implementation.createHTMLDocument("");
+    xmlhttp.open("GET", url + '?t=' + new Date().getTime(), false); // TODO : Disable caching for troubleshooting
+    xmlhttp.send();
+    if(xmlhttp.status == 200) {
+        var xmlString = xmlhttp.responseText,
+            doc = document.implementation.createHTMLDocument("");
         doc.body.innerHTML = xmlString;
         // returns a HTMLDocument, which also is a Document.
-		return doc;
-	} else {
-		return null;
-	}
+        return doc;
+    } else {
+        return null;
+    }
 }
