@@ -13,7 +13,7 @@ var maskId = 'EZ_mask';
 /**
  * Selector ID to use on the page
  * @type {string}
-  */
+ */
 var ezSelectorId = 'ezselected';
 
 /**
@@ -225,10 +225,10 @@ function isFocusable(o, source) {
 
     var attr = '';
 
-    /** 
+    /**
      * Check to see if immediate element is focusable or not.
      * More specific attributes should override less specific ones.
-     * data-ez-focusable* attributes should override aria-hidden. 
+     * data-ez-focusable* attributes should override aria-hidden.
      */
     if (o.hasAttribute('data-ez-focusable')) {
         attr = o.getAttribute('data-ez-focusable');
@@ -346,21 +346,21 @@ function isInteractive(o) {
  * @return {boolean} Whether the element can be edited.
  */
 function isUserEditable(obj) {
-  //Non-interactive elements cannot be edited
-  if (!isInteractive(obj)) {
-    return false;
-  }
+    //Non-interactive elements cannot be edited
+    if (!isInteractive(obj)) {
+        return false;
+    }
 
-  if (obj.hasAttribute('readonly') || obj.hasAttribute('disabled')) {
-    return false;
-  }
-  if (obj.hasAttribute('aria-readonly')) {
-    return !Boolean(obj.getAttribute('aria-readonly'));
-  }
-  if (obj.hasAttribute('aria-disabled')) {
-    return !Boolean(obj.getAttribute('aria-disabled'));
-  }
-  else return true;
+    if (obj.hasAttribute('readonly') || obj.hasAttribute('disabled')) {
+        return false;
+    }
+    if (obj.hasAttribute('aria-readonly')) {
+        return !Boolean(obj.getAttribute('aria-readonly'));
+    }
+    if (obj.hasAttribute('aria-disabled')) {
+        return !Boolean(obj.getAttribute('aria-disabled'));
+    }
+    else return true;
 }
 
 /**
@@ -855,7 +855,7 @@ function getNextNodes(startEl, source) {
  * @param startEl  The text node whose data should be returned
  * @param source ['nav'|'point'} Navigation method passed from calling function
  * @return {Array|null} Returns an array of node(s), or null (for end of document)
-**/
+ **/
 function getPrevNodes(startEl, source) {
     // Through recursion, reached end of document.
     if(startEl === null) return [];
@@ -1075,32 +1075,32 @@ function strip_masking() {
  * @param {'nav'|'point'} source The navigation method
  */
 function ez_navigate_start(propagated, source) {
-	ez_navigateToggle = true;
-	sessionStorage.setItem("EZ_Toggle", "1");
+    ez_navigateToggle = true;
+    sessionStorage.setItem("EZ_Toggle", "1");
 
     var obj;
-	if(document.body.hasAttribute('data-ez-startat')) {
+    if(document.body.hasAttribute('data-ez-startat')) {
         var startid;
-		if(propagated) {
-			// Of "#<id> #<id>" of second element
-			startid = document.body.getAttribute('data-ez-startat').split(" ")[1].slice(1);
-		} else {
-			// Of "#<id> #<id>" of first element
+        if(propagated) {
+            // Of "#<id> #<id>" of second element
+            startid = document.body.getAttribute('data-ez-startat').split(" ")[1].slice(1);
+        } else {
+            // Of "#<id> #<id>" of first element
             startid = document.body.getAttribute('data-ez-startat').split(" ")[0].slice(1);
-		}
+        }
         obj = document.getElementById(startid);
         if(obj !== null) ez_jump([obj], source);
-	} else {
-		if(propagated) {
-			if(document.URL.indexOf("#") != -1) {
-				var jumpTo = document.URL.substring(document.URL.indexOf("#") + 1);
+    } else {
+        if(propagated) {
+            if(document.URL.indexOf("#") != -1) {
+                var jumpTo = document.URL.substring(document.URL.indexOf("#") + 1);
                 obj = document.getElementById(jumpTo);
                 if(obj !== null) ez_jump([obj], source);
-			}
-		}
-	}
+            }
+        }
+    }
 
-	// TODO auto_advance_set(); // Find if autoadvancing element
+    // TODO auto_advance_set(); // Find if autoadvancing element
 
     // Start navigation
     ez_navigate('top', {alert: !propagated});
@@ -1113,89 +1113,89 @@ function ez_navigate_start(propagated, source) {
  */
 function load_ez() {
 
-	if(document.body.hasAttribute('data-ez-allowreorder')) {
-		allowReorder = true;
-	}
+    if(document.body.hasAttribute('data-ez-allowreorder')) {
+        allowReorder = true;
+    }
 
-	if(document.body.getAttribute('data-ez-autorepeat') === 'keyboard') {
-		autoRepeat = 'keyboard';
-	} else if(document.body.getAttribute('data-ez-autorepeat') === 'on') {
-		autoRepeat = 'on';
-	}
+    if(document.body.getAttribute('data-ez-autorepeat') === 'keyboard') {
+        autoRepeat = 'keyboard';
+    } else if(document.body.getAttribute('data-ez-autorepeat') === 'on') {
+        autoRepeat = 'on';
+    }
 
-	var lastEvent;
-	var heldKeys = {};
-	map = {}; // Have to do this weird thing in order to detect two keys at same time (e.g., shift+tab)
-	onkeydown = function (event) {
+    var lastEvent;
+    var heldKeys = {};
+    map = {}; // Have to do this weird thing in order to detect two keys at same time (e.g., shift+tab)
+    onkeydown = function (event) {
         autoAdvance = 0; // Stop any autoadvancing timers
-		window.clearInterval(autoAdvTimer);
-		if(autoRepeat == 'keyboard') {
+        window.clearInterval(autoAdvTimer);
+        if(autoRepeat == 'keyboard') {
             return1 = multikey_event(event);
-		} else if(autoRepeat == 'on') {
-			return1 = multikey_event(event);
+        } else if(autoRepeat == 'on') {
+            return1 = multikey_event(event);
             return2 = key_event(event);
-		}
-		if(lastEvent && lastEvent.keyCode == event.keyCode) {
-			return false;
-		}
-		lastEvent = event;
-		heldKeys[event.keyCode] = true;
-		if(autoRepeat == 'off') {
-			return1 = multikey_event(event);
-			return2 = key_down_event(event);
-		} else if(autoRepeat == 'keyboard') {
-			return2 = key_event(event);
-		}
+        }
+        if(lastEvent && lastEvent.keyCode == event.keyCode) {
+            return false;
+        }
+        lastEvent = event;
+        heldKeys[event.keyCode] = true;
+        if(autoRepeat == 'off') {
+            return1 = multikey_event(event);
+            return2 = key_down_event(event);
+        } else if(autoRepeat == 'keyboard') {
+            return2 = key_event(event);
+        }
         if (!(return1 && return2)) {
             return false;
         }
-	};
-	onkeyup = function (event) {
+    };
+    onkeyup = function (event) {
         key_up_event(event);
-		multikey_event(event);
-		lastEvent = null;
-		delete heldKeys[event.keyCode];
-		return false;
-	};
+        multikey_event(event);
+        lastEvent = null;
+        delete heldKeys[event.keyCode];
+        return false;
+    };
 
-	load_audio();
+    load_audio();
 
-	set_volume(); // If exists from previous page
+    set_volume(); // If exists from previous page
 
-	// "Universal" body tag stuff
-	if(document.body.hasAttribute('data-ez-screenwrap')) {
-		screenWrap = true;
-	}
+    // "Universal" body tag stuff
+    if(document.body.hasAttribute('data-ez-screenwrap')) {
+        screenWrap = true;
+    }
 
-	// Not actually implemented yet (just default is)
-	if(document.body.getAttribute('data-ez-tabnav') == 'standard') {
-		tabNav = 'standard';
-	} else if(document.body.getAttribute('data-ez-tabnav') == 'hybrid') {
-		tabNav = 'hybrid';
-	} else if(document.body.getAttribute('data-ez-tabnav') == 'none') {
-		tabNav = 'none';
-	}
+    // Not actually implemented yet (just default is)
+    if(document.body.getAttribute('data-ez-tabnav') == 'standard') {
+        tabNav = 'standard';
+    } else if(document.body.getAttribute('data-ez-tabnav') == 'hybrid') {
+        tabNav = 'hybrid';
+    } else if(document.body.getAttribute('data-ez-tabnav') == 'none') {
+        tabNav = 'none';
+    }
 
-	if(document.body.getAttribute('data-ez-slidetoread') == 'off') {
-		slideToRead = false;
-	}
-	if(document.body.getAttribute('data-ez-startingmode') == 'ezon') {
-		// On chrome, will not draw until a small amount of time passes for some reason
-		setTimeout(function () {
-			ez_navigate_start(false, 'nav');
-			drawSelected(selectedEls);
-		}, 10);
-	} else if(parseInt(sessionStorage.getItem("EZ_Toggle")) == true && document.body.getAttribute('data-ez-startingmode') != 'ezoff') {
-		setTimeout(function () {
-			ez_navigate_start(true, 'nav');
-			drawSelected(selectedEls);
-		}, 10);
-	}
+    if(document.body.getAttribute('data-ez-slidetoread') == 'off') {
+        slideToRead = false;
+    }
+    if(document.body.getAttribute('data-ez-startingmode') == 'ezon') {
+        // On chrome, will not draw until a small amount of time passes for some reason
+        setTimeout(function () {
+            ez_navigate_start(false, 'nav');
+            drawSelected(selectedEls);
+        }, 10);
+    } else if(parseInt(sessionStorage.getItem("EZ_Toggle")) == true && document.body.getAttribute('data-ez-startingmode') != 'ezoff') {
+        setTimeout(function () {
+            ez_navigate_start(true, 'nav');
+            drawSelected(selectedEls);
+        }, 10);
+    }
 
-	//idle_loop(); // TODO/ TEMP
+    //idle_loop(); // TODO/ TEMP
 
-	// Touch gesture dragging
-	if(slideToRead) {
+    // Touch gesture dragging
+    if(slideToRead) {
         document.addEventListener('touchmove', function(e) {
 
             e = e || window.event;
@@ -1225,17 +1225,17 @@ function load_ez() {
             }
         });
 
-	}
+    }
 
-	// Load any potential dictionary
-	if(document.body.hasAttribute('data-ez-pronounce')) {
-		Lib.ajax.getJSON({
-			url: document.body.getAttribute('data-ez-pronounce'),
-			type: 'json'
-		}, function (getDictionary) {
-			dictionary = JSON.parse(getDictionary);
-		});
-	}
+    // Load any potential dictionary
+    if(document.body.hasAttribute('data-ez-pronounce')) {
+        Lib.ajax.getJSON({
+            url: document.body.getAttribute('data-ez-pronounce'),
+            type: 'json'
+        }, function (getDictionary) {
+            dictionary = JSON.parse(getDictionary);
+        });
+    }
 
     ez_loaded = true;
 }
@@ -1323,80 +1323,80 @@ function drawSelected( nodArr ) {
     var height = maxVert - minVert;
 
 
-	if(width == 0 && height == 0) {
-		// If there is a problem finding the element position
-		return false;
-	}
-	var old = document.getElementById(ezSelectorId);
-	if(old === null) {
-		var div = document.createElement('div');
-		div.setAttribute("data-ez-focusable", "false");
-		var rgb = "rgba(" + hexToRgb(EzCustomColor).r + "," + hexToRgb(EzCustomColor).g + "," + hexToRgb(EzCustomColor).b + ",";
-		var rgbinverse = "rgba(" + (255 - hexToRgb(EzCustomColor).r) + "," + (255 - hexToRgb(EzCustomColor).g) + "," + (255 - hexToRgb(EzCustomColor).b) + ",";
-		// Load the CSS pulsing Stuff
-		var cssAnimation = document.createElement('hstyle');
-		cssAnimation.type = 'text/css';
-		var rules = document.createTextNode('@-webkit-keyframes pulse {' +
-			'from { border:5px solid ' + rgb + '1); }' +
-			'50% { border:5px solid ' + rgbinverse + '0.5); }' +
-			'to { border:5px solid ' + rgb + '0); }' +
-			'}');
-		cssAnimation.appendChild(rules);
-		document.getElementsByTagName("head")[0].appendChild(cssAnimation);
+    if(width == 0 && height == 0) {
+        // If there is a problem finding the element position
+        return false;
+    }
+    var old = document.getElementById(ezSelectorId);
+    if(old === null) {
+        var div = document.createElement('div');
+        div.setAttribute("data-ez-focusable", "false");
+        var rgb = "rgba(" + hexToRgb(EzCustomColor).r + "," + hexToRgb(EzCustomColor).g + "," + hexToRgb(EzCustomColor).b + ",";
+        var rgbinverse = "rgba(" + (255 - hexToRgb(EzCustomColor).r) + "," + (255 - hexToRgb(EzCustomColor).g) + "," + (255 - hexToRgb(EzCustomColor).b) + ",";
+        // Load the CSS pulsing Stuff
+        var cssAnimation = document.createElement('hstyle');
+        cssAnimation.type = 'text/css';
+        var rules = document.createTextNode('@-webkit-keyframes pulse {' +
+            'from { border:5px solid ' + rgb + '1); }' +
+            '50% { border:5px solid ' + rgbinverse + '0.5); }' +
+            'to { border:5px solid ' + rgb + '0); }' +
+            '}');
+        cssAnimation.appendChild(rules);
+        document.getElementsByTagName("head")[0].appendChild(cssAnimation);
 
-		div.style.border = "5px solid " + rgb + "1)";
-		div.style['boxShadow'] = "0px 0px 15px 5px " + rgb + ".80)";
-		div.id = ezSelectorId;
-		if(document.body.firstChild) {
-			document.body.insertBefore(div, document.body.firstChild);
-		} else {
-			document.body.appendChild(div);
-		}
-		old = document.getElementById(ezSelectorId); // Redefine the new selected div
-	}
-	old.style.visibility = "visible";
-	old.style.left = left - 10 + 'px';
-	old.style.top = top - 10 + 'px';
-	old.style.width = width + 10 + 'px';
-	old.style.height = height + 10 + 'px';
+        div.style.border = "5px solid " + rgb + "1)";
+        div.style['boxShadow'] = "0px 0px 15px 5px " + rgb + ".80)";
+        div.id = ezSelectorId;
+        if(document.body.firstChild) {
+            document.body.insertBefore(div, document.body.firstChild);
+        } else {
+            document.body.appendChild(div);
+        }
+        old = document.getElementById(ezSelectorId); // Redefine the new selected div
+    }
+    old.style.visibility = "visible";
+    old.style.left = left - 10 + 'px';
+    old.style.top = top - 10 + 'px';
+    old.style.width = width + 10 + 'px';
+    old.style.height = height + 10 + 'px';
 
     // Un-hide highlight, if once hidden
     old.style.visibility = '';
 
     smoothScroll(top - (document.documentElement.clientHeight/4));
 
-	return true;
+    return true;
 }
 
 /**
  * Event listener if window is resized ==> The selected box will be redrawn.
  */
 window.onresize = function () {
-	if(ez_navigateToggle) {
+    if(ez_navigateToggle) {
         var actionable = getActionableElement(selectedEls, 'nav');
         var label = get_label(actionable);
         if(label !== null) drawSelected(selectedEls.concat([label]));
         else drawSelected(selectedEls);
-	}
+    }
 };
 
 /**
  * Stops EZ Access navigation, hides EZ Access selector and resets variables.
  */
 function stopEZ() {
-	ez_navigateToggle = false;
-	idle_loop();
+    ez_navigateToggle = false;
+    idle_loop();
     selectedEls = [];
-	voice("");
-	sessionStorage.setItem("EZ_Toggle", "0");
-	var old = document.getElementById(ezSelectorId);
-	if(old !== null) {
-		old.style.visibility = "hidden";
-		old.style.left = 0 + "px";
-		old.style.top = 0 + "px";
-		old.style.width = 0 + "px";
-		old.style.height = 0 + "px";
-	}
+    voice("");
+    sessionStorage.setItem("EZ_Toggle", "0");
+    var old = document.getElementById(ezSelectorId);
+    if(old !== null) {
+        old.style.visibility = "hidden";
+        old.style.left = 0 + "px";
+        old.style.top = 0 + "px";
+        old.style.width = 0 + "px";
+        old.style.height = 0 + "px";
+    }
 }
 
 /**
@@ -1405,8 +1405,8 @@ function stopEZ() {
  * @returns {boolean} Debug status
  */
 function _debug(s) {
-	if (debugMode) {
-		console.log(s);
-	}
+    if (debugMode) {
+        console.log(s);
+    }
     return debugMode;
 }

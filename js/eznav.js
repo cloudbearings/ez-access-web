@@ -91,7 +91,7 @@ function key_up_event(e) {
  * @returns {boolean} If false, disables default key action.
  */
 function key_down_event(e) {
-	// 'if' keycode statements
+    // 'if' keycode statements
     if(e.keyCode == EZ_KEY_HELP || e.keyCode == 72) { // 72 == 'h'
         if(tinyOpen) {
             closeTiny(true, 'nav');
@@ -103,83 +103,83 @@ function key_down_event(e) {
             helpJustPressed = false;
         }
     } else if(e.keyCode == EZ_KEY_UP) {
-		if(tinyOpen) {
+        if(tinyOpen) {
             if(tinyOpen && helpObj !== null) {
                 ez_help_goto_section(-1);
             } else {
                 closeTiny(true, 'nav');
             }
-		} else {
-			if(ez_navigateToggle) {
-				ez_navigate('up');
-			} else {
-				ez_navigate_start(false, 'nav');
-			}
-		}
-	} else if(e.keyCode == EZ_KEY_DOWN) {
-		if(tinyOpen) {
+        } else {
+            if(ez_navigateToggle) {
+                ez_navigate('up');
+            } else {
+                ez_navigate_start(false, 'nav');
+            }
+        }
+    } else if(e.keyCode == EZ_KEY_DOWN) {
+        if(tinyOpen) {
             if(tinyOpen && helpObj !== null) {
                 ez_help_goto_section(1);
             } else {
                 closeTiny(true, 'nav');
             }
-		} else {
-			if(ez_navigateToggle) {
-				ez_navigate('down');
-			} else {
-				ez_navigate_start(false, 'nav');
-			}
-		}
-	} else if(e.keyCode == EZ_KEY_BACK || e.keyCode == 66) { // 'b' == 66
-		// TODO
-		if(tinyOpen) {
+        } else {
+            if(ez_navigateToggle) {
+                ez_navigate('down');
+            } else {
+                ez_navigate_start(false, 'nav');
+            }
+        }
+    } else if(e.keyCode == EZ_KEY_BACK || e.keyCode == 66) { // 'b' == 66
+        // TODO
+        if(tinyOpen) {
             closeTiny(true, 'nav');
-		} else {
-			var el = getKeyBinding('back');
-			if (el === null) {
-				window.history.back();
-			} else {
-				el.click();
-			}
-		}
-	} else if (e.keyCode === EZ_KEY_NEXT) {
-		if(tinyOpen) {
+        } else {
+            var el = getKeyBinding('back');
+            if (el === null) {
+                window.history.back();
+            } else {
+                el.click();
+            }
+        }
+    } else if (e.keyCode === EZ_KEY_NEXT) {
+        if(tinyOpen) {
             closeTiny(true, 'nav');
-		} else {
-			var el = getKeyBinding('next');
-			if (el !== null) {
-				el.click();
-			}
-		}
-	} else if(e.keyCode == EZ_KEY_ENTER || e.keyCode == KB_ENTER) {
-		if(tinyOpen) {
+        } else {
+            var el = getKeyBinding('next');
+            if (el !== null) {
+                el.click();
+            }
+        }
+    } else if(e.keyCode == EZ_KEY_ENTER || e.keyCode == KB_ENTER) {
+        if(tinyOpen) {
             sounds[AUDIO_NOACTION].feed.play();
             tinyContent = document.getElementById('tinycontent');
             voice([tinyContent], {repeat: true});
-		} else {
-			if(ez_navigateToggle) {
-				ez_enter(selectedEls, 'nav');
-			}
-			return false; // Disable any browser actions
-		}
-	} else if(e.keyCode == EZ_KEY_SKIPFORWARD) {
-		if(selectedEls.type == 'range') {
-			selectedEls.value = parseFloat(selectedEls.value) + parseFloat(selectedEls.step);
-			sounds[AUDIO_MOVE].feed.play();
-			voice(selectedEls.value);
-		} else if(selectedEls.tagName == 'SELECT') {
-			if(selectedEls.selectedIndex < selectedEls.length - 1) {
-				selectedEls.selectedIndex++;
-				sounds[AUDIO_MOVE].feed.play();
-				voice(selectedEls.value + '... option ' + (selectedEls.selectedIndex + 1) + ' of ' + selectedEls.length);
-			} else {
-				document.getElementById(ezSelectorId).className = 'pulse';
-				setTimeout(function () {
-					document.getElementById(ezSelectorId).className = '';
-				}, 300);
-				sounds[AUDIO_NOACTION].feed.play();
-			}
-		} else {
+        } else {
+            if(ez_navigateToggle) {
+                ez_enter(selectedEls, 'nav');
+            }
+            return false; // Disable any browser actions
+        }
+    } else if(e.keyCode == EZ_KEY_SKIPFORWARD) {
+        if(selectedEls.type == 'range') {
+            selectedEls.value = parseFloat(selectedEls.value) + parseFloat(selectedEls.step);
+            sounds[AUDIO_MOVE].feed.play();
+            voice(selectedEls.value);
+        } else if(selectedEls.tagName == 'SELECT') {
+            if(selectedEls.selectedIndex < selectedEls.length - 1) {
+                selectedEls.selectedIndex++;
+                sounds[AUDIO_MOVE].feed.play();
+                voice(selectedEls.value + '... option ' + (selectedEls.selectedIndex + 1) + ' of ' + selectedEls.length);
+            } else {
+                document.getElementById(ezSelectorId).className = 'pulse';
+                setTimeout(function () {
+                    document.getElementById(ezSelectorId).className = '';
+                }, 300);
+                sounds[AUDIO_NOACTION].feed.play();
+            }
+        } else {
             if(audioVolume <= 90) {
                 audioVolume += 10;
                 sessionStorage.setItem("EZ_Volume", audioVolume);
@@ -194,25 +194,25 @@ function key_down_event(e) {
                 sounds[AUDIO_NOACTION].feed.play();
                 voice("Maximum volume");
             }
-		}
-	} else if(e.keyCode == EZ_KEY_SKIPBACKWARD) {
-		if(selectedEls.type == 'range') {
-			selectedEls.value = parseFloat(selectedEls.value) - parseFloat(selectedEls.step);
-			sounds[AUDIO_MOVE].feed.play();
-			voice(selectedEls.value);
-		} else if(selectedEls.tagName == 'SELECT') {
-			if(selectedEls.selectedIndex > 0) {
-				selectedEls.selectedIndex--;
-				sounds[AUDIO_MOVE].feed.play();
-				voice(selectedEls.value + '... option ' + (selectedEls.selectedIndex + 1) + ' of ' + selectedEls.length);
-			} else {
-				document.getElementById(ezSelectorId).className = 'pulse';
-				setTimeout(function () {
-					document.getElementById(ezSelectorId).className = '';
-				}, 300);
-				sounds[AUDIO_NOACTION].feed.play();
-			}
-		} else {
+        }
+    } else if(e.keyCode == EZ_KEY_SKIPBACKWARD) {
+        if(selectedEls.type == 'range') {
+            selectedEls.value = parseFloat(selectedEls.value) - parseFloat(selectedEls.step);
+            sounds[AUDIO_MOVE].feed.play();
+            voice(selectedEls.value);
+        } else if(selectedEls.tagName == 'SELECT') {
+            if(selectedEls.selectedIndex > 0) {
+                selectedEls.selectedIndex--;
+                sounds[AUDIO_MOVE].feed.play();
+                voice(selectedEls.value + '... option ' + (selectedEls.selectedIndex + 1) + ' of ' + selectedEls.length);
+            } else {
+                document.getElementById(ezSelectorId).className = 'pulse';
+                setTimeout(function () {
+                    document.getElementById(ezSelectorId).className = '';
+                }, 300);
+                sounds[AUDIO_NOACTION].feed.play();
+            }
+        } else {
             if(audioVolume >= 10) {
                 sessionStorage.setItem("EZ_Volume", audioVolume);
                 audioVolume -= 10;
@@ -227,37 +227,37 @@ function key_down_event(e) {
                 sounds[AUDIO_NOACTION].feed.play();
                 voice("Minimum volume");
             }
-		}
-	} else if(selectedEls.type == 'textarea' || selectedEls.type == 'text') {
-		var key = String.fromCharCode(e.keyCode);
-		if(!key.match(/[^A-Za-z0-9\-_]/)) voice(key);
-	}
-	return true;
+        }
+    } else if(selectedEls.type == 'textarea' || selectedEls.type == 'text') {
+        var key = String.fromCharCode(e.keyCode);
+        if(!key.match(/[^A-Za-z0-9\-_]/)) voice(key);
+    }
+    return true;
 }
 
 
 /**
  * Finds the DOM element where key matches the data-ez-keybinding attribute.
  * @author J. Bern Jordan
- * @param {string} key A key name. Supported key names are in the constant 
+ * @param {string} key A key name. Supported key names are in the constant
  * array SUPPORTED_KEY_NAMES.
  * @return {Element|null} Returns the first DOM element with the keybinding
  * or null otherwise.
  */
 function getKeyBinding(key) {
-	'use strict'
+    'use strict'
 
     // Allow any case (consistent w/ HTML)
     key = key.toLowerCase();
 
-	var SUPPORTED_KEY_NAMES = ['back','next'];
+    var SUPPORTED_KEY_NAMES = ['back','next'];
 
-	if (SUPPORTED_KEY_NAMES.indexOf(key.toString()) < 0) {
+    if (SUPPORTED_KEY_NAMES.indexOf(key.toString()) < 0) {
         _debug('getKeyBinding(): key=' + key + ' is not supported.');
-		return null;
-	}
+        return null;
+    }
 
-	return document.querySelector("[data-ez-keybinding~='" + key + "']");
+    return document.querySelector("[data-ez-keybinding~='" + key + "']");
 }
 
 /**
@@ -406,7 +406,7 @@ function ez_jump(nodArr, source) {
 
     blurPrev();
 
-	selectedEls = nodArr;
+    selectedEls = nodArr;
 
     drawSelected(selectedEls);
 
@@ -459,7 +459,7 @@ function hrefJump(obj) {
  */
 function ez_enter(nodArr, source, userDid) {
 
-	var obj = getActionableElement(nodArr, source);
+    var obj = getActionableElement(nodArr, source);
 
     var sound = AUDIO_NOACTION;
     var spoken = "";
@@ -483,22 +483,22 @@ function ez_enter(nodArr, source, userDid) {
     } else if(getClick(obj) !== null || getType(obj) === 'submit' || getType(obj) === 'button') {
         sound = AUDIO_SELECT;
         speak = false;
-		obj.click();
-	} else if(isInteractive(obj)) {
+        obj.click();
+    } else if(isInteractive(obj)) {
         // TODO: Basis for clicking interactive elements prompts
-		obj.click();
-		if(obj.checked) {
-			sounds[AUDIO_SELECT].feed.play();
-		} else {
-			sounds[AUDIO_DESELECT].feed.play();
-		}
-	} else if(obj.tagName == 'INPUT' && (obj.type == 'submit' || obj.type == 'image')) {
-		obj.click();
-	} else {
+        obj.click();
+        if(obj.checked) {
+            sounds[AUDIO_SELECT].feed.play();
+        } else {
+            sounds[AUDIO_DESELECT].feed.play();
+        }
+    } else if(obj.tagName == 'INPUT' && (obj.type == 'submit' || obj.type == 'image')) {
+        obj.click();
+    } else {
         pulseSelector();
         clicked = false;
         repeat = true;
-	}
+    }
 
     /*
      * AUDIO ICON
@@ -536,76 +536,76 @@ function pulseSelector() {
  * @returns {boolean} If false, overrides default action.
  */
 function multikey_event(e) {
-	e = e || event; //to deal with IE
-	map[e.keyCode] = !!(e.type == 'keydown');
-	if(map[KB_TAB] && map[KB_SHIFT] && tabNav != 'none') { //SHIFT+TAB
-		if(tinyOpen) {
+    e = e || event; //to deal with IE
+    map[e.keyCode] = !!(e.type == 'keydown');
+    if(map[KB_TAB] && map[KB_SHIFT] && tabNav != 'none') { //SHIFT+TAB
+        if(tinyOpen) {
             if(tinyOpen && helpObj !== null) {
                 ez_help_goto_section(-1);
             } else {
                 closeTiny(true, 'nav');
             }
-		} else if(ez_navigateToggle) {
-			ez_navigate('up');
-			//window.scroll(0,findPos(selectedEls));
-		} else {
-			ez_navigate_start(false, 'nav');
-		}
-		return false; // Overwrite default browser functionality
-	} else if(map[KB_TAB] && tabNav != 'none') { //TAB
-		if(tinyOpen) {
+        } else if(ez_navigateToggle) {
+            ez_navigate('up');
+            //window.scroll(0,findPos(selectedEls));
+        } else {
+            ez_navigate_start(false, 'nav');
+        }
+        return false; // Overwrite default browser functionality
+    } else if(map[KB_TAB] && tabNav != 'none') { //TAB
+        if(tinyOpen) {
             if(tinyOpen && helpObj !== null) {
                 ez_help_goto_section(1);
             } else {
                 closeTiny(true, 'nav');
             }
-		}else if(ez_navigateToggle) {
-			ez_navigate('down');
-			//window.scroll(0,findPos(selectedEls));
-		} else {
-			ez_navigate_start(false, 'nav');
-		}
-		return false;
-	}
-	return true;
+        }else if(ez_navigateToggle) {
+            ez_navigate('down');
+            //window.scroll(0,findPos(selectedEls));
+        } else {
+            ez_navigate_start(false, 'nav');
+        }
+        return false;
+    }
+    return true;
 }
 
 /**
  * Sets autoadvancing timer.
  */
 function auto_advance_set() {
-	// If this is a new element to start autoadvancing, set the timer
-	if(find_parent_attr(selectedEls, 'data-ez-autoadvance') !== undefined) {
-		if(find_parent_attr(selectedElsements[currIndex - 1], 'data-ez-autoadvance') === undefined) {
-			autoAdvance = find_parent_attr(selectedEls, 'data-ez-autoadvance');
-			autoAdvance = parseInt(autoAdvance);
-			if(autoAdvance < 100) {
-				console.log("Please choose a autoadvance pause of 100 ms or greater.");
-				autoAdvance = 100;
-			}
-			auto_advance_decide();
-		}
-	}
+    // If this is a new element to start autoadvancing, set the timer
+    if(find_parent_attr(selectedEls, 'data-ez-autoadvance') !== undefined) {
+        if(find_parent_attr(selectedElsements[currIndex - 1], 'data-ez-autoadvance') === undefined) {
+            autoAdvance = find_parent_attr(selectedEls, 'data-ez-autoadvance');
+            autoAdvance = parseInt(autoAdvance);
+            if(autoAdvance < 100) {
+                console.log("Please choose a autoadvance pause of 100 ms or greater.");
+                autoAdvance = 100;
+            }
+            auto_advance_decide();
+        }
+    }
 }
 
 /**
  * Handles autoadvancing, and stopping autoadvancing if runs into end.
  */
 function auto_advance_decide() {
-	window.clearInterval(autoAdvTimer);
-	if(autoAdvance !== 0) {
-		autoAdvTimer = setInterval(function () {
-			ez_navigate('down');
-			if(currIndex >= findFocusable('last')) {
-				autoAdvance = 0;
-				window.clearInterval(autoAdvTimer);
-			}
-			if(find_parent_attr(selectedEls, 'data-ez-autoadvance') === undefined) {
-				autoAdvance = 0;
-				window.clearInterval(autoAdvTimer);
-			}
-		}, autoAdvance);
-	}
+    window.clearInterval(autoAdvTimer);
+    if(autoAdvance !== 0) {
+        autoAdvTimer = setInterval(function () {
+            ez_navigate('down');
+            if(currIndex >= findFocusable('last')) {
+                autoAdvance = 0;
+                window.clearInterval(autoAdvTimer);
+            }
+            if(find_parent_attr(selectedEls, 'data-ez-autoadvance') === undefined) {
+                autoAdvance = 0;
+                window.clearInterval(autoAdvTimer);
+            }
+        }, autoAdvance);
+    }
 }
 
 /**
@@ -614,14 +614,14 @@ function auto_advance_decide() {
  * @returns {number} Where to scroll to
  */
 function currentYPosition() {
-	// Firefox, Chrome, Opera, Safari
-	if(self.pageYOffset) return self.pageYOffset;
-	// Internet Explorer 6 - standards mode
-	if(document.documentElement && document.documentElement.scrollTop)
-		return document.documentElement.scrollTop;
-	// Internet Explorer 6, 7 and 8
-	if(document.body.scrollTop) return document.body.scrollTop;
-	return 0;
+    // Firefox, Chrome, Opera, Safari
+    if(self.pageYOffset) return self.pageYOffset;
+    // Internet Explorer 6 - standards mode
+    if(document.documentElement && document.documentElement.scrollTop)
+        return document.documentElement.scrollTop;
+    // Internet Explorer 6, 7 and 8
+    if(document.body.scrollTop) return document.body.scrollTop;
+    return 0;
 }
 
 /**
@@ -629,30 +629,30 @@ function currentYPosition() {
  * @param stopY Where to stop the incremental scrolling
  */
 function smoothScroll(stopY) {
-	var startY = currentYPosition();
-	var distance = stopY > startY ? stopY - startY : startY - stopY;
-	if(distance < 100) {
-		scrollTo(0, stopY);
-		return;
-	}
-	var speed = Math.round(distance / 100);
-	if(speed >= 20) speed = 20;
-	var step = Math.round(distance / 200);
-	var leapY = stopY > startY ? startY + step : startY - step;
-	var timer = 0;
-	if(stopY > startY) {
-		for(i = startY; i < stopY; i += step) {
-			setTimeout("window.scrollTo(0, " + leapY + ")", timer * speed);
-			leapY += step;
-			if(leapY > stopY) leapY = stopY;
-			timer++;
-		}
-		return;
-	}
-	for(i = startY; i > stopY; i -= step) {
-		setTimeout("window.scrollTo(0, " + leapY + ")", timer * speed);
-		leapY -= step;
-		if(leapY < stopY) leapY = stopY;
-		timer++;
-	}
+    var startY = currentYPosition();
+    var distance = stopY > startY ? stopY - startY : startY - stopY;
+    if(distance < 100) {
+        scrollTo(0, stopY);
+        return;
+    }
+    var speed = Math.round(distance / 100);
+    if(speed >= 20) speed = 20;
+    var step = Math.round(distance / 200);
+    var leapY = stopY > startY ? startY + step : startY - step;
+    var timer = 0;
+    if(stopY > startY) {
+        for(i = startY; i < stopY; i += step) {
+            setTimeout("window.scrollTo(0, " + leapY + ")", timer * speed);
+            leapY += step;
+            if(leapY > stopY) leapY = stopY;
+            timer++;
+        }
+        return;
+    }
+    for(i = startY; i > stopY; i -= step) {
+        setTimeout("window.scrollTo(0, " + leapY + ")", timer * speed);
+        leapY -= step;
+        if(leapY < stopY) leapY = stopY;
+        timer++;
+    }
 }
