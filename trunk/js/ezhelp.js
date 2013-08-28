@@ -36,7 +36,7 @@ var DEFAULT_HELP = '<!doctype html> <html lang="en"> <head> <meta charset="utf-8
 function ez_help(alert) {
 
     // If null, EZ Access is not started, so default to body help text.
-    if(alert === null) alert = document.body;
+    if (alert === null) alert = document.body;
 
     helpJustOpened = true;
 
@@ -46,16 +46,16 @@ function ez_help(alert) {
     helpObj = null;
 
     // Hide EZ Highlight
-    if(document.getElementById(ezSelectorId)) document.getElementById(ezSelectorId).style.visibility = 'hidden';
+    if (document.getElementById(ezSelectorId)) document.getElementById(ezSelectorId).style.visibility = 'hidden';
 
     var helpText = "";
 
-    if(typeof alert === 'string') {
+    if (typeof alert === 'string') {
         helpText = alert + append_footnote(true, true);
-    } else if(typeof alert === 'object') {
+    } else if (typeof alert === 'object') {
         helpObj = alert;
         var helpArr = getHelpArray(alert);
-        if(helpArr.length === 0) {
+        if (helpArr.length === 0) {
             helpText = 'No EZ Help is available.';
         } else {
             helpText = helpArr[0] + append_footnote(true, false);
@@ -76,12 +76,12 @@ function ez_help_goto_section(skip) {
 
     var helpText = "";
 
-    if(helpObj !== null) {
+    if (helpObj !== null) {
         var helpPrompts = getHelpArray(helpObj);
 
-        if(helpCounter !== Math.round(helpCounter)) {
+        if (helpCounter !== Math.round(helpCounter)) {
             throw new Error('Invalid section! Check passed parameters.')
-        } else if(helpCounter + skip === -1) {
+        } else if (helpCounter + skip === -1) {
             // First, 'default' page
             helpCounter += skip;
             helpText = 'Start of help text.' + append_footnote(true, false);
@@ -90,7 +90,7 @@ function ez_help_goto_section(skip) {
             playSFX(AUDIO_NAV_MOVE, 'nav');
             tinyContent = document.getElementById('tinycontent');
             voice([tinyContent]);
-        } else if(helpPrompts.length===helpCounter + skip) {
+        } else if (helpPrompts.length === helpCounter + skip) {
             // Last, 'default' page
             helpCounter += skip;
             helpText = 'End of help text.' + append_footnote(false, true);
@@ -99,10 +99,11 @@ function ez_help_goto_section(skip) {
             playSFX(AUDIO_NAV_MOVE, 'nav');
             tinyContent = document.getElementById('tinycontent');
             voice([tinyContent]);
-        } else if(helpCounter + skip < -1 || helpCounter + skip > helpPrompts.length) {
+        } else if (helpCounter + skip < -1 || helpCounter + skip > helpPrompts.length) {
             // Out of range, exit
             closeTiny(true);
         } else {
+            // Still in range; normal
             helpCounter += skip;
             helpText = helpPrompts[helpCounter] + append_footnote(false, false);
 
@@ -131,15 +132,15 @@ function append_footnote(isFirst, isLast) {
 
     ret += '<hr>';
 
-    if(isFirst) {
+    if (isFirst) {
         ret += '<p style="text-align:center">' + repeat + '</p>';
     }
 
-    ret += '<p style="text-align:center">' + more + '</p>';
-
-    if(isLast) {
-        ret += '<p style="text-align:center">' + leave + '</p>';
+    if (!isLast) {
+        ret += '<p style="text-align:center">' + more + '</p>';
     }
+
+    ret += '<p style="text-align:center">' + leave + '</p>';
 
 
     return ret;
@@ -152,8 +153,8 @@ function append_footnote(isFirst, isLast) {
  * Mostly for when clicking outside of lightbox and it closes itself.
  */
 function closeTiny(close, source) {
-    if(!helpJustOpened) {
-        if(ez_navigateToggle) {
+    if (!helpJustOpened) {
+        if (ez_navigateToggle) {
             ez_navigate('top');
         }
         voice(selectedEls, {source: source, pre: 'EZ Help Closed. '});
@@ -162,10 +163,10 @@ function closeTiny(close, source) {
     }
 
     // Hide EZ Highlight
-    if(document.getElementById(ezSelectorId)) document.getElementById(ezSelectorId).style.visibility = '';
+    if (document.getElementById(ezSelectorId)) document.getElementById(ezSelectorId).style.visibility = '';
 
     playSFX(AUDIO_NAV_MOVE, 'nav');
-    if(close) TINY.box.hide();
+    if (close) TINY.box.hide();
     tinyOpen = false;
 }
 
@@ -175,14 +176,14 @@ function closeTiny(close, source) {
  * @param {boolean} display If false, start timer for idle loop. Otherwise, display lightbox + reset.
  */
 function idle_loop(display) {
-    if(!display) {
-        if(alerts.idle.wait != -1) {
+    if (!display) {
+        if (alerts.idle.wait != -1) {
             idleLoop = self.setInterval(function () {
                 idle_loop(true)
             }, alerts.idle.wait);
         }
     } else {
-        if(!tinyOpen && !ez_navigateToggle) {
+        if (!tinyOpen && !ez_navigateToggle) {
             idleLoop = self.clearInterval(idleLoop);
             tinyOpen = true;
             ez_help(alerts.idle.value);
@@ -230,21 +231,21 @@ function getHelpArray(obj) {
      */
     var end;
 
-    if(obj.hasAttribute('data-ez-help')) {
+    if (obj.hasAttribute('data-ez-help')) {
         attr = obj.getAttribute('data-ez-help');
-    } else if(obj.tagName === 'BODY') {
+    } else if (obj.tagName === 'BODY') {
         attr = 'default#keypad8';
     }
 
-    if(attr !== '') {
+    if (attr !== '') {
 
         //See if this function needs to make a recursive call
         end = attr.slice(-TERMINATOR.length) === TERMINATOR;
 
         ret = attr.split(DELIMITER);
 
-        for(var i = 0; i < ret.length;) {
-            if(ret[i] == '' || ret[i] === null) {
+        for (var i = 0; i < ret.length;) {
+            if (ret[i] == '' || ret[i] === null) {
                 ret.splice(i, 1);
             } else {
                 var parsedRet = parseHelpPageString(ret[i]);
@@ -261,22 +262,22 @@ function getHelpArray(obj) {
     /**
      * This function may be called recursively on parent elements.
      */
-    if(!end) {
+    if (!end) {
         var parent = obj.parentNode;
 
         //End the recursion because there are no more parent elements
-        if(parent === null || parent.tagName === 'HTML') {
+        if (parent === null || parent.tagName === 'HTML') {
             return ret;
         }
 
         var recursive = getHelpArray(parent);
 
-        if(isArray({o: recursive}) && recursive !== null) {
-            if(ret === null) {
+        if (isArray({o: recursive}) && recursive !== null) {
+            if (ret === null) {
                 ret = [];
             }
             ret = ret.concat(recursive);
-        } else if(recursive !== null) {
+        } else if (recursive !== null) {
             throw new Error('Array not passed to getHelpArray()');
         } //else (thus recursive === null) ret does not change (ret = ret;)
     }
@@ -298,12 +299,12 @@ function parseHelpPageString(s) {
     var ret;
 
     //First check if the string is a reference to another string
-    if(s.indexOf('#') !== -1) {
+    if (s.indexOf('#') !== -1) {
 
         // Potentially ID-referencing
         var ref = s.split('#');
 
-        if(ref[0].trim().length === 0) {
+        if (ref[0].trim().length === 0) {
             //Referencing ID of el on current page
 
             //Hashes are *not* allowed in IDs (http://goo.gl/YgTLi), but get
@@ -314,17 +315,17 @@ function parseHelpPageString(s) {
 
             ret = getHelpFromObj(div, 'current page', id);
 
-            if(ret !== null) return ret;
+            if (ret !== null) return ret;
 
         } else {
             // (Potentially) referencing an external file
             var url = ref[0];
             var ext = url.slice(url.lastIndexOf('.') + 1);
 
-            if(ext == 'htm' || ext == 'html') {
+            if (ext == 'htm' || ext == 'html') {
                 // Forms URL: HTM or HTML. Still don't know if exists
                 var externalDocument = getDocument(url);
-                if(externalDocument !== null) {
+                if (externalDocument !== null) {
                     // Document exists. Still don't know if specific ID exists
 
                     var id = s.slice(s.indexOf('#') + 1);
@@ -332,13 +333,13 @@ function parseHelpPageString(s) {
 
                     ret = getHelpFromObj(div, url, id);
 
-                    if(ret !== null) return ret;
+                    if (ret !== null) return ret;
 
                 } else {
                     // Document doesn't exist; is an error
                     console.log("Error: Could not find file '" + url + "' for help layers");
                 }
-            } else if(url === 'default') { // Default file
+            } else if (url === 'default') { // Default file
                 var doc = document.implementation.createHTMLDocument("");
                 doc.body.innerHTML = DEFAULT_HELP;
 
@@ -347,7 +348,7 @@ function parseHelpPageString(s) {
 
                 ret = getHelpFromObj(div, url, id);
 
-                if(ret !== null) return ret;
+                if (ret !== null) return ret;
 
             } // ELSE: Invalid URL; not an error: Could just be a normal file
         }
@@ -365,14 +366,14 @@ function parseHelpPageString(s) {
  * @returns {string[]} Returns array of strings of 'help layers' that can be used from a given object.
  */
 function getHelpFromObj(obj, url, id) {
-    if(obj !== null) {
-        if(obj.hasAttribute('data-ez-help')) {
+    if (obj !== null) {
+        if (obj.hasAttribute('data-ez-help')) {
             var sections = obj.getElementsByTagName('section');
-            if(sections.length == 0) {
+            if (sections.length == 0) {
                 console.log("Error: No sections in ID '" + id + "' with data-ez-help attribute in '" + url + "' for help layers");
             } else {
                 var tempSecs = [];
-                for(var i = 0; i < sections.length; i++) {
+                for (var i = 0; i < sections.length; i++) {
                     tempSecs[i] = sections[i].innerHTML;
                 }
                 return tempSecs;
@@ -400,7 +401,7 @@ var xmlhttp = new XMLHttpRequest();
 function getDocument(url) {
     xmlhttp.open("GET", url + '?t=' + new Date().getTime(), false); // TODO : Disable caching for troubleshooting
     xmlhttp.send();
-    if(xmlhttp.status == 200) {
+    if (xmlhttp.status == 200) {
         var xmlString = xmlhttp.responseText,
             doc = document.implementation.createHTMLDocument("");
         doc.body.innerHTML = xmlString;
