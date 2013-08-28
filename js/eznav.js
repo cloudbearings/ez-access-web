@@ -46,37 +46,63 @@ var tabNav = 'ezaccess';
  */
 var idleLoop;
 
+/**
+ * On key up/down timer (to keep track of when to allow keypress)
+ * @type {Number}
+ */
+var onKeyHelp;
+
+/**
+ * If the EZ Help button was just pressed
+ * @type {boolean}
+ */
+var helpJustPressed = false;
+
 // If autoadvance is enabled or not
 // Also autoadvance timer is global to disable from other functions
 var autoAdvance = 0;
 var autoAdvTimer;
 
-
-/* Referred to by window.onload anonymous function.
-   http://www.dreamincode.net/code/snippet1246.htm */
-
 /**
- * Handles key events for EZ Access (except for multi-key pressed, like tab+shift handled by multikey_event)
+ * Handles kev on *released* events for EZ Access (except for multi-key, like tab+shift handled by multikey_event)
  * @param {event} e Event object passed from set up on EZ Access startup.
  * @returns {boolean} If false, disables default key action.
  */
-function key_event(e) {
-	// 'if' keycode statements
-	if(e.keyCode == EZ_KEY_HELP || e.keyCode == 72) { // 72 == 'h'
-        sounds[AUDIO_MOVE].feed.play();
+function key_up_event(e) {
+    if(e.keyCode == EZ_KEY_HELP || e.keyCode == 72) { // 72 == 'h'
 
-		if(tinyOpen) {
-			closeTiny(true);
-		} else {
-			ez_help(getActionableElement(selectedEls, 'nav'));
-		}
+        if(!tinyOpen && !helpJustPressed) {
+            ez_help(getActionableElement(selectedEls, 'nav'));
+            sounds[AUDIO_MOVE].feed.play();
+        }
 
         // Set when closing the lightbox
         document.getElementById('tinymask').addEventListener('click', function() {
             closeTiny(false);
         });
+        return false;
+    }
+    return true;
+}
 
-	} else if(e.keyCode == EZ_KEY_UP) {
+/**
+ * Handles key on *pressed* events for EZ Access (except for multi-key, like tab+shift handled by multikey_event)
+ * @param {event} e Event object passed from set up on EZ Access startup.
+ * @returns {boolean} If false, disables default key action.
+ */
+function key_down_event(e) {
+	// 'if' keycode statements
+    if(e.keyCode == EZ_KEY_HELP || e.keyCode == 72) { // 72 == 'h'
+        if(tinyOpen) {
+            closeTiny(true);
+            helpJustPressed = true;
+            onKeyHelp = setTimeout(function(){helpJustPressed = false},1000);
+            sounds[AUDIO_MOVE].feed.play();
+        } else {
+            window.clearTimeout(onKeyHelp);
+            helpJustPressed = false;
+        }
+    } else if(e.keyCode == EZ_KEY_UP) {
 		if(tinyOpen) {
             if(tinyOpen && helpObj !== null) {
                 ez_help_goto_section(-1);

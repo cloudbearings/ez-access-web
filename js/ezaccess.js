@@ -1142,7 +1142,7 @@ function load_ez() {
 		heldKeys[event.keyCode] = true;
 		if(autoRepeat == 'off') {
 			return1 = multikey_event(event);
-			return2 = key_event(event);
+			return2 = key_down_event(event);
 		} else if(autoRepeat == 'keyboard') {
 			return2 = key_event(event);
 		}
@@ -1151,6 +1151,7 @@ function load_ez() {
         }
 	};
 	onkeyup = function (event) {
+        key_up_event(event);
 		multikey_event(event);
 		lastEvent = null;
 		delete heldKeys[event.keyCode];
