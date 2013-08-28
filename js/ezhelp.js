@@ -86,8 +86,8 @@ function ez_help_goto_section(skip) {
             helpCounter += skip;
             helpText = 'Start of help text.' + append_footnote(true, false);
             TINY.box.show(helpText, 0, 400, 0, 0);
-
-            sounds[AUDIO_MOVE].feed.play();
+            playSFX(AUDIO_NAV_MOVE, 'nav');
+            playSFX(AUDIO_NAV_MOVE, 'nav');
             tinyContent = document.getElementById('tinycontent');
             voice([tinyContent]);
         } else if(helpPrompts.length===helpCounter + skip) {
@@ -96,7 +96,7 @@ function ez_help_goto_section(skip) {
             helpText = 'End of help text.' + append_footnote(false, true);
             TINY.box.show(helpText, 0, 400, 0, 0);
 
-            sounds[AUDIO_MOVE].feed.play();
+            playSFX(AUDIO_NAV_MOVE, 'nav');
             tinyContent = document.getElementById('tinycontent');
             voice([tinyContent]);
         } else if(helpCounter + skip < -1 || helpCounter + skip > helpPrompts.length) {
@@ -108,7 +108,7 @@ function ez_help_goto_section(skip) {
 
             TINY.box.show(helpText, 0, 400, 0, 0);
 
-            sounds[AUDIO_MOVE].feed.play();
+            playSFX(AUDIO_NAV_MOVE, 'nav');
             tinyContent = document.getElementById('tinycontent');
             voice([tinyContent]);
         }
@@ -164,7 +164,7 @@ function closeTiny(close, source) {
     // Hide EZ Highlight
     if(document.getElementById(ezSelectorId)) document.getElementById(ezSelectorId).style.visibility = '';
 
-    sounds[AUDIO_MOVE].feed.play();
+    playSFX(AUDIO_NAV_MOVE, 'nav');
     if(close) TINY.box.hide();
     tinyOpen = false;
 }

@@ -73,7 +73,7 @@ function key_up_event(e) {
 
         if(!tinyOpen && !helpJustPressed) {
             ez_help(getActionableElement(selectedEls, 'nav'));
-            sounds[AUDIO_MOVE].feed.play();
+            playSFX(AUDIO_NAV_MOVE, 'nav');
         }
 
         // Set when closing the lightbox
@@ -97,7 +97,7 @@ function key_down_event(e) {
             closeTiny(true, 'nav');
             helpJustPressed = true;
             onKeyHelp = setTimeout(function(){helpJustPressed = false},1000);
-            sounds[AUDIO_MOVE].feed.play();
+            playSFX(AUDIO_NAV_MOVE, 'nav');
         } else {
             window.clearTimeout(onKeyHelp);
             helpJustPressed = false;
@@ -153,7 +153,7 @@ function key_down_event(e) {
         }
     } else if(e.keyCode == EZ_KEY_ENTER || e.keyCode == KB_ENTER) {
         if(tinyOpen) {
-            sounds[AUDIO_NOACTION].feed.play();
+            playSFX(AUDIO_ACTION_NONE, 'nav');
             tinyContent = document.getElementById('tinycontent');
             voice([tinyContent], {repeat: true});
         } else {
@@ -165,66 +165,66 @@ function key_down_event(e) {
     } else if(e.keyCode == EZ_KEY_SKIPFORWARD) {
         if(selectedEls.type == 'range') {
             selectedEls.value = parseFloat(selectedEls.value) + parseFloat(selectedEls.step);
-            sounds[AUDIO_MOVE].feed.play();
+            playSFX(AUDIO_NAV_MOVE, 'nav');
             voice(selectedEls.value);
         } else if(selectedEls.tagName == 'SELECT') {
             if(selectedEls.selectedIndex < selectedEls.length - 1) {
                 selectedEls.selectedIndex++;
-                sounds[AUDIO_MOVE].feed.play();
+                playSFX(AUDIO_NAV_MOVE, 'nav');
                 voice(selectedEls.value + '... option ' + (selectedEls.selectedIndex + 1) + ' of ' + selectedEls.length);
             } else {
                 document.getElementById(ezSelectorId).className = 'pulse';
                 setTimeout(function () {
                     document.getElementById(ezSelectorId).className = '';
                 }, 300);
-                sounds[AUDIO_NOACTION].feed.play();
+                playSFX(AUDIO_ACTION_NONE, 'nav');
             }
         } else {
             if(audioVolume <= 90) {
                 audioVolume += 10;
                 sessionStorage.setItem("EZ_Volume", audioVolume);
                 set_volume();
-                sounds[AUDIO_MOVE].feed.play();
+                playSFX(AUDIO_NAV_MOVE, 'nav');
                 voice("Volume... " + audioVolume + " percent");
             } else {
                 document.getElementById(ezSelectorId).className = 'pulse';
                 setTimeout(function () {
                     document.getElementById(ezSelectorId).className = '';
                 }, 300);
-                sounds[AUDIO_NOACTION].feed.play();
+                playSFX(AUDIO_ACTION_NONE, 'nav');
                 voice("Maximum volume");
             }
         }
     } else if(e.keyCode == EZ_KEY_SKIPBACKWARD) {
         if(selectedEls.type == 'range') {
             selectedEls.value = parseFloat(selectedEls.value) - parseFloat(selectedEls.step);
-            sounds[AUDIO_MOVE].feed.play();
+            playSFX(AUDIO_NAV_MOVE, 'nav');
             voice(selectedEls.value);
         } else if(selectedEls.tagName == 'SELECT') {
             if(selectedEls.selectedIndex > 0) {
                 selectedEls.selectedIndex--;
-                sounds[AUDIO_MOVE].feed.play();
+                playSFX(AUDIO_NAV_MOVE, 'nav');
                 voice(selectedEls.value + '... option ' + (selectedEls.selectedIndex + 1) + ' of ' + selectedEls.length);
             } else {
                 document.getElementById(ezSelectorId).className = 'pulse';
                 setTimeout(function () {
                     document.getElementById(ezSelectorId).className = '';
                 }, 300);
-                sounds[AUDIO_NOACTION].feed.play();
+                playSFX(AUDIO_ACTION_NONE, 'nav');
             }
         } else {
             if(audioVolume >= 10) {
                 sessionStorage.setItem("EZ_Volume", audioVolume);
                 audioVolume -= 10;
                 set_volume();
-                sounds[AUDIO_MOVE].feed.play();
+                playSFX(AUDIO_NAV_MOVE, 'nav');
                 voice("Volume... " + audioVolume + " percent");
             } else {
                 document.getElementById(ezSelectorId).className = 'pulse';
                 setTimeout(function () {
                     document.getElementById(ezSelectorId).className = '';
                 }, 300);
-                sounds[AUDIO_NOACTION].feed.play();
+                playSFX(AUDIO_ACTION_NONE, 'nav');
                 voice("Minimum volume");
             }
         }
@@ -352,7 +352,7 @@ function ez_navigate(move, options) {
         }
 
         pulseSelector();
-        if(options.alert) sounds[AUDIO_NOACTION].feed.play();
+        if(options.alert) playSFX(AUDIO_ACTION_NONE, 'nav');
 
         return;
     } else if(argMove !== 'top' && argMove !== 'bottom') {
@@ -389,7 +389,7 @@ function ez_navigate(move, options) {
     if(label !== null) drawSelected(selectedEls.concat([label]));
     else drawSelected(selectedEls);
 
-    if(options.alert) sounds[getElementAudio(actionable)].feed.play();
+    if(options.alert) playSFX(actionable, 'nav');
 
     if(actionable !== null) actionable.focus();
 
@@ -412,7 +412,7 @@ function ez_jump(nodArr, source) {
 
     var actionable = getActionableElement(selectedEls, source);
 
-    sounds[getElementAudio(actionable)].feed.play();
+    playSFX(actionable, 'nav');
 
     if(actionable !== null) actionable.focus();
 
@@ -461,7 +461,7 @@ function ez_enter(nodArr, source, userDid) {
 
     var obj = getActionableElement(nodArr, source);
 
-    var sound = AUDIO_NOACTION;
+    var sound = AUDIO_ACTION_NONE;
     var spoken = "";
     var action = "";
     var clicked = true;
@@ -479,18 +479,18 @@ function ez_enter(nodArr, source, userDid) {
         ez_jump([jumpTo], source);
         clicked = false;
         nodArr = [jumpTo];
-        sound = AUDIO_SELECT;
+        sound = AUDIO_ACTION;
     } else if(getClick(obj) !== null || getType(obj) === 'submit' || getType(obj) === 'button') {
-        sound = AUDIO_SELECT;
+        sound = AUDIO_ACTION;
         speak = false;
         obj.click();
     } else if(isInteractive(obj)) {
         // TODO: Basis for clicking interactive elements prompts
         obj.click();
         if(obj.checked) {
-            sounds[AUDIO_SELECT].feed.play();
+            sound = AUDIO_ACTION_CHECK;
         } else {
-            sounds[AUDIO_DESELECT].feed.play();
+            sound = AUDIO_ACTION_UNCHECK;
         }
     } else if(obj.tagName == 'INPUT' && (obj.type == 'submit' || obj.type == 'image')) {
         obj.click();
@@ -503,7 +503,7 @@ function ez_enter(nodArr, source, userDid) {
     /*
      * AUDIO ICON
      */
-    sounds[sound].feed.play();
+    playSFX(sound, 'nav');
 
     /*
      * VOICE

@@ -24,11 +24,18 @@ function load_audio() {
  * These usually shouldn't be changed (cached indexes): just change
  * the URL for the audio name in the settings.js file.
  */
-var AUDIO_MOVE = find_audio('move');
-var AUDIO_SELECT = find_audio('select');
-var AUDIO_DESELECT = find_audio('deselect');
-var AUDIO_NOACTION = find_audio('noaction');
-var AUDIO_BUTTON = find_audio('button');
+var AUDIO_ACTION =          find_audio('action');
+var AUDIO_ACTION_NONE =     find_audio('action-none');
+var AUDIO_ACTION_CHECK =    find_audio('action-check');
+var AUDIO_ACTION_UNCHECK =  find_audio('action-uncheck');
+
+var AUDIO_NAV_INTERACTIVE = find_audio('nav-interactive');
+var AUDIO_NAV_MOVE =        find_audio('nav-move');
+var AUDIO_NAV_CHECKED =     find_audio('nav-checked');
+var AUDIO_NAV_UNCHECKED =   find_audio('nav-unchecked');
+
+var AUDIO_PAGECHANGE =      find_audio('pagechange');
+var AUDIO_ALERT =           find_audio('alert');
 
 /**
  * Searches sounds array of objects for name of sound
@@ -55,27 +62,6 @@ function set_volume() {
 }
 
 /**
- * Indexes sounds for specific tags from JSON setup file.
- * @returns {number} The audio ID.
- */
-function getElementAudio(obj) {
-
-    if(obj === null) return AUDIO_MOVE;
-
-    for(var tmp = ['p', 'span', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'li'], i = 0; i < tmp.length; i++) {
-        // To simplify comparing to a whole lot of possibilities, use a loop
-        if(getClick(obj) !== undefined || obj.tagName == 'INPUT') {
-            return AUDIO_BUTTON;
-        }
-        if(obj.tagName == tmp[i].toUpperCase()) {
-            return AUDIO_MOVE;
-        }
-    }
-    _debug('No specific sound for "' + obj.tagName + '" HTML tag.');
-    return AUDIO_MOVE;
-}
-
-/**
  * Plays an appropriate sound effect. The sound effect can be defined either
  * by passing a keyword or the element/nodes for which a sound effect is
  * needed (e.g., on navigation or pointing).
@@ -90,7 +76,7 @@ function getElementAudio(obj) {
 function playSFX(arg, source) {
     'use strict';
     /** The default sound effect if a better one is not found */
-    var DEFAULT_SOUND = AUDIO_MOVE;
+    var DEFAULT_SOUND = AUDIO_NAV_MOVE;
     /** The reference to the sound effect in sounds[] */
     var sfxRef;
 
@@ -108,31 +94,24 @@ function playSFX(arg, source) {
         sfxRef = DEFAULT_SOUND;
     }
 
-    //If argument is a string, play the file in sounds[]
-    if (typeof arg === 'string' || arg instanceof String) {
-        sfxRef = find_audio(arg);
-        if (arg.indexOf('AUDIO_') === 0) {
-            sfxRef = arg;
-        } else if (sfxRef < 0) {
-            //Could potentially do something else, like play a spearcon
-            _debug('getSFX(arg): arg=' + arg + ' not found in sounds[]');
-            return false;
-        }
+    //If argument is a number, play the file (via index) in sounds[]
+    if (typeof arg === 'number' || arg instanceof Number) {
+        sfxRef = arg;
     }
 
     else if (true) { //TODO check if DOM element or text node or collect of some type...
         var type = getType(arg);
         if (!isInteractive(arg)) {
-            sfxRef = AUDIO_MOVE;
+            sfxRef = AUDIO_NAV_MOVE;
         } else if (type === 'checkbox' || type === 'radio') {
             //example of value-dependendent SFX
             if (getValue(arg) === 'checked') {
-                sfxRef = AUDIO_BUTTON; //TODO: AUDIO_CHECKED
+                sfxRef = AUDIO_NAV_CHECKED;
             } else {
-                sfxRef = AUDIO_BUTTON; //TODO: AUDIO_UNCHECKED
+                sfxRef = AUDIO_NAV_UNCHECKED;
             }
         } else {
-            sfxRef = AUDIO_BUTTON;
+            sfxRef = AUDIO_ACTION;
         }
 
         if(isElement(arg)) {

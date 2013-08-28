@@ -1,21 +1,4 @@
 /**
- * Checks if parent is a descendant of the child.
- * @param {object} parent The DOM parent object.
- * @param {object} child The DOM child element.
- * @returns {boolean} True iff descendant.
- */
-function isDescendant(parent, child) {
-    var node = child.parentNode;
-    while(node != null) {
-        if(node == parent) {
-            return true;
-        }
-        node = node.parentNode;
-    }
-    return false;
-}
-
-/**
  * Generic anonymous JSON-getter function
  */
 (function () {
