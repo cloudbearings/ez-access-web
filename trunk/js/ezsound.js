@@ -104,14 +104,17 @@ function playSFX(arg, source) {
         if (!isInteractive(arg)) {
             sfxRef = AUDIO_NAV_MOVE;
         } else if (type === 'checkbox' || type === 'radio') {
-            //example of value-dependendent SFX
-            if (getValue(arg) === 'checked') {
+            //example of value-dependent SFX
+            var val = getValue(arg);
+	        if (val === true) {
                 sfxRef = AUDIO_NAV_CHECKED;
-            } else {
+            } else if (val === false) {
                 sfxRef = AUDIO_NAV_UNCHECKED;
-            }
+            } else {
+			    sfxRef = AUDIO_NAV_INTERACTIVE;
+	        }
         } else {
-            sfxRef = AUDIO_ACTION;
+            sfxRef = AUDIO_NAV_INTERACTIVE;
         }
 
         if(isElement(arg)) {
