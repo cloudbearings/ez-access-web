@@ -46,10 +46,16 @@ function ez_help(alert) {
         helpText = alert + append_footnote(true, true);
 	} else if(typeof alert === 'object') {
         helpObj = alert;
-        helpText = getHelpArray(alert)[0] + append_footnote(true, false);
+        var helpArr = getHelpArray(alert);
+        if(helpArr.length === 0) {
+            helpText = 'No EZ Help is available.';
+        } else {
+            helpText = helpArr[0] + append_footnote(true, false);
+        }
 	}
 	TINY.box.show(helpText, 0, 400, 0, 0);
-	voice(helpText);
+    tinyContent = document.getElementById('tinycontent');
+	voice([tinyContent]);
 }
 
 /**
@@ -68,7 +74,8 @@ function ez_help_goto_section(skip) {
             // Out of range, beep as if reached ond of page.
             sounds[AUDIO_NOACTION].feed.play();
             helpText = helpPrompts[helpCounter] + append_footnote(helpCounter === 0, helpCounter >= helpPrompts.length);
-            voice("Repeating help text: " + helpText);
+            tinyContent = document.getElementById('tinycontent');
+            voice([tinyContent], {repeat: true});
         } else {
             helpCounter += skip;
             helpText = helpPrompts[helpCounter] + append_footnote(helpCounter === 0, helpCounter >= helpPrompts.length);
@@ -76,7 +83,8 @@ function ez_help_goto_section(skip) {
             TINY.box.show(helpText, 0, 400, 0, 0);
 
             sounds[AUDIO_MOVE].feed.play();
-            voice(helpText);
+            tinyContent = document.getElementById('tinycontent');
+            voice([tinyContent]);
         }
     }
 }
