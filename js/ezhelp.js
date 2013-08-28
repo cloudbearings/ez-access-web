@@ -78,17 +78,33 @@ function ez_help_goto_section(skip) {
 
     if(helpObj !== null) {
         var helpPrompts = getHelpArray(helpObj);
+
         if(helpCounter !== Math.round(helpCounter)) {
             throw new Error('Invalid section! Check passed parameters.')
-        } else if(helpCounter + skip < 0 || helpCounter + skip >= helpPrompts.length) {
-            // Out of range, beep as if reached ond of page.
-            sounds[AUDIO_NOACTION].feed.play();
-            helpText = helpPrompts[helpCounter] + append_footnote(helpCounter === 0, helpCounter >= helpPrompts.length);
+        } else if(helpCounter + skip === -1) {
+            // First, 'default' page
+            helpCounter += skip;
+            helpText = 'Start of help text.' + append_footnote(true, false);
+            TINY.box.show(helpText, 0, 400, 0, 0);
+
+            sounds[AUDIO_MOVE].feed.play();
             tinyContent = document.getElementById('tinycontent');
-            voice([tinyContent], {repeat: true});
+            voice([tinyContent]);
+        } else if(helpPrompts.length===helpCounter + skip) {
+            // Last, 'default' page
+            helpCounter += skip;
+            helpText = 'End of help text.' + append_footnote(false, true);
+            TINY.box.show(helpText, 0, 400, 0, 0);
+
+            sounds[AUDIO_MOVE].feed.play();
+            tinyContent = document.getElementById('tinycontent');
+            voice([tinyContent]);
+        } else if(helpCounter + skip < -1 || helpCounter + skip > helpPrompts.length) {
+            // Out of range, exit
+            closeTiny(true);
         } else {
             helpCounter += skip;
-            helpText = helpPrompts[helpCounter] + append_footnote(helpCounter === 0, helpCounter >= helpPrompts.length);
+            helpText = helpPrompts[helpCounter] + append_footnote(false, false);
 
             TINY.box.show(helpText, 0, 400, 0, 0);
 
