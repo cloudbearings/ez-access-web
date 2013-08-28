@@ -17,6 +17,12 @@ var helpObj = null;
 var helpCounter = 0;
 
 /**
+ * If help was just opened, and nothing else done
+ * @type {boolean}
+ */
+var helpJustOpened = false;
+
+/**
  * Default EZ Help HTML File. Might make more flexible later,
  * but for now, replace ' with \' and remove linebreaks and replace here.
  * @type {string}
@@ -31,6 +37,8 @@ function ez_help(alert) {
 
     // If null, EZ Access is not started, so default to body help text.
     if(alert === null) alert = document.body;
+
+    helpJustOpened = true;
 
     tinyOpen = true;
 
@@ -63,6 +71,8 @@ function ez_help(alert) {
  * @param skip Relative order of sections to skip. Should usually be -1 or 1.
  */
 function ez_help_goto_section(skip) {
+
+    helpJustOpened = false;
 
     var helpText = "";
 
@@ -121,10 +131,19 @@ function append_footnote(isFirst, isLast) {
 
 /**
  * Cleanup in closing a Tiny Box (lightbox)
- * @param close Actually close the lightbox, or if it will be done automatically (and we just need to cleanup
+ * @param close Actually close the lightbox, or if it will be done automatically (and we just need to cleanup).
+ * @param source ['nav'|'point'] Navigation method
+ * Mostly for when clicking outside of lightbox and it closes itself.
  */
-function closeTiny(close) {
-    voice("EZ Help closed");
+function closeTiny(close, source) {
+    if(!helpJustOpened) {
+        if(ez_navigateToggle) {
+            ez_navigate('top');
+        }
+        voice(selectedEls, {source: source, pre: 'EZ Help Closed. '});
+    } else {
+        voice('');
+    }
 
     // Hide EZ Highlight
     if(document.getElementById(ezSelectorId)) document.getElementById(ezSelectorId).style.visibility = '';

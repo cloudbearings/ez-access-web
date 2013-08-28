@@ -37,7 +37,8 @@ function voice(obj, options) {
     var defaults = {
         source:      'nav',
         repeat:      false,
-        enqueue:     false
+        enqueue:     false,
+        pre:         ''
     };
     options = merge_options(defaults, options);
 
@@ -59,8 +60,11 @@ function voice(obj, options) {
 	}
 
 	if(dictionary !== null) {
-		speech = fixPronunciation(speech, dictionary);
+        speech = fixPronunciation(speech, dictionary);
 	}
+
+    // Workaround since Chrome's tts enqueue is a nightmare and likes deciding when it works
+    speech = options.pre + speech;
 
     _debug(speech);
 

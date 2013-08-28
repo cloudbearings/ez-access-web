@@ -78,7 +78,7 @@ function key_up_event(e) {
 
         // Set when closing the lightbox
         document.getElementById('tinymask').addEventListener('click', function() {
-            closeTiny(false);
+            closeTiny(false, 'point');
         });
         return false;
     }
@@ -94,7 +94,7 @@ function key_down_event(e) {
 	// 'if' keycode statements
     if(e.keyCode == EZ_KEY_HELP || e.keyCode == 72) { // 72 == 'h'
         if(tinyOpen) {
-            closeTiny(true);
+            closeTiny(true, 'nav');
             helpJustPressed = true;
             onKeyHelp = setTimeout(function(){helpJustPressed = false},1000);
             sounds[AUDIO_MOVE].feed.play();
@@ -107,7 +107,7 @@ function key_down_event(e) {
             if(tinyOpen && helpObj !== null) {
                 ez_help_goto_section(-1);
             } else {
-                closeTiny(true);
+                closeTiny(true, 'nav');
             }
 		} else {
 			if(ez_navigateToggle) {
@@ -121,7 +121,7 @@ function key_down_event(e) {
             if(tinyOpen && helpObj !== null) {
                 ez_help_goto_section(1);
             } else {
-                closeTiny(true);
+                closeTiny(true, 'nav');
             }
 		} else {
 			if(ez_navigateToggle) {
@@ -133,7 +133,7 @@ function key_down_event(e) {
 	} else if(e.keyCode == EZ_KEY_BACK || e.keyCode == 66) { // 'b' == 66
 		// TODO
 		if(tinyOpen) {
-            closeTiny(true);
+            closeTiny(true, 'nav');
 		} else {
 			var el = getKeyBinding('back');
 			if (el === null) {
@@ -144,7 +144,7 @@ function key_down_event(e) {
 		}
 	} else if (e.keyCode === EZ_KEY_NEXT) {
 		if(tinyOpen) {
-            closeTiny(true);
+            closeTiny(true, 'nav');
 		} else {
 			var el = getKeyBinding('next');
 			if (el !== null) {
@@ -153,7 +153,9 @@ function key_down_event(e) {
 		}
 	} else if(e.keyCode == EZ_KEY_ENTER || e.keyCode == KB_ENTER) {
 		if(tinyOpen) {
-            closeTiny(true);
+            sounds[AUDIO_NOACTION].feed.play();
+            tinyContent = document.getElementById('tinycontent');
+            voice([tinyContent], {repeat: true});
 		} else {
 			if(ez_navigateToggle) {
 				ez_enter(selectedEls, 'nav');
@@ -315,8 +317,8 @@ function ez_navigate(move, options) {
 
     // set up default options
     var defaults = {
-        voice:      true,
-        alert:      true
+        voice:          true,
+        alert:          true
     };
     options = merge_options(defaults, options);
 
@@ -391,7 +393,7 @@ function ez_navigate(move, options) {
 
     if(actionable !== null) actionable.focus();
 
-    if(options.voice) voice(selectedEls, 'nav');
+    if(options.voice) voice(selectedEls, {source: 'nav'});
 
     _debug(selectedEls);
 }
@@ -541,7 +543,7 @@ function multikey_event(e) {
             if(tinyOpen && helpObj !== null) {
                 ez_help_goto_section(-1);
             } else {
-                closeTiny(true);
+                closeTiny(true, 'nav');
             }
 		} else if(ez_navigateToggle) {
 			ez_navigate('up');
@@ -555,7 +557,7 @@ function multikey_event(e) {
             if(tinyOpen && helpObj !== null) {
                 ez_help_goto_section(1);
             } else {
-                closeTiny(true);
+                closeTiny(true, 'nav');
             }
 		}else if(ez_navigateToggle) {
 			ez_navigate('down');
