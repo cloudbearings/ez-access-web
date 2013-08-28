@@ -343,7 +343,7 @@ function getHelpFromObj(obj, url, id) {
 				return tempSecs;
 			}
 		}
-		return new Array(obj.textContent);
+		return new Array(obj.innerHTML);
 	} else {
 		console.log("Error: Could not find ID '" + id + "' in '" + url + "' for help layers");
 	}
