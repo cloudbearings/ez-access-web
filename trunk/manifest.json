@@ -4,9 +4,9 @@
     "version": "0.13.0.0",
     "manifest_version": 2,
     "icons": {
-        "16":"icon-16.png",
-        "48":"icon-48.png",
-        "128":"icon-128.png"
+        "16": "icon-16.png",
+        "48": "icon-48.png",
+        "128": "icon-128.png"
     },
     "permissions": ["tts"],
     "background": {
@@ -21,12 +21,12 @@
         "default_title": "EZ Access",
         "default_popup": "popup.html"
     },
-    "content_scripts" : [
+    "content_scripts": [
         {
             "run_at": "document_end",
             "matches": ["<all_urls>"],
             "css": ["style.css"],
-            "js" : [
+            "js": [
                 "enable.js",
                 "settings.js",
                 "js/ezaccess.js",
@@ -34,8 +34,10 @@
                 "js/ezvoice.js",
                 "js/ezsound.js",
                 "js/ezhelp.js",
+                "js/ezalert.js",
                 "js/ezhelpers.js",
-                "js/tinybox.js"
+                "js/eztinyhelp.js",
+                "js/eztinyalert.js"
             ]
         }
     ],

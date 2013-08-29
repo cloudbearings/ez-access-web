@@ -90,7 +90,8 @@ function voice(obj, options) {
 
 function voice_node(nod) {
     // Remove line breaks
-    return nod.nodeValue.replace(/(\r\n|\n|\r)/gm, " ");
+    if (nod.nodeType === 3) return nod.nodeValue.replace(/(\r\n|\n|\r)/gm, " ");
+    return '';
 }
 
 /**
@@ -1057,8 +1058,6 @@ function alertEdgeNav(move) {
         edgeNavAttempt = alerts[move].length - 1;
     }
 
-    var speak = alerts[move][edgeNavAttempt].value;
-
-    voice(speak);
+    newAlert(alerts[move][edgeNavAttempt].value, 'nav');
 
 }

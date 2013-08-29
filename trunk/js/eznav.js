@@ -71,15 +71,10 @@ var autoAdvTimer;
 function key_up_event(e) {
     if (e.keyCode == EZ_KEY_HELP || e.keyCode == 72) { // 72 == 'h'
 
-        if (!tinyOpen && !helpJustPressed) {
+        if (!tinyHelpOpen && !helpJustPressed) {
             ez_help(getActionableElement(selectedEls, 'nav'));
             playSFX(AUDIO_NAV_MOVE, 'nav');
         }
-
-        // Set when closing the lightbox
-        document.getElementById('tinymask').addEventListener('click', function () {
-            closeTiny(false, 'point');
-        });
         return false;
     }
     return true;
@@ -91,10 +86,11 @@ function key_up_event(e) {
  * @returns {boolean} If false, disables default key action.
  */
 function key_down_event(e) {
+
     // 'if' keycode statements
     if (e.keyCode == EZ_KEY_HELP || e.keyCode == 72) { // 72 == 'h'
-        if (tinyOpen) {
-            closeTiny(true, 'nav');
+        if (tinyHelpOpen) {
+            closeTinyHelp('nav');
             helpJustPressed = true;
             onKeyHelp = setTimeout(function () {
                 helpJustPressed = false
@@ -105,11 +101,11 @@ function key_down_event(e) {
             helpJustPressed = false;
         }
     } else if (e.keyCode == EZ_KEY_UP) {
-        if (tinyOpen) {
-            if (tinyOpen && helpObj !== null) {
+        if (tinyHelpOpen) {
+            if (tinyHelpOpen && helpObj !== null) {
                 ez_help_goto_section(-1);
             } else {
-                closeTiny(true, 'nav');
+                closeTinyHelp('nav');
             }
         } else {
             if (ez_navigateToggle) {
@@ -119,11 +115,11 @@ function key_down_event(e) {
             }
         }
     } else if (e.keyCode == EZ_KEY_DOWN) {
-        if (tinyOpen) {
-            if (tinyOpen && helpObj !== null) {
+        if (tinyHelpOpen) {
+            if (tinyHelpOpen && helpObj !== null) {
                 ez_help_goto_section(1);
             } else {
-                closeTiny(true, 'nav');
+                closeTinyHelp('nav');
             }
         } else {
             if (ez_navigateToggle) {
@@ -134,8 +130,8 @@ function key_down_event(e) {
         }
     } else if (e.keyCode == EZ_KEY_BACK || e.keyCode == 66) { // 'b' == 66
         // TODO
-        if (tinyOpen) {
-            closeTiny(true, 'nav');
+        if (tinyHelpOpen) {
+            closeTinyHelp('nav');
         } else {
             var el = getKeyBinding('back');
             if (el === null) {
@@ -145,8 +141,8 @@ function key_down_event(e) {
             }
         }
     } else if (e.keyCode === EZ_KEY_NEXT) {
-        if (tinyOpen) {
-            closeTiny(true, 'nav');
+        if (tinyHelpOpen) {
+            closeTinyHelp('nav');
         } else {
             var el = getKeyBinding('next');
             if (el !== null) {
@@ -154,7 +150,7 @@ function key_down_event(e) {
             }
         }
     } else if (e.keyCode == EZ_KEY_ENTER || e.keyCode == KB_ENTER) {
-        if (tinyOpen) {
+        if (tinyHelpOpen) {
             playSFX(AUDIO_ACTION_NONE, 'nav');
             tinyContent = document.getElementById('tinycontent');
             voice([tinyContent], {repeat: true});
@@ -360,6 +356,7 @@ function ez_navigate(move, options) {
     } else if (argMove !== 'top' && argMove !== 'bottom') {
         // Valid selection, so reset edge nav attempts
         edgeNavAttempt = 0;
+        if (tinyAlertOpen) closeAlert('nav');
     }
 
     // Check to make sure it's not a short, weird selection
@@ -553,11 +550,11 @@ function multikey_event(e) {
     e = e || event; //to deal with IE
     map[e.keyCode] = !!(e.type == 'keydown');
     if (map[KB_TAB] && map[KB_SHIFT] && tabNav != 'none') { //SHIFT+TAB
-        if (tinyOpen) {
-            if (tinyOpen && helpObj !== null) {
+        if (tinyHelpOpen) {
+            if (tinyHelpOpen && helpObj !== null) {
                 ez_help_goto_section(-1);
             } else {
-                closeTiny(true, 'nav');
+                closeTinyHelp('nav');
             }
         } else if (ez_navigateToggle) {
             ez_navigate('up');
@@ -567,11 +564,11 @@ function multikey_event(e) {
         }
         return false; // Overwrite default browser functionality
     } else if (map[KB_TAB] && tabNav != 'none') { //TAB
-        if (tinyOpen) {
-            if (tinyOpen && helpObj !== null) {
+        if (tinyHelpOpen) {
+            if (tinyHelpOpen && helpObj !== null) {
                 ez_help_goto_section(1);
             } else {
-                closeTiny(true, 'nav');
+                closeTinyHelp('nav');
             }
         } else if (ez_navigateToggle) {
             ez_navigate('down');
