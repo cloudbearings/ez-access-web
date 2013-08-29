@@ -550,7 +550,7 @@ function getValue(obj) {
  * (1) the user enters a heirarchical control (such as number, or select),
  * in which case the user needs to know details about obj and its current value
  * (2) the user "submits" or makes a change to a control (activate a checkbox
- * or activate an option within a heirarchical <select>), in which case the
+ * or activate an option within a hierarchical <select>), in which case the
  * user might want to know the value they set.
  */
 function getValueSubstring(obj, userDid) {
@@ -619,7 +619,9 @@ function getValueSubstring(obj, userDid) {
             ret = 'is blank'
         } else if (userDid === 'type') {
             ret = 'you have typed ' + getTypedSpeech(value);
-        } else {
+        } else if (obj.hasAttribute('readonly') || obj.hasAttribute('disabled')) {
+		    ret = 'is ' + value;
+	    } else {
             ret = 'contains ' + value;
         }
     }
