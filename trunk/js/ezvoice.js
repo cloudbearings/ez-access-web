@@ -197,7 +197,7 @@ function voice_element(obj, source, options) {
         }
     }
 
-    if(obj.tagName === 'A' && obj.hasAttribute('href')) {
+    if(type === 'a' && obj.hasAttribute('href')) {
         speech = role + ': ' + name;
     }
 
