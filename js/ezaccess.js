@@ -203,25 +203,25 @@ function isFocusable(o, source) {
     'use strict';
 
     // Look for nodes and elements only; return false otherwise
-    if(o === document.doctype) return false; // For some reason this isn't caught below + can cause exceptions
-    else if(isElement(o));
-    else if(isNode(o)) return !isMumboJumbo(o.data);
+    if (o === document.doctype) return false; // For some reason this isn't caught below + can cause exceptions
+    else if (isElement(o));
+    else if (isNode(o)) return !isMumboJumbo(o.data);
     else return false;
 
-    if(source === undefined) source = 'nav';
+    if (source === undefined) source = 'nav';
 
     if (SKIPPED_TAGS.indexOf(o.tagName.toLowerCase()) !== -1) {
         return false;
     }
 
-    if(o.hasAttribute('aria-flowto')) return true;
+    if (o.hasAttribute('aria-flowto')) return true;
 
-    if(o.hasAttribute('id')) {
-        if(ariaFlowFrom(o.getAttribute('id')) !== null) return true;
+    if (o.hasAttribute('id')) {
+        if (ariaFlowFrom(o.getAttribute('id')) !== null) return true;
     }
 
     // If grouped at a higher level
-    if(isParentGrouped(o)) return false;
+    if (isParentGrouped(o)) return false;
 
     var attr = '';
 
@@ -253,24 +253,24 @@ function isFocusable(o, source) {
     if (o.hasAttribute('aria-hidden')) {
         attr = o.getAttribute('aria-hidden');
     }
-    if(attr === 'true') {
+    if (attr === 'true') {
         return false;
     }
 
     var voiced = voice_element(o, source);
-    if(isMumboJumbo(voiced)) return false;
+    if (isMumboJumbo(voiced)) return false;
 
     // If hidden
-    if(o.hasAttribute('hidden')) return false;
+    if (o.hasAttribute('hidden')) return false;
 
     // If css hidden
-    if(o.style.display === 'none') return false;
+    if (o.style.display === 'none') return false;
 
     // If css invisible
-    if(o.style.visibility === 'hidden') return false;
+    if (o.style.visibility === 'hidden') return false;
 
     // If hidden input tag
-    if(o.tagName === 'INPUT' && o.type === 'hidden') {
+    if (o.tagName === 'INPUT' && o.type === 'hidden') {
         return false;
     }
 
@@ -289,25 +289,25 @@ function isFocusable(o, source) {
  */
 function isMumboJumbo(str) {
     str = str.replace(/<(?:.|\n)*?>/gm, '');
-    str = str.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
-    str = str.replace('|','');
-    str = str.replace(/\s{2,}/g," ");
+    str = str.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g, "");
+    str = str.replace('|', '');
+    str = str.replace(/\s{2,}/g, " ");
     return str.length <= 1;
 }
 
 //Returns true if it is a DOM node
-function isNode(o){
+function isNode(o) {
     return (
         typeof Node === "object" ? o instanceof Node :
-            o && typeof o === "object" && typeof o.nodeType === "number" && typeof o.nodeName==="string"
+            o && typeof o === "object" && typeof o.nodeType === "number" && typeof o.nodeName === "string"
         );
 }
 
 //Returns true if it is a DOM element
-function isElement(o){
+function isElement(o) {
     return (
         typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
-            o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName==="string"
+            o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName === "string"
         );
 }
 
@@ -323,8 +323,8 @@ function isInteractive(o) {
     'use strict';
 
     // Look for nodes and elements only; return false otherwise
-    if(isElement(o));
-    else if(isNode(o)) o = o.parentElement;
+    if (isElement(o));
+    else if (isNode(o)) o = o.parentElement;
     else return false;
 
     if (o.hasAttribute('onlick')) {
@@ -372,7 +372,7 @@ function isUserEditable(obj) {
 function isGrouped(o) {
 
     var ezGroup = false;
-    if(isElement(o) && o.hasAttribute('data-ez-chunking')) {
+    if (isElement(o) && o.hasAttribute('data-ez-chunking')) {
         ezGroup = o.getAttribute('data-ez-chunking') === 'group';
     }
 
@@ -385,9 +385,9 @@ function isGrouped(o) {
  * @returns {boolean} True if grouped via EZ Access, interactive element, etc.
  */
 function isParentGrouped(o) {
-    while(o !== null) {
+    while (o !== null) {
         o = o.parentElement;
-        if(isGrouped(o)) return true;
+        if (isGrouped(o)) return true;
     }
     return false;
 }
@@ -408,7 +408,7 @@ function oneChild(o) {
  * @returns {Element}
  */
 function singleChildMost(o) {
-    if(!oneChild(o)) return o;
+    if (!oneChild(o)) return o;
     return singleChildMost(first_child(o));
 }
 
@@ -428,10 +428,10 @@ function isInlineElement(o, source) {
     'use strict';
 
     // Look for nodes and elements only; return false otherwise
-    if(isElement(o));
+    if (isElement(o));
     else return isNode(o);
 
-    if(source === undefined) source = 'nav';
+    if (source === undefined) source = 'nav';
 
     if (o.nodeType !== 1) {
         if (o.nodeType === 3) {
@@ -548,7 +548,7 @@ function areAllChildrenInline(o, source) {
  * @return {null|Node[]} An actual array of child nodes that are "useful"
  * in HTML. If there are no appropriate child nodes, the function returns null.
  */
-function getChildNodes( nod, source ) {
+function getChildNodes(nod, source) {
     'use strict';
     /** The array to be returned */
     var ret = [];
@@ -594,7 +594,7 @@ function getChildNodes( nod, source ) {
  * @return     True if all of the text content of |nod| is whitespace,
  *             otherwise false.
  */
-function is_all_ws( nod ) {
+function is_all_ws(nod) {
     return !(/[^\t\n\r ]/.test(nod.data));
 }
 
@@ -604,8 +604,8 @@ function is_all_ws( nod ) {
  *            a |Text|, |Comment|, or |CDATASection| node
  * @returns {boolean} Returns true if length <= 1 indicating that it probably shouldn't be navigable.
  */
-function is_all_punct( nod ) {
-    if(nod.data === undefined) return false;
+function is_all_punct(nod) {
+    if (nod.data === undefined) return false;
     return nod.data.length <= 1;
 }
 
@@ -624,7 +624,7 @@ function is_all_punct( nod ) {
  *                2) A |Comment| node
  *             and otherwise false.
  */
-function is_ignorable( nod ) {
+function is_ignorable(nod) {
     return ( nod.nodeType == 8) || // A comment node
         ( (nod.nodeType == 3) && is_all_ws(nod)); // a text node, all ws
 }
@@ -646,7 +646,7 @@ function is_ignorable( nod ) {
  *                  ignorable according to |is_ignorable|, or
  *               2) null if no such node exists.
  */
-function node_before( sib, source ) {
+function node_before(sib, source) {
     while ((sib = sib.previousSibling)) {
         if (!is_ignorable(sib) && isFocusable(sib, source)) {
             return sib;
@@ -670,7 +670,7 @@ function node_before( sib, source ) {
  *                  ignorable according to |is_ignorable|, or
  *               2) null if no such node exists.
  */
-function node_after( sib, source ) {
+function node_after(sib, source) {
     while ((sib = sib.nextSibling)) {
         if (!is_ignorable(sib) && isFocusable(sib, source)) {
             return sib;
@@ -696,11 +696,11 @@ function node_after( sib, source ) {
  *                  ignorable according to |is_ignorable|, or
  *               2) null if no such node exists.
  */
-function last_child( par, source ) {
+function last_child(par, source) {
     // If isGrouped == leaf node; no children
-    if(isGrouped(par)) return null;
+    if (isGrouped(par)) return null;
 
-    var res=par.lastChild;
+    var res = par.lastChild;
     while (res) {
         if (!is_ignorable(res) && isFocusable(res, source)) {
             return res;
@@ -725,11 +725,11 @@ function last_child( par, source ) {
  *                  ignorable according to |is_ignorable|, or
  *               2) null if no such node exists.
  */
-function first_child( par, source ) {
+function first_child(par, source) {
     // If isGrouped == leaf node; no children
-    if(isGrouped(par)) return null;
+    if (isGrouped(par)) return null;
 
-    var res=par.firstChild;
+    var res = par.firstChild;
     while (res) {
         if (!is_ignorable(res) && isFocusable(res, source)) {
             return res;
@@ -753,7 +753,7 @@ function first_child( par, source ) {
  * @return     A string giving the contents of the text node with
  *             whitespace collapsed.
  */
-function data_of( txt ) {
+function data_of(txt) {
     var data = txt.data;
     // Use ECMA-262 Edition 3 String and RegExp features
     data = data.replace(/[\t\n\r ]+/g, " ");
@@ -777,10 +777,10 @@ function getChildNodRange(first, last) {
     var ret = [];
     var obj = first;
 
-    while(obj !== last) {
+    while (obj !== last) {
         ret.push(obj);
         obj = node_after(obj);
-        if(obj === null) throw new Error("Invalid range object!" + first + last);
+        if (obj === null) throw new Error("Invalid range object!" + first + last);
     }
     ret.push(obj);
 
@@ -796,12 +796,12 @@ function getChildNodRange(first, last) {
  */
 function getInnerGrouping(e) {
     var first = e[0];
-    var last = e[e.length-1];
+    var last = e[e.length - 1];
 
 
     // Get inner-most grouping (if possible)
-    while(first === last) {
-        if(first_child(first) === null || last_child(last) === null) break;
+    while (first === last) {
+        if (first_child(first) === null || last_child(last) === null) break;
         first = first_child(first);
         last = last_child(last);
     }
@@ -822,24 +822,24 @@ function getInnerGrouping(e) {
 function getNextNodes(startEl, source) {
 
     // Through recursion, reached end of document.
-    if(startEl === null) return [];
+    if (startEl === null) return [];
 
     var first = node_after(startEl, source);
-    if(first === null) {
+    if (first === null) {
         // Fall back onto the parent; no first el exists at this level
         return getNextNodes(startEl.parentNode, source);
     }
     // First el exists, so check if child of first el exists
-    while(first_child(first, source) !== null && !areAllChildrenInline(first, source)) {
+    while (first_child(first, source) !== null && !areAllChildrenInline(first, source)) {
         first = first_child(first, source);
     }
 
     // By this point, we have the 'first' node
     var ret = [first];
 
-    if(isInlineElement(first, source)) {
-        while(node_after(ret[ret.length-1], source) !== null && isInlineElement(node_after(ret[ret.length-1], source), source)) {
-            ret.push(node_after(ret[ret.length-1], source));
+    if (isInlineElement(first, source)) {
+        while (node_after(ret[ret.length - 1], source) !== null && isInlineElement(node_after(ret[ret.length - 1], source), source)) {
+            ret.push(node_after(ret[ret.length - 1], source));
         }
     }
 
@@ -858,23 +858,23 @@ function getNextNodes(startEl, source) {
  **/
 function getPrevNodes(startEl, source) {
     // Through recursion, reached end of document.
-    if(startEl === null) return [];
+    if (startEl === null) return [];
 
     var last = node_before(startEl, source);
-    if(last === null) {
+    if (last === null) {
         // Fall back onto the parent; no first el exists at this level
         return getPrevNodes(startEl.parentNode, source);
     }
     // First el exists, so check if child of first el exists
-    while(last_child(last, source) !== null && !areAllChildrenInline(last, source)) {
+    while (last_child(last, source) !== null && !areAllChildrenInline(last, source)) {
         last = last_child(last, source);
     }
 
     // By this point, we have the 'last' node
     var ret = [last];
 
-    if(isInlineElement(last, source)) {
-        while(node_before(ret[0], source) !== null && isInlineElement(node_before(ret[0], source), source)) {
+    if (isInlineElement(last, source)) {
+        while (node_before(ret[0], source) !== null && isInlineElement(node_before(ret[0], source), source)) {
             ret.unshift(node_before(ret[0], source));
         }
     }
@@ -892,11 +892,11 @@ function getFirstElement(start, source) {
 
     var first = first_child(start, source);
 
-    if(first === null || orphanTxtNode(first)) {
+    if (first === null || orphanTxtNode(first)) {
         var ret = [start];
-        if(isInlineElement(start, source)) {
-            while(isInlineElement(node_after(ret[ret.length-1], source), source)) {
-                ret.push(node_after(ret[ret.length-1]));
+        if (isInlineElement(start, source)) {
+            while (isInlineElement(node_after(ret[ret.length - 1], source), source)) {
+                ret.push(node_after(ret[ret.length - 1]));
             }
         }
         return getInnerGrouping(ret);
@@ -913,7 +913,7 @@ function getFirstElement(start, source) {
  * @param nod
  * @returns {boolean}
  */
-function orphanTxtNode( nod ) {
+function orphanTxtNode(nod) {
     return node_before(nod) === null && node_after(nod) === null && nod.nodeType === 3;
 }
 
@@ -927,10 +927,10 @@ function getLastElement(start, source) {
 
     var last = last_child(start, source);
 
-    if(last === null || orphanTxtNode(last)) {
+    if (last === null || orphanTxtNode(last)) {
         var ret = [start];
-        if(isInlineElement(start, source)) {
-            while(isInlineElement(node_before(ret[0], source), source)) {
+        if (isInlineElement(start, source)) {
+            while (isInlineElement(node_before(ret[0], source), source)) {
                 ret.unshift(node_before(ret[0]));
             }
         }
@@ -946,17 +946,17 @@ function getLastElement(start, source) {
  */
 function getNextSelection(source) {
 
-    var fromEl = selectedEls[selectedEls.length-1];
+    var fromEl = selectedEls[selectedEls.length - 1];
     var actionable = getActionableElement(selectedEls, 'nav');
 
     var selectedNodes;
 
     var nod = null;
-    if(actionable.hasAttribute('aria-flowto')) {
+    if (actionable.hasAttribute('aria-flowto')) {
         nod = document.getElementById(actionable.getAttribute('aria-flowto'));
     }
 
-    if(nod !== null) {
+    if (nod !== null) {
         selectedNodes = getInnerGrouping([nod]);
     } else {
         selectedNodes = getNextNodes(fromEl, source);
@@ -979,9 +979,9 @@ function getPrevSelection(source) {
 
 
     var nod = null;
-    if(actionable.hasAttribute('id')) nod = ariaFlowFrom(actionable.getAttribute('id'));
+    if (actionable.hasAttribute('id')) nod = ariaFlowFrom(actionable.getAttribute('id'));
 
-    if(nod !== null) {
+    if (nod !== null) {
         selectedNodes = getInnerGrouping([nod]);
     } else {
         selectedNodes = getPrevNodes(fromEl, source);
@@ -1031,7 +1031,7 @@ function mask_DOMObjs(wrap) {
     var first = wrap.first;
     var last = wrap.last;
 
-    if(first.parentElement !== last.parentElement) throw new Error('DOM Objects must have same parent');
+    if (first.parentElement !== last.parentElement) throw new Error('DOM Objects must have same parent');
 
     var parentEl = first.parentElement;
 
@@ -1041,7 +1041,7 @@ function mask_DOMObjs(wrap) {
     parentEl.insertBefore(maskEl, first);
 
     var next = first;
-    while(next !== last) {
+    while (next !== last) {
         var insert = next;
         next = next.nextSibling;
         maskEl.insertBefore(insert, null);
@@ -1058,8 +1058,8 @@ function mask_DOMObjs(wrap) {
 function strip_masking() {
     var maskEl = document.getElementById(maskId);
 
-    if(maskEl !== null) {
-        while(maskEl.childNodes.length !== 0) {
+    if (maskEl !== null) {
+        while (maskEl.childNodes.length !== 0) {
             maskEl.parentElement.insertBefore(maskEl.firstChild, maskEl);
         }
 
@@ -1079,9 +1079,9 @@ function ez_navigate_start(propagated, source) {
     sessionStorage.setItem("EZ_Toggle", "1");
 
     var obj;
-    if(document.body.hasAttribute('data-ez-startat')) {
+    if (document.body.hasAttribute('data-ez-startat')) {
         var startid;
-        if(propagated) {
+        if (propagated) {
             // Of "#<id> #<id>" of second element
             startid = document.body.getAttribute('data-ez-startat').split(" ")[1].slice(1);
         } else {
@@ -1089,13 +1089,13 @@ function ez_navigate_start(propagated, source) {
             startid = document.body.getAttribute('data-ez-startat').split(" ")[0].slice(1);
         }
         obj = document.getElementById(startid);
-        if(obj !== null) ez_jump([obj], source);
+        if (obj !== null) ez_jump([obj], source);
     } else {
-        if(propagated) {
-            if(document.URL.indexOf("#") != -1) {
+        if (propagated) {
+            if (document.URL.indexOf("#") != -1) {
                 var jumpTo = document.URL.substring(document.URL.indexOf("#") + 1);
                 obj = document.getElementById(jumpTo);
-                if(obj !== null) ez_jump([obj], source);
+                if (obj !== null) ez_jump([obj], source);
             }
         }
     }
@@ -1113,13 +1113,13 @@ function ez_navigate_start(propagated, source) {
  */
 function load_ez() {
 
-    if(document.body.hasAttribute('data-ez-allowreorder')) {
+    if (document.body.hasAttribute('data-ez-allowreorder')) {
         allowReorder = true;
     }
 
-    if(document.body.getAttribute('data-ez-autorepeat') === 'keyboard') {
+    if (document.body.getAttribute('data-ez-autorepeat') === 'keyboard') {
         autoRepeat = 'keyboard';
-    } else if(document.body.getAttribute('data-ez-autorepeat') === 'on') {
+    } else if (document.body.getAttribute('data-ez-autorepeat') === 'on') {
         autoRepeat = 'on';
     }
 
@@ -1129,21 +1129,21 @@ function load_ez() {
     onkeydown = function (event) {
         autoAdvance = 0; // Stop any autoadvancing timers
         window.clearInterval(autoAdvTimer);
-        if(autoRepeat == 'keyboard') {
+        if (autoRepeat == 'keyboard') {
             return1 = multikey_event(event);
-        } else if(autoRepeat == 'on') {
+        } else if (autoRepeat == 'on') {
             return1 = multikey_event(event);
             return2 = key_event(event);
         }
-        if(lastEvent && lastEvent.keyCode == event.keyCode) {
+        if (lastEvent && lastEvent.keyCode == event.keyCode) {
             return false;
         }
         lastEvent = event;
         heldKeys[event.keyCode] = true;
-        if(autoRepeat == 'off') {
+        if (autoRepeat == 'off') {
             return1 = multikey_event(event);
             return2 = key_down_event(event);
-        } else if(autoRepeat == 'keyboard') {
+        } else if (autoRepeat == 'keyboard') {
             return2 = key_event(event);
         }
         if (!(return1 && return2)) {
@@ -1163,29 +1163,29 @@ function load_ez() {
     set_volume(); // If exists from previous page
 
     // "Universal" body tag stuff
-    if(document.body.hasAttribute('data-ez-screenwrap')) {
+    if (document.body.hasAttribute('data-ez-screenwrap')) {
         screenWrap = true;
     }
 
     // Not actually implemented yet (just default is)
-    if(document.body.getAttribute('data-ez-tabnav') == 'standard') {
+    if (document.body.getAttribute('data-ez-tabnav') == 'standard') {
         tabNav = 'standard';
-    } else if(document.body.getAttribute('data-ez-tabnav') == 'hybrid') {
+    } else if (document.body.getAttribute('data-ez-tabnav') == 'hybrid') {
         tabNav = 'hybrid';
-    } else if(document.body.getAttribute('data-ez-tabnav') == 'none') {
+    } else if (document.body.getAttribute('data-ez-tabnav') == 'none') {
         tabNav = 'none';
     }
 
-    if(document.body.getAttribute('data-ez-slidetoread') == 'off') {
+    if (document.body.getAttribute('data-ez-slidetoread') == 'off') {
         slideToRead = false;
     }
-    if(document.body.getAttribute('data-ez-startingmode') == 'ezon') {
+    if (document.body.getAttribute('data-ez-startingmode') == 'ezon') {
         // On chrome, will not draw until a small amount of time passes for some reason
         setTimeout(function () {
             ez_navigate_start(false, 'nav');
             drawSelected(selectedEls);
         }, 10);
-    } else if(parseInt(sessionStorage.getItem("EZ_Toggle")) == true && document.body.getAttribute('data-ez-startingmode') != 'ezoff') {
+    } else if (parseInt(sessionStorage.getItem("EZ_Toggle")) == true && document.body.getAttribute('data-ez-startingmode') != 'ezoff') {
         setTimeout(function () {
             ez_navigate_start(true, 'nav');
             drawSelected(selectedEls);
@@ -1195,16 +1195,16 @@ function load_ez() {
     //idle_loop(); // TODO/ TEMP
 
     // Touch gesture dragging
-    if(slideToRead) {
-        document.addEventListener('touchmove', function(e) {
+    if (slideToRead) {
+        document.addEventListener('touchmove', function (e) {
 
             e = e || window.event;
 
             var target = document.elementFromPoint(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
-            if((selectedEls.length !== 1 || selectedEls[0] != target) && new Date().getTime() - touchStartTime > 250) {
-                if(!ez_loaded) load_ez();
+            if ((selectedEls.length !== 1 || selectedEls[0] != target) && new Date().getTime() - touchStartTime > 250) {
+                if (!ez_loaded) load_ez();
                 target = jumpToElFinder(target);
-                if(target !== null) {
+                if (target !== null) {
                     ez_navigateToggle = true;
                     ez_jump([target], 'point');
                 }
@@ -1212,23 +1212,23 @@ function load_ez() {
             }
         }, false);
 
-        document.addEventListener('touchstart', function(e) {
+        document.addEventListener('touchstart', function (e) {
             touchStartTime = new Date().getTime();
 
             touchTap = true;
 
         });
 
-        document.addEventListener('touchend', function(e) {
-            if(touchTap === true || new Date().getTime() - touchStartTime < 250) { // If not 'dragged' or quickly 'dragged'
-                if(!tinyOpen) stopEZ();
+        document.addEventListener('touchend', function (e) {
+            if (touchTap === true || new Date().getTime() - touchStartTime < 250) { // If not 'dragged' or quickly 'dragged'
+                if (!tinyOpen) stopEZ();
             }
         });
 
     }
 
     // Load any potential dictionary
-    if(document.body.hasAttribute('data-ez-pronounce')) {
+    if (document.body.hasAttribute('data-ez-pronounce')) {
         Lib.ajax.getJSON({
             url: document.body.getAttribute('data-ez-pronounce'),
             type: 'json'
@@ -1245,20 +1245,20 @@ function load_ez() {
  * @param e Determines if given Element is valid for highlighting (a 'leaf' node or something)
  * @returns {Element}null} Null if not valid, e if it is.
  */
-function jumpToElFinder( e ) {
+function jumpToElFinder(e) {
 
     if (e === null) return null;
 
     var children = getChildNodes(e);
-    if(children !== null) {
+    if (children !== null) {
         var allInline = true;
-        for(i = 0; i < children.length; i++) {
-            if(!isInlineElement(children[i])) {
+        for (i = 0; i < children.length; i++) {
+            if (!isInlineElement(children[i])) {
                 allInline = false;
                 break;
             }
         }
-        if(allInline === true  && isFocusable(e)) return e;
+        if (allInline === true && isFocusable(e)) return e;
     }
 
     if (children === null && isFocusable(e)) return e;
@@ -1273,8 +1273,8 @@ function jumpToElFinder( e ) {
  * @param nod Node to find dimensions of.
  * @returns {*} Look at getBoundingClientRect() specs online (ret.left, right, top, bottom, width, height etc).
  */
-function getNodPos( nod ) {
-    if(!isElement(nod)) {
+function getNodPos(nod) {
+    if (!isElement(nod)) {
         pos = mask_DOMObjs({first: nod, last: nod}).getBoundingClientRect();
         strip_masking();
     } else pos = nod.getBoundingClientRect();
@@ -1288,7 +1288,7 @@ function getNodPos( nod ) {
  * @param {Array} nodArr DOM Object to draw box selected box around.
  * @returns {boolean} If finding dimensions of element failed (such as if hidden).
  */
-function drawSelected( nodArr ) {
+function drawSelected(nodArr) {
 
     var minHoriz = 0;
     var minVert = 0;
@@ -1296,7 +1296,7 @@ function drawSelected( nodArr ) {
     var maxVert = 0;
     var pos;
 
-    if(nodArr.length > 0) {
+    if (nodArr.length > 0) {
         pos = getNodPos(nodArr[0]);
 
         minVert = pos.top + window.pageYOffset;
@@ -1306,14 +1306,14 @@ function drawSelected( nodArr ) {
 
     }
 
-    for(i = 1; i < nodArr.length; i++) {
+    for (i = 1; i < nodArr.length; i++) {
 
         pos = getNodPos(nodArr[i]);
 
-        if(pos.left + window.pageXOffset < minHoriz) minHoriz = pos.left + window.pageXOffset;
-        if(pos.top + window.pageYOffset < minVert) minVert = pos.top + window.pageYOffset;
-        if(pos.bottom + window.pageYOffset > maxVert) maxVert = pos.bottom + window.pageYOffset;
-        if(pos.right + window.pageXOffset > maxHoriz) maxHoriz = pos.right + window.pageXOffset;
+        if (pos.left + window.pageXOffset < minHoriz) minHoriz = pos.left + window.pageXOffset;
+        if (pos.top + window.pageYOffset < minVert) minVert = pos.top + window.pageYOffset;
+        if (pos.bottom + window.pageYOffset > maxVert) maxVert = pos.bottom + window.pageYOffset;
+        if (pos.right + window.pageXOffset > maxHoriz) maxHoriz = pos.right + window.pageXOffset;
 
     }
 
@@ -1323,18 +1323,18 @@ function drawSelected( nodArr ) {
     var height = maxVert - minVert;
 
 
-    if(width == 0 && height == 0) {
+    if (width == 0 && height == 0) {
         // If there is a problem finding the element position
         return false;
     }
     var old = document.getElementById(ezSelectorId);
-    if(old === null) {
+    if (old === null) {
         var div = document.createElement('div');
         div.setAttribute("data-ez-focusable", "false");
         var rgb = "rgba(" + hexToRgb(EzCustomColor).r + "," + hexToRgb(EzCustomColor).g + "," + hexToRgb(EzCustomColor).b + ",";
         var rgbinverse = "rgba(" + (255 - hexToRgb(EzCustomColor).r) + "," + (255 - hexToRgb(EzCustomColor).g) + "," + (255 - hexToRgb(EzCustomColor).b) + ",";
         // Load the CSS pulsing Stuff
-        var cssAnimation = document.createElement('hstyle');
+        var cssAnimation = document.createElement('style');
         cssAnimation.type = 'text/css';
         var rules = document.createTextNode('@-webkit-keyframes pulse {' +
             'from { border:5px solid ' + rgb + '1); }' +
@@ -1347,7 +1347,7 @@ function drawSelected( nodArr ) {
         div.style.border = "5px solid " + rgb + "1)";
         div.style['boxShadow'] = "0px 0px 15px 5px " + rgb + ".80)";
         div.id = ezSelectorId;
-        if(document.body.firstChild) {
+        if (document.body.firstChild) {
             document.body.insertBefore(div, document.body.firstChild);
         } else {
             document.body.appendChild(div);
@@ -1363,7 +1363,7 @@ function drawSelected( nodArr ) {
     // Un-hide highlight, if once hidden
     old.style.visibility = '';
 
-    smoothScroll(top - (document.documentElement.clientHeight/4));
+    smoothScroll(top - (document.documentElement.clientHeight / 4));
 
     return true;
 }
@@ -1372,10 +1372,10 @@ function drawSelected( nodArr ) {
  * Event listener if window is resized ==> The selected box will be redrawn.
  */
 window.onresize = function () {
-    if(ez_navigateToggle) {
+    if (ez_navigateToggle) {
         var actionable = getActionableElement(selectedEls, 'nav');
         var label = get_label(actionable);
-        if(label !== null) drawSelected(selectedEls.concat([label]));
+        if (label !== null) drawSelected(selectedEls.concat([label]));
         else drawSelected(selectedEls);
     }
 };
@@ -1390,7 +1390,7 @@ function stopEZ() {
     voice("");
     sessionStorage.setItem("EZ_Toggle", "0");
     var old = document.getElementById(ezSelectorId);
-    if(old !== null) {
+    if (old !== null) {
         old.style.visibility = "hidden";
         old.style.left = 0 + "px";
         old.style.top = 0 + "px";
