@@ -25,9 +25,10 @@ var slideToRead = true;
 
 /**
  * How many times the user tried to navigate up or down
+ * The user gets one free attempt (therefore -1) so they know that they reached the end.
  * @type {number}
  */
-var edgeNavAttempt = 0;
+var edgeNavAttempt = -1;
 
 /**
  * Determines key autorepeat preperty or not
@@ -343,10 +344,20 @@ function ez_navigate(move, options) {
         if (move === 'down') {
             ez_navigate('bottom', quiet);
             alertEdgeNav('bottom');
+            if (edgeNavAttempt === 0) {
+                ez_navigate('bottom');
+            } else {
+                ez_navigate('bottom', quiet);
+            }
         }
         else if (move === 'up') {
             ez_navigate('top', quiet);
             alertEdgeNav('top');
+            if (edgeNavAttempt === 0) {
+                ez_navigate('top');
+            } else {
+                ez_navigate('top', quiet);
+            }
         }
 
         pulseSelector();
@@ -355,7 +366,7 @@ function ez_navigate(move, options) {
         return;
     } else if (argMove !== 'top' && argMove !== 'bottom') {
         // Valid selection, so reset edge nav attempts
-        edgeNavAttempt = 0;
+        edgeNavAttempt = -1;
         if (tinyAlertOpen) closeAlert('nav');
     }
 
