@@ -69,15 +69,15 @@ var autoAdvTimer;
  * @returns {boolean} If false, disables default key action.
  */
 function key_up_event(e) {
-    if(e.keyCode == EZ_KEY_HELP || e.keyCode == 72) { // 72 == 'h'
+    if (e.keyCode == EZ_KEY_HELP || e.keyCode == 72) { // 72 == 'h'
 
-        if(!tinyOpen && !helpJustPressed) {
+        if (!tinyOpen && !helpJustPressed) {
             ez_help(getActionableElement(selectedEls, 'nav'));
             playSFX(AUDIO_NAV_MOVE, 'nav');
         }
 
         // Set when closing the lightbox
-        document.getElementById('tinymask').addEventListener('click', function() {
+        document.getElementById('tinymask').addEventListener('click', function () {
             closeTiny(false, 'point');
         });
         return false;
@@ -92,47 +92,49 @@ function key_up_event(e) {
  */
 function key_down_event(e) {
     // 'if' keycode statements
-    if(e.keyCode == EZ_KEY_HELP || e.keyCode == 72) { // 72 == 'h'
-        if(tinyOpen) {
+    if (e.keyCode == EZ_KEY_HELP || e.keyCode == 72) { // 72 == 'h'
+        if (tinyOpen) {
             closeTiny(true, 'nav');
             helpJustPressed = true;
-            onKeyHelp = setTimeout(function(){helpJustPressed = false},1000);
+            onKeyHelp = setTimeout(function () {
+                helpJustPressed = false
+            }, 1000);
             playSFX(AUDIO_NAV_MOVE, 'nav');
         } else {
             window.clearTimeout(onKeyHelp);
             helpJustPressed = false;
         }
-    } else if(e.keyCode == EZ_KEY_UP) {
-        if(tinyOpen) {
-            if(tinyOpen && helpObj !== null) {
+    } else if (e.keyCode == EZ_KEY_UP) {
+        if (tinyOpen) {
+            if (tinyOpen && helpObj !== null) {
                 ez_help_goto_section(-1);
             } else {
                 closeTiny(true, 'nav');
             }
         } else {
-            if(ez_navigateToggle) {
+            if (ez_navigateToggle) {
                 ez_navigate('up');
             } else {
                 ez_navigate_start(false, 'nav');
             }
         }
-    } else if(e.keyCode == EZ_KEY_DOWN) {
-        if(tinyOpen) {
-            if(tinyOpen && helpObj !== null) {
+    } else if (e.keyCode == EZ_KEY_DOWN) {
+        if (tinyOpen) {
+            if (tinyOpen && helpObj !== null) {
                 ez_help_goto_section(1);
             } else {
                 closeTiny(true, 'nav');
             }
         } else {
-            if(ez_navigateToggle) {
+            if (ez_navigateToggle) {
                 ez_navigate('down');
             } else {
                 ez_navigate_start(false, 'nav');
             }
         }
-    } else if(e.keyCode == EZ_KEY_BACK || e.keyCode == 66) { // 'b' == 66
+    } else if (e.keyCode == EZ_KEY_BACK || e.keyCode == 66) { // 'b' == 66
         // TODO
-        if(tinyOpen) {
+        if (tinyOpen) {
             closeTiny(true, 'nav');
         } else {
             var el = getKeyBinding('back');
@@ -143,7 +145,7 @@ function key_down_event(e) {
             }
         }
     } else if (e.keyCode === EZ_KEY_NEXT) {
-        if(tinyOpen) {
+        if (tinyOpen) {
             closeTiny(true, 'nav');
         } else {
             var el = getKeyBinding('next');
@@ -151,24 +153,24 @@ function key_down_event(e) {
                 el.click();
             }
         }
-    } else if(e.keyCode == EZ_KEY_ENTER || e.keyCode == KB_ENTER) {
-        if(tinyOpen) {
+    } else if (e.keyCode == EZ_KEY_ENTER || e.keyCode == KB_ENTER) {
+        if (tinyOpen) {
             playSFX(AUDIO_ACTION_NONE, 'nav');
             tinyContent = document.getElementById('tinycontent');
             voice([tinyContent], {repeat: true});
         } else {
-            if(ez_navigateToggle) {
+            if (ez_navigateToggle) {
                 ez_enter(selectedEls, 'nav');
             }
             return false; // Disable any browser actions
         }
-    } else if(e.keyCode == EZ_KEY_SKIPFORWARD) {
-        if(selectedEls.type == 'range') {
+    } else if (e.keyCode == EZ_KEY_SKIPFORWARD) {
+        if (selectedEls.type == 'range') {
             selectedEls.value = parseFloat(selectedEls.value) + parseFloat(selectedEls.step);
             playSFX(AUDIO_NAV_MOVE, 'nav');
             voice(selectedEls.value);
-        } else if(selectedEls.tagName == 'SELECT') {
-            if(selectedEls.selectedIndex < selectedEls.length - 1) {
+        } else if (selectedEls.tagName == 'SELECT') {
+            if (selectedEls.selectedIndex < selectedEls.length - 1) {
                 selectedEls.selectedIndex++;
                 playSFX(AUDIO_NAV_MOVE, 'nav');
                 voice(selectedEls.value + '... option ' + (selectedEls.selectedIndex + 1) + ' of ' + selectedEls.length);
@@ -180,7 +182,7 @@ function key_down_event(e) {
                 playSFX(AUDIO_ACTION_NONE, 'nav');
             }
         } else {
-            if(audioVolume <= 90) {
+            if (audioVolume <= 90) {
                 audioVolume += 10;
                 sessionStorage.setItem("EZ_Volume", audioVolume);
                 set_volume();
@@ -195,13 +197,13 @@ function key_down_event(e) {
                 voice("Maximum volume");
             }
         }
-    } else if(e.keyCode == EZ_KEY_SKIPBACKWARD) {
-        if(selectedEls.type == 'range') {
+    } else if (e.keyCode == EZ_KEY_SKIPBACKWARD) {
+        if (selectedEls.type == 'range') {
             selectedEls.value = parseFloat(selectedEls.value) - parseFloat(selectedEls.step);
             playSFX(AUDIO_NAV_MOVE, 'nav');
             voice(selectedEls.value);
-        } else if(selectedEls.tagName == 'SELECT') {
-            if(selectedEls.selectedIndex > 0) {
+        } else if (selectedEls.tagName == 'SELECT') {
+            if (selectedEls.selectedIndex > 0) {
                 selectedEls.selectedIndex--;
                 playSFX(AUDIO_NAV_MOVE, 'nav');
                 voice(selectedEls.value + '... option ' + (selectedEls.selectedIndex + 1) + ' of ' + selectedEls.length);
@@ -213,7 +215,7 @@ function key_down_event(e) {
                 playSFX(AUDIO_ACTION_NONE, 'nav');
             }
         } else {
-            if(audioVolume >= 10) {
+            if (audioVolume >= 10) {
                 sessionStorage.setItem("EZ_Volume", audioVolume);
                 audioVolume -= 10;
                 set_volume();
@@ -228,9 +230,9 @@ function key_down_event(e) {
                 voice("Minimum volume");
             }
         }
-    } else if(selectedEls.type == 'textarea' || selectedEls.type == 'text') {
+    } else if (selectedEls.type == 'textarea' || selectedEls.type == 'text') {
         var key = String.fromCharCode(e.keyCode);
-        if(!key.match(/[^A-Za-z0-9\-_]/)) voice(key);
+        if (!key.match(/[^A-Za-z0-9\-_]/)) voice(key);
     }
     return true;
 }
@@ -250,7 +252,7 @@ function getKeyBinding(key) {
     // Allow any case (consistent w/ HTML)
     key = key.toLowerCase();
 
-    var SUPPORTED_KEY_NAMES = ['back','next'];
+    var SUPPORTED_KEY_NAMES = ['back', 'next'];
 
     if (SUPPORTED_KEY_NAMES.indexOf(key.toString()) < 0) {
         _debug('getKeyBinding(): key=' + key + ' is not supported.');
@@ -269,26 +271,26 @@ function getKeyBinding(key) {
  */
 function getActionableElement(nods, source) {
 
-    if(nods.length === 0) return null;
+    if (nods.length === 0) return null;
 
     // Nv'd inside an element's text
-    if(nods.length === 1 && nods[0].nodeType === 3) {
+    if (nods.length === 1 && nods[0].nodeType === 3) {
         return nods[0].parentElement;
     }
 
     // Get the element if multiple nodes and one element are navagable.
     var els = 0;
     var lastEl;
-    for(i = 0; i < nods.length; i++) {
-        if(isElement(nods[i])) {
+    for (i = 0; i < nods.length; i++) {
+        if (isElement(nods[i])) {
             els++;
             lastEl = nods[i];
         }
     }
-    if(els === 1) {
+    if (els === 1) {
         return lastEl;
     }
-    if(isElement(nods[0])) return nods[0];
+    if (isElement(nods[0])) return nods[0];
     else return nods[0].parentElement;
 }
 
@@ -298,7 +300,7 @@ function getActionableElement(nods, source) {
 function blurPrev() {
     // Blur previously selected element
     var prevFocused = getActionableElement(selectedEls, 'nav');
-    if(prevFocused !== null) prevFocused.blur();
+    if (prevFocused !== null) prevFocused.blur();
 }
 
 /**
@@ -317,60 +319,60 @@ function ez_navigate(move, options) {
 
     // set up default options
     var defaults = {
-        voice:          true,
-        alert:          true
+        voice: true,
+        alert: true
     };
     options = merge_options(defaults, options);
 
 
     blurPrev();
 
-    if(move === 'down') {
+    if (move === 'down') {
         selectedEls = getNextSelection('nav');
-    } else if(move === 'up') {
+    } else if (move === 'up') {
         selectedEls = getPrevSelection('nav');
-    } else if(move === 'top') {
+    } else if (move === 'top') {
         selectedEls = getFirstSelection('nav');
         move = 'down';
-    } else if(move === 'bottom') {
+    } else if (move === 'bottom') {
         selectedEls = getLastSelection('nav');
         move = 'up';
     } else {
         throw new Error("Parameter *move* must be 'up'|'down'|'top'|'bottom'.")
     }
 
-    if(selectedEls.length === 0) {
+    if (selectedEls.length === 0) {
         var quiet = {voice: false, alert: false};
 
-        if(move === 'down') {
+        if (move === 'down') {
             ez_navigate('bottom', quiet);
             alertEdgeNav('bottom');
         }
-        else if(move === 'up'){
+        else if (move === 'up') {
             ez_navigate('top', quiet);
             alertEdgeNav('top');
         }
 
         pulseSelector();
-        if(options.alert) playSFX(AUDIO_ACTION_NONE, 'nav');
+        if (options.alert) playSFX(AUDIO_ACTION_NONE, 'nav');
 
         return;
-    } else if(argMove !== 'top' && argMove !== 'bottom') {
+    } else if (argMove !== 'top' && argMove !== 'bottom') {
         // Valid selection, so reset edge nav attempts
         edgeNavAttempt = 0;
     }
 
     // Check to make sure it's not a short, weird selection
     var allInline = true;
-    for(i = 0; i < selectedEls.length; i++) {
-        if(!isInlineElement(selectedEls[i], 'nav')) {
+    for (i = 0; i < selectedEls.length; i++) {
+        if (!isInlineElement(selectedEls[i], 'nav')) {
             allInline = false;
             break;
         }
 
     }
 
-    if(allInline
+    if (allInline
         && selectedEls.length === 1
         && is_all_punct(selectedEls[0])) {
         ez_navigate(move);
@@ -380,20 +382,20 @@ function ez_navigate(move, options) {
     var actionable = getActionableElement(selectedEls, 'nav');
 
     // Check to make sure not label
-    if(actionable.tagName === 'LABEL' && orphanedLabel(actionable)) {
+    if (actionable.tagName === 'LABEL' && orphanedLabel(actionable)) {
         ez_navigate(move);
         return;
     }
 
     var label = get_label(actionable);
-    if(label !== null) drawSelected(selectedEls.concat([label]));
+    if (label !== null) drawSelected(selectedEls.concat([label]));
     else drawSelected(selectedEls);
 
-    if(options.alert) playSFX(actionable, 'nav');
+    if (options.alert) playSFX(actionable, 'nav');
 
-    if(actionable !== null) actionable.focus();
+    if (actionable !== null) actionable.focus();
 
-    if(options.voice) voice(selectedEls, {source: 'nav'});
+    if (options.voice) voice(selectedEls, {source: 'nav'});
 
     _debug(selectedEls);
 }
@@ -414,7 +416,7 @@ function ez_jump(nodArr, source) {
 
     playSFX(actionable, 'nav');
 
-    if(actionable !== null) actionable.focus();
+    if (actionable !== null) actionable.focus();
 
     voice(selectedEls, 'nav');
 
@@ -428,21 +430,21 @@ function ez_jump(nodArr, source) {
  * @return {Element|null} Returns element to jump to, if one exists.
  */
 function hrefJump(obj) {
-    if(obj.tagName === "A") {
-        if(obj.href.indexOf("#") !== -1) {
+    if (obj.tagName === "A") {
+        if (obj.href.indexOf("#") !== -1) {
             var hrefBase = obj.href.substring(0, obj.href.indexOf("#"));
-            if(window.location.href.indexOf("#") != -1) {
+            if (window.location.href.indexOf("#") != -1) {
                 pageBase = window.location.href.substring(0, window.location.href.indexOf("#"));
             } else {
                 pageBase = window.location.href;
             }
-            if(hrefBase == "" || hrefBase == pageBase) { // If from same URL base
+            if (hrefBase == "" || hrefBase == pageBase) { // If from same URL base
                 var jumpTo = obj.href.substring(obj.href.indexOf("#") + 1);
                 var idLocation = document.getElementById(jumpTo);
                 var nameLocation = document.getElementsByName(jumpTo)[0];
-                if(idLocation !== null) {
+                if (idLocation !== null) {
                     return idLocation;
-                } else if(nameLocation !== undefined) {
+                } else if (nameLocation !== undefined) {
                     return nameLocation;
                 }
             }
@@ -455,18 +457,22 @@ function hrefJump(obj) {
  * Decides what to do, if anything, when EZ Action is pressed.
  * @param nodArr Node array to 'enter' on
  * @param source {'point'|'nav'} The navigation method
- * @param userDid {'selectControl'|'changeValue'} What
+ * @param [userDid] {'selectControl'|'changeValue'} What the user did. Not currently used (TODO)
  */
 function ez_enter(nodArr, source, userDid) {
 
     var obj = getActionableElement(nodArr, source);
 
+    var type = getType(obj);
+
     var sound = AUDIO_ACTION_NONE;
-    var spoken = "";
-    var action = "";
-    var clicked = true;
+
+    var playVoice = true;
+
     var repeat = false;
-    var speak = true;
+
+    var name = '';
+    var action = '';
 
     /*
      * ACTION
@@ -475,47 +481,55 @@ function ez_enter(nodArr, source, userDid) {
     // Check for possible jump
     var jumpTo = hrefJump(obj);
 
-    if(jumpTo !== null) {
+    if (jumpTo !== null) {
+        // Jump to element
         ez_jump([jumpTo], source);
-        clicked = false;
         nodArr = [jumpTo];
         sound = AUDIO_ACTION;
-    } else if(getClick(obj) !== null || getType(obj) === 'submit' || getType(obj) === 'button') {
+        playVoice = false;
+
+    } else if (silentClick(obj)) {
+        // Is a button or href or onclick etc.
+        obj.click();
         sound = AUDIO_ACTION;
-        speak = false;
+        playVoice = false;
+
+    } else if (type === 'radio' || type === 'checkbox') {
+        // Radios and checkboxes are currently supported
         obj.click();
-    } else if(isInteractive(obj)) {
-        // TODO: Basis for clicking interactive elements prompts
-        obj.click();
-        if(obj.checked) {
+
+        if (obj.checked) {
             sound = AUDIO_ACTION_CHECK;
         } else {
             sound = AUDIO_ACTION_UNCHECK;
         }
-    } else if(obj.tagName == 'INPUT' && (obj.type == 'submit' || obj.type == 'image')) {
-        obj.click();
+
     } else {
+        // Not interactive / actionable
         pulseSelector();
-        clicked = false;
         repeat = true;
+
     }
 
     /*
-     * AUDIO ICON
+     * AUDIO ICON -- something is always played
      */
     playSFX(sound, 'nav');
 
     /*
      * VOICE
      */
-    if(speak) {
-        if(clicked) {
-            voice(nodArr, {source: source});
+    if (playVoice) {
+        if (!repeat) {
+            name = getName(obj, source);
+
+            if (name === '') name = getRole(obj);
 
             action = getValueSubstring(obj, "action");
-            //voice(action, {source: source, enqueue: true});
+
+            voice(name + ' ' + action);
         } else {
-            voice(nodArr, {source: source, repeat: repeat});
+            voice(nodArr, {source: source, repeat: true});
         }
     }
 }
@@ -538,28 +552,28 @@ function pulseSelector() {
 function multikey_event(e) {
     e = e || event; //to deal with IE
     map[e.keyCode] = !!(e.type == 'keydown');
-    if(map[KB_TAB] && map[KB_SHIFT] && tabNav != 'none') { //SHIFT+TAB
-        if(tinyOpen) {
-            if(tinyOpen && helpObj !== null) {
+    if (map[KB_TAB] && map[KB_SHIFT] && tabNav != 'none') { //SHIFT+TAB
+        if (tinyOpen) {
+            if (tinyOpen && helpObj !== null) {
                 ez_help_goto_section(-1);
             } else {
                 closeTiny(true, 'nav');
             }
-        } else if(ez_navigateToggle) {
+        } else if (ez_navigateToggle) {
             ez_navigate('up');
             //window.scroll(0,findPos(selectedEls));
         } else {
             ez_navigate_start(false, 'nav');
         }
         return false; // Overwrite default browser functionality
-    } else if(map[KB_TAB] && tabNav != 'none') { //TAB
-        if(tinyOpen) {
-            if(tinyOpen && helpObj !== null) {
+    } else if (map[KB_TAB] && tabNav != 'none') { //TAB
+        if (tinyOpen) {
+            if (tinyOpen && helpObj !== null) {
                 ez_help_goto_section(1);
             } else {
                 closeTiny(true, 'nav');
             }
-        }else if(ez_navigateToggle) {
+        } else if (ez_navigateToggle) {
             ez_navigate('down');
             //window.scroll(0,findPos(selectedEls));
         } else {
@@ -575,11 +589,11 @@ function multikey_event(e) {
  */
 function auto_advance_set() {
     // If this is a new element to start autoadvancing, set the timer
-    if(find_parent_attr(selectedEls, 'data-ez-autoadvance') !== undefined) {
-        if(find_parent_attr(selectedElsements[currIndex - 1], 'data-ez-autoadvance') === undefined) {
+    if (find_parent_attr(selectedEls, 'data-ez-autoadvance') !== undefined) {
+        if (find_parent_attr(selectedElsements[currIndex - 1], 'data-ez-autoadvance') === undefined) {
             autoAdvance = find_parent_attr(selectedEls, 'data-ez-autoadvance');
             autoAdvance = parseInt(autoAdvance);
-            if(autoAdvance < 100) {
+            if (autoAdvance < 100) {
                 console.log("Please choose a autoadvance pause of 100 ms or greater.");
                 autoAdvance = 100;
             }
@@ -593,14 +607,14 @@ function auto_advance_set() {
  */
 function auto_advance_decide() {
     window.clearInterval(autoAdvTimer);
-    if(autoAdvance !== 0) {
+    if (autoAdvance !== 0) {
         autoAdvTimer = setInterval(function () {
             ez_navigate('down');
-            if(currIndex >= findFocusable('last')) {
+            if (currIndex >= findFocusable('last')) {
                 autoAdvance = 0;
                 window.clearInterval(autoAdvTimer);
             }
-            if(find_parent_attr(selectedEls, 'data-ez-autoadvance') === undefined) {
+            if (find_parent_attr(selectedEls, 'data-ez-autoadvance') === undefined) {
                 autoAdvance = 0;
                 window.clearInterval(autoAdvTimer);
             }
@@ -615,12 +629,12 @@ function auto_advance_decide() {
  */
 function currentYPosition() {
     // Firefox, Chrome, Opera, Safari
-    if(self.pageYOffset) return self.pageYOffset;
+    if (self.pageYOffset) return self.pageYOffset;
     // Internet Explorer 6 - standards mode
-    if(document.documentElement && document.documentElement.scrollTop)
+    if (document.documentElement && document.documentElement.scrollTop)
         return document.documentElement.scrollTop;
     // Internet Explorer 6, 7 and 8
-    if(document.body.scrollTop) return document.body.scrollTop;
+    if (document.body.scrollTop) return document.body.scrollTop;
     return 0;
 }
 
@@ -631,28 +645,28 @@ function currentYPosition() {
 function smoothScroll(stopY) {
     var startY = currentYPosition();
     var distance = stopY > startY ? stopY - startY : startY - stopY;
-    if(distance < 100) {
+    if (distance < 100) {
         scrollTo(0, stopY);
         return;
     }
     var speed = Math.round(distance / 100);
-    if(speed >= 20) speed = 20;
+    if (speed >= 20) speed = 20;
     var step = Math.round(distance / 200);
     var leapY = stopY > startY ? startY + step : startY - step;
     var timer = 0;
-    if(stopY > startY) {
-        for(i = startY; i < stopY; i += step) {
+    if (stopY > startY) {
+        for (i = startY; i < stopY; i += step) {
             setTimeout("window.scrollTo(0, " + leapY + ")", timer * speed);
             leapY += step;
-            if(leapY > stopY) leapY = stopY;
+            if (leapY > stopY) leapY = stopY;
             timer++;
         }
         return;
     }
-    for(i = startY; i > stopY; i -= step) {
+    for (i = startY; i > stopY; i -= step) {
         setTimeout("window.scrollTo(0, " + leapY + ")", timer * speed);
         leapY -= step;
-        if(leapY < stopY) leapY = stopY;
+        if (leapY < stopY) leapY = stopY;
         timer++;
     }
 }
