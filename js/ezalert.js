@@ -17,7 +17,7 @@ function newAlert(str, source) {
 
     if (tinyHelpOpen) closeTinyHelp(source);
 
-    TINYALERT.box.show('<p>' + str + '</p>', 0, 400, 0, 0);
+    TINYALERT.box.show('<p style="text-align:center">' + str + '</p>', 0, 400, 0, 0);
 
     tinyAlertOpen = true;
 
