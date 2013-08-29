@@ -38,7 +38,8 @@ function voice(obj, options) {
         source:      'nav',
         repeat:      false,
         enqueue:     false,
-        pre:         ''
+        pre:         '',
+	    ssml:        SSML
     };
     options = merge_options(defaults, options);
 
@@ -65,6 +66,16 @@ function voice(obj, options) {
 
     // Workaround since Chrome's tts enqueue is a nightmare and likes deciding when it works
     speech = options.pre + speech;
+
+	/**
+	 * Adding SSML wrapper markup if required.
+	 */
+	if (options.ssml && speech !== '') {
+		speech = '<?xml version="1.0"?>' +
+			'<speak>' +
+			speech +
+			'</speak>';
+	}
 
     _debug(speech);
 
@@ -203,16 +214,6 @@ function voice_element(obj, source, options) {
 
     // Replace override custom EZ Access
     speech = say_replace(obj, speech, source);
-
-    /**
-     * Adding SSML wrapper markup if required.
-     */
-    if (options.ssml && speech !== '') {
-        speech = '<?xml version="1.0"?>' +
-            '<speak>' +
-            speech +
-            '</speak>';
-    }
 
     return speech;
 }
