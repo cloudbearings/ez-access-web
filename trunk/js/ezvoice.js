@@ -35,47 +35,47 @@ function voice(obj, options) {
 
     // set up default options
     var defaults = {
-        source:      'nav',
-        repeat:      false,
-        enqueue:     false,
-        pre:         '',
-	    ssml:        SSML
+        source: 'nav',
+        repeat: false,
+        enqueue: false,
+        pre: '',
+        ssml: SSML
     };
     options = merge_options(defaults, options);
 
 
     var speech = "";
-    if(typeof (obj) == 'string') {
+    if (typeof (obj) == 'string') {
         speech = obj;
     } else {
         // Loop through all selected elements
-        for(var i = 0; i < obj.length; i++) {
-            if(isElement(obj[i])) speech += voice_element(obj[i], options.source);
+        for (var i = 0; i < obj.length; i++) {
+            if (isElement(obj[i])) speech += voice_element(obj[i], options.source);
             else speech += voice_node(obj[i]);
         }
     }
 
     // Global speech appendages
-    if(options.repeat == true) {
+    if (options.repeat == true) {
         speech = "Repeating... " + speech;
     }
 
-    if(dictionary !== null) {
+    if (dictionary !== null) {
         speech = fixPronunciation(speech, dictionary);
     }
 
     // Workaround since Chrome's tts enqueue is a nightmare and likes deciding when it works
     speech = options.pre + speech;
 
-	/**
-	 * Adding SSML wrapper markup if required.
-	 */
-	if (options.ssml && speech !== '') {
-		speech = '<?xml version="1.0"?>' +
-			'<speak>' +
-			speech +
-			'</speak>';
-	}
+    /**
+     * Adding SSML wrapper markup if required.
+     */
+    if (options.ssml && speech !== '') {
+        speech = '<?xml version="1.0"?>' +
+            '<speak>' +
+            speech +
+            '</speak>';
+    }
 
     _debug(speech);
 
@@ -88,9 +88,9 @@ function voice(obj, options) {
     chrome.extension.sendRequest(req);
 }
 
-function voice_node( nod ) {
+function voice_node(nod) {
     // Remove line breaks
-    return nod.nodeValue.replace(/(\r\n|\n|\r)/gm," ");
+    return nod.nodeValue.replace(/(\r\n|\n|\r)/gm, " ");
 }
 
 /**
@@ -106,7 +106,7 @@ function voice_element(obj, source, options) {
 
     // set up default options
     var defaults = {
-        ssml:      SSML
+        ssml: SSML
     };
     options = merge_options(defaults, options);
 
@@ -161,13 +161,13 @@ function voice_element(obj, source, options) {
      * Get other speech for different elements
      */
     if (type === 'range') {
-        if(obj.hasAttribute('min') && obj.hasAttribute('max')) {
+        if (obj.hasAttribute('min') && obj.hasAttribute('max')) {
             extra = 'and ranges from ' + obj.min + ' to ' + obj.max;
             //The following are "sort of" error cases
-        } else if(obj.hasAttribute('min')) {
+        } else if (obj.hasAttribute('min')) {
             //With no max, Chrome returns '' but uses 100
             extra = 'and ranges from ' + obj.min + ' to 100';
-        } else if(obj.hasAttribute('max')) {
+        } else if (obj.hasAttribute('max')) {
             //With no min, Chrome returns '' but uses 0
             extra = 'and ranges from 0 to ' + obj.max;
         } else {
@@ -178,14 +178,14 @@ function voice_element(obj, source, options) {
     /**
      * Potentially add SSML tags to different speech substrings.
      */
-    if(options.ssml && role !== '') {
+    if (options.ssml && role !== '') {
         role = '<prosody pitch="low" rate="fast">' + role + '</prosody>';
     }
 
     /**
      * Concatenation for the speech string to be returned.
      */
-    if(speech === '') { //default concatenation
+    if (speech === '') { //default concatenation
         //speech = name + ', ' + role + ', ' + value + ' ' + extra + '.';
         speech += name;
         if (speech !== '' && role !== '') {
@@ -208,7 +208,7 @@ function voice_element(obj, source, options) {
         }
     }
 
-    if(type === 'a' && obj.hasAttribute('href')) {
+    if (type === 'a' && obj.hasAttribute('href')) {
         speech = role + ': ' + name;
     }
 
@@ -229,20 +229,20 @@ function getType(obj) {
      * @type {Array}
      * @const
      */
-    var ariaRoles = ['checkbox','radio','button'];
+    var ariaRoles = ['checkbox', 'radio', 'button'];
 
     // Check for aria-role, and return iff valid
-    if(obj.hasAttribute('aria-role')) {
+    if (obj.hasAttribute('aria-role')) {
         var type = obj.getAttribute('aria-role').toLowerCase();
-        for(var i = 0; i < ariaRoles.length; i++) {
-            if(type === ariaRoles[i]) {
+        for (var i = 0; i < ariaRoles.length; i++) {
+            if (type === ariaRoles[i]) {
                 return type;
             }
         }
     }
 
     // Special case
-    if(obj.tagName === 'INPUT') {
+    if (obj.tagName === 'INPUT') {
         return obj.type.toLowerCase();
     }
 
@@ -272,7 +272,7 @@ function getName(obj, source, defaultString) {
     'use strict';
     var ret;
 
-    if(defaultString === undefined) {
+    if (defaultString === undefined) {
         ret = '';
     } else {
         ret = defaultString;
@@ -281,40 +281,40 @@ function getName(obj, source, defaultString) {
     var label = get_label(obj);
     var type = getType(obj);
 
-    if(obj.hasAttribute('aria-labelledby')) {
+    if (obj.hasAttribute('aria-labelledby')) {
         ret = '';
         var labelIDs = obj.getAttribute('aria-labelledby').split(' ');
-        for(var i = 0; i < labelIDs.length; i++) {
+        for (var i = 0; i < labelIDs.length; i++) {
             ret += document.getElementById(labelIDs[i]).textContent;
             ret += ' ';
         }
-    } else if(obj.hasAttribute('aria-label')) {
+    } else if (obj.hasAttribute('aria-label')) {
         ret = obj.getAttribute('aria-label');
-    } else if(label !== null) {
+    } else if (label !== null) {
         //always check for a label before checking for default names
-        if(typeof label === "object") {
+        if (typeof label === "object") {
             ret = say_replace(label, get_inner_alt(label, source), source);
         } else {
             ret = label;
         }
     }
     // Get generic name for specific input types
-    else if(obj.hasAttribute('readonly') || obj.hasAttribute('disabled')) {
+    else if (obj.hasAttribute('readonly') || obj.hasAttribute('disabled')) {
         ret = 'Disabled field';
-    } else if(type === 'submit') {
-        if(obj.hasAttribute('value')) {
+    } else if (type === 'submit') {
+        if (obj.hasAttribute('value')) {
             ret = obj.value;
         } else {
             ret = 'Submit';
         }
-    } else if(type === 'reset') {
-        if(obj.hasAttribute('value')) {
+    } else if (type === 'reset') {
+        if (obj.hasAttribute('value')) {
             ret = obj.value;
         } else {
             ret = 'Reset';
         }
-    } else if(type === 'button') {
-        if(obj.hasAttribute('value')) {
+    } else if (type === 'button') {
+        if (obj.hasAttribute('value')) {
             ret = obj.value;
         }
 
@@ -322,20 +322,20 @@ function getName(obj, source, defaultString) {
         if (ret === '') {
             ret = obj.innerText;
         }
-    } else if(type === 'image') {
+    } else if (type === 'image') {
         //alt is preferred, title is second choice
-        if(obj.hasAttribute('alt')) {
+        if (obj.hasAttribute('alt')) {
             ret = obj.alt;
-        } else if(obj.title) {
+        } else if (obj.title) {
             ret = obj.title;
         } else {
             ret = 'Image';
         }
-    } else if(type === 'password' || type === 'text' ||
+    } else if (type === 'password' || type === 'text' ||
         type === 'email' || type === 'search' ||
         type === 'url' || type === 'tel' ||
         type === 'number' || type === 'textarea') {
-        if(obj.hasAttribute('placeholder')) {
+        if (obj.hasAttribute('placeholder')) {
             /**
              * Using a placeholder as a label is NOT generally recommended,
              * but it is probably better than nothing in this case (because
@@ -343,11 +343,11 @@ function getName(obj, source, defaultString) {
              */
             ret = obj.getAttribute('placeholder');
         }
-    } else if(type === 'img') { //TODO - check if necessary
-        if(obj.alt) {
+    } else if (type === 'img') { //TODO - check if necessary
+        if (obj.alt) {
             ret = obj.alt;
         }
-    } else if(type === 'a' && obj.hasAttribute('href')) {
+    } else if (type === 'a' && obj.hasAttribute('href')) {
         ret = get_inner_alt(obj, source);
     } else if (type === 'select') {
         //do nothing
@@ -376,59 +376,59 @@ function getRole(obj, defaultString) {
     'use strict';
     var ret;
 
-    if(defaultString === undefined) {
+    if (defaultString === undefined) {
         ret = '';
     } else {
         ret = defaultString;
     }
 
-    if(obj.hasAttribute('data-ez-sayrole')) {
+    if (obj.hasAttribute('data-ez-sayrole')) {
         ret = obj.getAttribute('data-ez-sayrole');
     }
 
     var type = getType(obj);
 
     // Roles for specific input types
-    if(type === 'submit' || type === 'button' ||
+    if (type === 'submit' || type === 'button' ||
         type === 'reset') {
         ret = 'Button';
-    } else if(type === 'image') {
+    } else if (type === 'image') {
         ret = 'image input';
-    } else if(type === 'radio') {
+    } else if (type === 'radio') {
         ret = 'Radio Button';
-    } else if(type === 'checkbox') {
+    } else if (type === 'checkbox') {
         ret = 'Checkbox';
-    } else if(type === 'range') {
+    } else if (type === 'range') {
         ret = 'Slider';
-    } else if(type === 'password') {
+    } else if (type === 'password') {
         ret = 'Password field';
-    } else if(type === 'text') {
+    } else if (type === 'text') {
         ret = 'Text field';
-    } else if(type === 'email') {
+    } else if (type === 'email') {
         ret = 'E-mail field';
-    } else if(type === 'search') {
+    } else if (type === 'search') {
         ret = 'Search field';
-    } else if(type === 'url') {
+    } else if (type === 'url') {
         ret = 'Web address field';
-    } else if(type === 'tel') {
+    } else if (type === 'tel') {
         ret = 'Telephone field';
-    } else if(type === 'number') {
+    } else if (type === 'number') {
         ret = 'Number field'; //spinner in Chrome
-    } else if(type === 'button') {
+    } else if (type === 'button') {
         ret = 'Button';
-    } else if(type === 'img') { //TODO - check if necessary
-        if(!obj.hasAttribute('alt')) {
+    } else if (type === 'img') { //TODO - check if necessary
+        if (!obj.hasAttribute('alt')) {
             ret = "Image";
         }
-    } else if(type === 'a' && obj.hasAttribute('href')) {
+    } else if (type === 'a' && obj.hasAttribute('href')) {
         ret = 'Link';
-    } else if(type === 'select') {
-        if(obj.hasAttribute('multiple')) {
+    } else if (type === 'select') {
+        if (obj.hasAttribute('multiple')) {
             ret = 'Multiple-selections menu';
         } else {
             ret = 'Menu';
         }
-    } else if(type === 'textarea') {
+    } else if (type === 'textarea') {
         ret = 'Text area';
     }
 
@@ -492,9 +492,9 @@ function getValue(obj) {
         //if ARIA slider or spinbutton, then ret=aria-valuenow (set above)
     }
     //Various text input fields
-    else if (type === 'text'   || type === 'textarea' || type === 'email' ||
-        type === 'search' || type === 'url'      || type === 'tel'   ||
-        type === 'password' ) {
+    else if (type === 'text' || type === 'textarea' || type === 'email' ||
+        type === 'search' || type === 'url' || type === 'tel' ||
+        type === 'password') {
         ret = obj.value;
         //if ARIA, then ret=aria-valuetext (set above)
     }
@@ -522,7 +522,7 @@ function getValue(obj) {
                 }
             }
         } else {
-            if(obj.selectedIndex !== -1) {
+            if (obj.selectedIndex !== -1) {
                 ret = obj.options[obj.selectedIndex].value;
             } else {
                 ret = '';
@@ -613,15 +613,15 @@ function getValueSubstring(obj, userDid) {
         }
     }
     //Various text input fields
-    else if (type === 'text'   || type === 'textarea' || type === 'email' ||
-        type === 'search' || type === 'url'      || type === 'tel' ) {
+    else if (type === 'text' || type === 'textarea' || type === 'email' ||
+        type === 'search' || type === 'url' || type === 'tel') {
         if (value.length <= 0) {
             ret = 'is blank'
         } else if (userDid === 'type') {
             ret = 'you have typed ' + getTypedSpeech(value);
         } else if (obj.hasAttribute('readonly') || obj.hasAttribute('disabled')) {
-		    ret = 'is ' + value;
-	    } else {
+            ret = 'is ' + value;
+        } else {
             ret = 'contains ' + value;
         }
     }
@@ -652,7 +652,7 @@ function getValueSubstring(obj, userDid) {
         } else { //string[], which means multiple options selected
             var options = '';
             var length = value.length;
-            for (var i=0; i<length; i++) {
+            for (var i = 0; i < length; i++) {
                 if (i === length - 1 && length > 1) {
                     options += ', and ' + value[i];
                 } else if (i === 0) {
@@ -711,7 +711,7 @@ function getDataDomainSubstring(obj) {
     } else if (type === 'number') {
         var min = getMin(obj);
         var max = getMax(obj);
-        if(min !== null && max !== null) {
+        if (min !== null && max !== null) {
             ret = 'ranges from ' + min + ' to ' + max;
         } else if (min !== null) {
             ret = 'has a minimum of ' + min;
@@ -817,10 +817,10 @@ function getNumOptions(obj) {
  */
 function get_inner_alt(obj, source) {
     var speech = "";
-    for(var i = 0; i < obj.childNodes.length; i++) {
-        if(obj.childNodes[i].nodeType == 3) {
+    for (var i = 0; i < obj.childNodes.length; i++) {
+        if (obj.childNodes[i].nodeType == 3) {
             speech += obj.childNodes[i].nodeValue;
-        } else if(obj.childNodes[i].nodeType == 1 && obj.tagName !== 'LABEL') {
+        } else if (obj.childNodes[i].nodeType == 1 && obj.tagName !== 'LABEL') {
             speech += voice_element(obj.childNodes[i], source);
         }
     }
@@ -836,28 +836,28 @@ function get_inner_alt(obj, source) {
  */
 function say_replace(obj, speech, source) {
     // data-ez-sayalt
-    if(source == 'nav' && obj.hasAttribute('data-ez-sayalt-nav')) {
+    if (source == 'nav' && obj.hasAttribute('data-ez-sayalt-nav')) {
         speech = obj.getAttribute('data-ez-sayalt-nav');
-    } else if(source == 'point' && obj.hasAttribute('data-ez-sayalt-point')) {
+    } else if (source == 'point' && obj.hasAttribute('data-ez-sayalt-point')) {
         speech = obj.getAttribute('data-ez-sayalt-point');
-    } else if(obj.hasAttribute('data-ez-sayalt')) {
+    } else if (obj.hasAttribute('data-ez-sayalt')) {
         speech = obj.getAttribute('data-ez-sayalt');
     }
     // data-ez-saybefore
-    if(source == 'nav' && obj.hasAttribute('data-ez-saybefore-nav')) {
+    if (source == 'nav' && obj.hasAttribute('data-ez-saybefore-nav')) {
         speech = obj.getAttribute('data-ez-saybefore-nav') + ' ' + speech;
-    } else if(source == 'point' && obj.hasAttribute('data-ez-saybefore-point')) {
+    } else if (source == 'point' && obj.hasAttribute('data-ez-saybefore-point')) {
         speech = obj.getAttribute('data-ez-saybefore-point') + ' ' + speech;
-    } else if(obj.hasAttribute('data-ez-saybefore')) {
+    } else if (obj.hasAttribute('data-ez-saybefore')) {
         speech = obj.getAttribute('data-ez-saybefore') + ' ' + speech;
     }
 
     // data-ez-sayafter
-    if(source == 'nav' && obj.hasAttribute('data-ez-sayafter-nav')) {
+    if (source == 'nav' && obj.hasAttribute('data-ez-sayafter-nav')) {
         speech += ' ' + obj.getAttribute('data-ez-sayafter-nav');
-    } else if(source == 'point' && obj.hasAttribute('data-ez-sayafter-point')) {
+    } else if (source == 'point' && obj.hasAttribute('data-ez-sayafter-point')) {
         speech += ' ' + obj.getAttribute('data-ez-sayafter-point');
-    } else if(obj.hasAttribute('data-ez-sayafter')) {
+    } else if (obj.hasAttribute('data-ez-sayafter')) {
         speech += ' ' + obj.getAttribute('data-ez-sayafter');
     }
 
@@ -880,13 +880,13 @@ function say_replace(obj, speech, source) {
 function getTypedSpeech(s, regex) {
     /** The regex object for finding alphabet characters */
     var alphaChars;
-    if(regex === undefined) {
+    if (regex === undefined) {
         alphaChars = ALPHABET_CHAR;
     } else {
         alphaChars = regex;
     }
 
-    if(s.slice(-1).search(alphaChars) === -1) {
+    if (s.slice(-1).search(alphaChars) === -1) {
         return s;
     } //else the last letter is an alphabetical character
 
@@ -915,21 +915,21 @@ function getTypedSpeech(s, regex) {
 
     //Split the last space-delimited "word" into two if it contains other than
     //alphabet chars.
-    while(!done) {
-        if(penultimateWord[penultimateWord.length - 1].search(alphaChars) !== -1) {
+    while (!done) {
+        if (penultimateWord[penultimateWord.length - 1].search(alphaChars) !== -1) {
             lastWord.unshift(penultimateWord.pop());
         } else {
             done = true;
         }
 
-        if(penultimateWord <= 0) {
+        if (penultimateWord <= 0) {
             done = true;
         }
     }
 
     //Concatenate and return the ret string
     ret = words.join(' ');
-    if(penultimateWord.length > 0) {
+    if (penultimateWord.length > 0) {
         ret += ' ' + penultimateWord.join('');
     }
     ret += ' ' + lastWord.join(', ');
@@ -957,14 +957,14 @@ function fixPronunciation(s, dictionary, caseSensitive) {
     /** The array to be returned after join() into a string */
     var ret = [];
 
-    if(caseSensitive === undefined) {
+    if (caseSensitive === undefined) {
         caseSensitive = false;
     }
 
     /** Associative array to map lowercase key to real dictionary key */
     var lowerCaseShadow = {};
-    if(!caseSensitive) {
-        for(keyword in dictionary) {
+    if (!caseSensitive) {
+        for (keyword in dictionary) {
             //noinspection JSUnfilteredForInLoop
             lowerCaseShadow[keyword.toLowerCase()] = keyword;
         }
@@ -972,34 +972,34 @@ function fixPronunciation(s, dictionary, caseSensitive) {
 
     //Build regular expression from the keys in the dictionary
     exp = '\\b(';
-    for(var keyword in dictionary) {
+    for (var keyword in dictionary) {
         exp += keyword + '|';
     }
     exp = exp.slice(0, -1); //remove last pipe
     exp += ')\\b';
 
-    if(caseSensitive) {
+    if (caseSensitive) {
         array = s.split(new RegExp(exp, 'g'));
     } else {
         array = s.split(new RegExp(exp, 'gi'));
     }
 
 
-    if(array.length <= 1) { //Thus keys not found
+    if (array.length <= 1) { //Thus keys not found
         return s;
     } // ELSE: need to replace words in the array
 
-    if(caseSensitive) {
-        for(var i = 0, n = array.length; i < n; i++) {
-            if(dictionary[array[i]] !== undefined) {
+    if (caseSensitive) {
+        for (var i = 0, n = array.length; i < n; i++) {
+            if (dictionary[array[i]] !== undefined) {
                 ret[i] = dictionary[array[i]];
             } else {
                 ret[i] = array[i];
             }
         }
     } else {
-        for(i = 0, n = array.length; i < n; i++) {
-            if(lowerCaseShadow[array[i].toLowerCase()] !== undefined) {
+        for (i = 0, n = array.length; i < n; i++) {
+            if (lowerCaseShadow[array[i].toLowerCase()] !== undefined) {
                 ret[i] = dictionary[lowerCaseShadow[array[i].toLowerCase()]];
             } else {
                 ret[i] = array[i];
@@ -1010,14 +1010,50 @@ function fixPronunciation(s, dictionary, caseSensitive) {
     return ret.join('');
 } //End fixPronunciation()
 
+/**
+ * Evaluates if the button should not be read after clicking (because it probably loads another page or something)
+ * @param obj Element to check
+ * @returns {boolean} True iff silently interactive
+ */
+function silentClick(obj) {
+    var type = getType(obj);
 
+    // Is href or onclick
+    if (getClick(obj) !== null) return true;
+
+    // Is submit button
+    if (type === 'submit') return true;
+
+    // Is regular button
+    if (type === 'button') return true;
+
+    // Is submit button
+    if (type === 'submit') return true;
+
+    // Is reset button
+    if (type === 'reset') return true;
+
+    // Is image button
+    if (type === 'image') return true;
+
+
+    // Else
+    return false;
+}
+
+/**
+ * Keeps track of how many times the user has tried to navigate off of the screen,
+ * and warns them (as according to the options.js file)
+ * @param move {'top'|'bottom'} Location in which the user is attempting to navigate
+ * past on the page.
+ */
 function alertEdgeNav(move) {
 
     edgeNavAttempt++;
 
-    if(move !== 'top' && move !== 'bottom') throw new Error('Invalid value for move parameter.');
+    if (move !== 'top' && move !== 'bottom') throw new Error('Invalid value for move parameter.');
 
-    if(edgeNavAttempt > alerts[move].length - 1) {
+    if (edgeNavAttempt > alerts[move].length - 1) {
         edgeNavAttempt = alerts[move].length - 1;
     }
 
