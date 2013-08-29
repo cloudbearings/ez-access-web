@@ -1,7 +1,7 @@
 /**
  * Keep track if the TINY modal is open or not
  */
-var tinyOpen = false;
+var tinyHelpOpen = false;
 
 /**
  * The current object in which ez help is describing.
@@ -34,13 +34,15 @@ var DEFAULT_HELP = '<!doctype html> <html lang="en"> <head> <meta charset="utf-8
  * @param {string|object} alert A string to display or object to get help info about.
  */
 function ez_help(alert) {
+    if (tinyAlertOpen) closeAlert('nav');
+
 
     // If null, EZ Access is not started, so default to body help text.
     if (alert === null) alert = document.body;
 
     helpJustOpened = true;
 
-    tinyOpen = true;
+    tinyHelpOpen = true;
 
     helpCounter = 0;
     helpObj = null;
@@ -61,8 +63,9 @@ function ez_help(alert) {
             helpText = helpArr[0] + append_footnote(true, false);
         }
     }
-    TINY.box.show(helpText, 0, 400, 0, 0);
-    tinyContent = document.getElementById('tinycontent');
+    TINYHELP.box.show(helpText, 0, 400, 0, 0);
+    tinyContent = document.getElementById('tinycontenthelp');
+
     voice([tinyContent]);
 }
 
@@ -85,32 +88,32 @@ function ez_help_goto_section(skip) {
             // First, 'default' page
             helpCounter += skip;
             helpText = 'Start of help text.' + append_footnote(true, false);
-            TINY.box.show(helpText, 0, 400, 0, 0);
+            TINYHELP.box.show(helpText, 0, 400, 0, 0);
             playSFX(AUDIO_NAV_MOVE, 'nav');
             playSFX(AUDIO_NAV_MOVE, 'nav');
-            tinyContent = document.getElementById('tinycontent');
+            tinyContent = document.getElementById('tinycontenthelp');
             voice([tinyContent]);
         } else if (helpPrompts.length === helpCounter + skip) {
             // Last, 'default' page
             helpCounter += skip;
             helpText = 'End of help text.' + append_footnote(false, true);
-            TINY.box.show(helpText, 0, 400, 0, 0);
+            TINYHELP.box.show(helpText, 0, 400, 0, 0);
 
             playSFX(AUDIO_NAV_MOVE, 'nav');
-            tinyContent = document.getElementById('tinycontent');
+            tinyContent = document.getElementById('tinycontenthelp');
             voice([tinyContent]);
         } else if (helpCounter + skip < -1 || helpCounter + skip > helpPrompts.length) {
             // Out of range, exit
-            closeTiny(true);
+            closeTinyHelp('nav');
         } else {
             // Still in range; normal
             helpCounter += skip;
             helpText = helpPrompts[helpCounter] + append_footnote(false, false);
 
-            TINY.box.show(helpText, 0, 400, 0, 0);
+            TINYHELP.box.show(helpText, 0, 400, 0, 0);
 
             playSFX(AUDIO_NAV_MOVE, 'nav');
-            tinyContent = document.getElementById('tinycontent');
+            tinyContent = document.getElementById('tinycontenthelp');
             voice([tinyContent]);
         }
     }
@@ -148,11 +151,10 @@ function append_footnote(isFirst, isLast) {
 
 /**
  * Cleanup in closing a Tiny Box (lightbox)
- * @param close Actually close the lightbox, or if it will be done automatically (and we just need to cleanup).
  * @param source ['nav'|'point'] Navigation method
  * Mostly for when clicking outside of lightbox and it closes itself.
  */
-function closeTiny(close, source) {
+function closeTinyHelp(source) {
     if (!helpJustOpened) {
         if (ez_navigateToggle) {
             ez_navigate('top');
@@ -162,12 +164,12 @@ function closeTiny(close, source) {
         voice('');
     }
 
-    // Hide EZ Highlight
+    // Show EZ Highlight
     if (document.getElementById(ezSelectorId)) document.getElementById(ezSelectorId).style.visibility = '';
 
     playSFX(AUDIO_NAV_MOVE, 'nav');
-    if (close) TINY.box.hide();
-    tinyOpen = false;
+    TINYHELP.box.hide();
+    tinyHelpOpen = false;
 }
 
 /**
@@ -183,9 +185,9 @@ function idle_loop(display) {
             }, alerts.idle.wait);
         }
     } else {
-        if (!tinyOpen && !ez_navigateToggle) {
+        if (!tinyHelpOpen && !ez_navigateToggle) {
             idleLoop = self.clearInterval(idleLoop);
-            tinyOpen = true;
+            tinyHelpOpen = true;
             ez_help(alerts.idle.value);
         }
     }

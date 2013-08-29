@@ -1221,7 +1221,7 @@ function load_ez() {
 
         document.addEventListener('touchend', function (e) {
             if (touchTap === true || new Date().getTime() - touchStartTime < 250) { // If not 'dragged' or quickly 'dragged'
-                if (!tinyOpen) stopEZ();
+                if (!tinyHelpOpen) stopEZ();
             }
         });
 
