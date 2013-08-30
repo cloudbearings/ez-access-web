@@ -345,9 +345,9 @@ function getName(obj, source, defaultString) {
             ret = obj.getAttribute('placeholder');
         }
     } else if (type === 'img') { //TODO - check if necessary
-        if (obj.alt) {
-            ret = obj.alt;
-        }
+        if (obj.hasAttribute('alt')) {
+            ret = obj.getAttribute('alt')
+        } else ret = 'Image.';
     } else if (type === 'a' && obj.hasAttribute('href')) {
         ret = get_inner_alt(obj, source);
     } else if (type === 'select') {
