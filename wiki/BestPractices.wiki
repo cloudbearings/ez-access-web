@@ -33,8 +33,8 @@ Alternatively, you may turn off Autofill in Chrome by going to the settings page
 The EZ Access keypad has from 5 to 8 buttons depending on the model. Several of the buttons have well-defined behaviors specific to EZ Access, but several of the other buttons can have application-specific behaviors.
 
 The `data-ez-keybinding` attribute supports the following values for the respective EZ Access keys:
- * `KEY_EZ_BACK`
- * `KEY_EZ_NEXT`
+ * `back` for the EZ Back key
+ * `next` for the EZ Next key
 
 === What to do ===
 Add the `data-ez-keybinding` attribute to buttons on the screen that go to back and next pages. For example:
