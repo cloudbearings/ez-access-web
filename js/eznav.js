@@ -4,6 +4,9 @@
 var KB_TAB = 9;
 var KB_SHIFT = 16;
 var KB_ENTER = 13;
+var KB_F2 = 113;
+var KB_PGUP = 33; // page up
+var KB_PGDOWN = 34; // page down
 
 /**
  * EZ-Access keycode declarations
@@ -70,7 +73,7 @@ var autoAdvTimer;
  * @returns {boolean} If false, disables default key action.
  */
 function key_up_event(e) {
-    if (e.keyCode == EZ_KEY_HELP || e.keyCode == 72) { // 72 == 'h'
+    if (e.keyCode == EZ_KEY_HELP || e.keyCode == KB_F2) {
 
         if (!tinyHelpOpen && !helpJustPressed) {
             ez_help(getActionableElement(selectedEls, 'nav'));
@@ -89,7 +92,7 @@ function key_up_event(e) {
 function key_down_event(e) {
 
     // 'if' keycode statements
-    if (e.keyCode == EZ_KEY_HELP || e.keyCode == 72) { // 72 == 'h'
+    if (e.keyCode == EZ_KEY_HELP || e.keyCode == KB_F2) {
         if (tinyHelpOpen) {
             closeTinyHelp('nav');
             helpJustPressed = true;
@@ -129,7 +132,7 @@ function key_down_event(e) {
                 ez_navigate_start(false, 'nav');
             }
         }
-    } else if (e.keyCode == EZ_KEY_BACK || e.keyCode == 66) { // 'b' == 66
+    } else if (e.keyCode == EZ_KEY_BACK || e.keyCode == KB_PGDOWN) {
         // TODO
         if (tinyHelpOpen) {
             closeTinyHelp('nav');
