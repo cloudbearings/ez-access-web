@@ -1078,6 +1078,9 @@ function ez_navigate_start(propagated, source) {
     ez_navigateToggle = true;
     sessionStorage.setItem("EZ_Toggle", "1");
 
+    // Reset edge nav attempts
+    edgeNavAttempt = -1;
+
     var obj;
     if (document.body.hasAttribute('data-ez-startat')) {
         var startid;
