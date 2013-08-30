@@ -62,10 +62,12 @@ var allowReorder = false;
 /**
  * An array/list of input types and tags that are interactive and should be
  * highlighted separately from other elements.
+ * NOTE: 'image' refers to the <input type="image">, and not the <img> tag (which
+ * getType returns as 'img'
  */
 var INTERACTIVE_TYPES = [
     'checkbox', 'radio', 'select', 'button', 'submit', 'reset',
-    'range', 'number',
+    'range', 'number', 'image',
     'text', 'password', 'email', 'search', 'url', 'tel', 'textarea'];
 
 /**
