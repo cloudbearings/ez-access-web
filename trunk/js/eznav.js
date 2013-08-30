@@ -132,7 +132,7 @@ function key_down_event(e) {
                 ez_navigate_start(false, 'nav');
             }
         }
-    } else if (e.keyCode == EZ_KEY_BACK || e.keyCode == KB_PGDOWN) {
+    } else if (e.keyCode == EZ_KEY_BACK || e.keyCode == KB_PGUP) {
         // TODO
         if (tinyHelpOpen) {
             closeTinyHelp('nav');
@@ -144,7 +144,7 @@ function key_down_event(e) {
                 el.click();
             }
         }
-    } else if (e.keyCode === EZ_KEY_NEXT) {
+    } else if (e.keyCode === EZ_KEY_NEXT || e.keyCode === KB_PGDOWN) {
         if (tinyHelpOpen) {
             closeTinyHelp('nav');
         } else {
