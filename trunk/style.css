@@ -69,12 +69,18 @@
 }
 
 #tinycontenthelp {
-    font-size: 200%;
+    font-size: 32px;
+    line-height: 110%;
+    font-variant: normal;
+    font-stretch: normal;
     background: transparent;
 }
 
 #tinycontentalert {
-    font-size: 200%;
+    font-size: 32px;
+    line-height: 110%;
+    font-variant: normal;
+    font-stretch: normal;
     background: transparent;
 }
 
@@ -130,6 +136,11 @@
     margin-top: 0;
 }
 
+#tinycontenthelp p {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
 #tinycontentalert h1, #tinycontentalert h2, #tinycontentalert h3,
 #tinycontentalert h4, #tinycontentalert h5, #tinycontentalert h6 {
     margin-top: 0;
@@ -150,4 +161,25 @@
 
 #tinycontentalert h1 + p {
     margin-top: 0;
+}
+
+#tinycontenthelp p {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+#tinycontenthelp hr {
+    border: 0;
+    height: 2px;
+    background-color: #333333;
+    background-image: -webkit-linear-gradient(left, #CCCCCC, #333333, #CCCCCC);
+    background-image: linear-gradient(left, #CCCCCC, #333333, #CCCCCC);
+}
+
+#tinycontentalert hr {
+    border: 0;
+    height: 2px;
+    background-color: #333333;
+    background-image: -webkit-linear-gradient(left, #CCCCCC, #333333, #CCCCCC);
+    background-image: linear-gradient(left, #CCCCCC, #333333, #CCCCCC);
 }
