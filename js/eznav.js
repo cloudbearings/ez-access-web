@@ -151,6 +151,7 @@ function key_down_event(e) {
             }
         }
     } else if (e.keyCode == EZ_KEY_ENTER || e.keyCode == KB_ENTER) {
+        if (tinyAlertOpen) closeAlert('nav');
         if (tinyHelpOpen) {
             playSFX(AUDIO_ACTION_NONE, 'nav');
             tinyContent = document.getElementById('tinycontent');
