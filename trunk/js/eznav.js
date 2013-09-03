@@ -547,7 +547,7 @@ function ez_enter(nodArr, source, userDid) {
 }
 
 /**
- * Uses CSS3 effects to 'pulse' thhe ezSelectorId element.
+ * Uses CSS3 effects to 'pulse' the ezSelectorId element.
  */
 function pulseSelector() {
     document.getElementById(ezSelectorId).className = 'pulse';
