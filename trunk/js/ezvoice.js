@@ -321,7 +321,7 @@ function getName(obj, source, defaultString) {
 
         // <button>s are special -- need to read similar to other input type="button"s
         if (ret === '') {
-            ret = obj.innerText;
+            ret = get_inner_alt(obj, source);
         }
     } else if (type === 'image') {
         //alt is preferred, title is second choice
