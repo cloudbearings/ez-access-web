@@ -434,6 +434,8 @@ function getRole(obj, defaultString) {
         }
     } else if (type === 'textarea') {
         ret = 'Text area';
+    } else if (obj.hasAttribute('onclick')) {
+	    ret = 'Click-able';
     }
 
     return ret;
