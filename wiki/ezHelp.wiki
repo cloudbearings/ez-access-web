@@ -1,4 +1,4 @@
-#This page details how to include or change context-sensitive EZ Access help.
+#summary This page details how to include or change context-sensitive EZ Access help.
 
 = EZ Help =
 
