@@ -509,11 +509,13 @@ function ez_enter(nodArr, source, userDid) {
     } else if (type === 'radio' || type === 'checkbox') {
         // Radios and checkboxes are currently supported
         obj.click();
-
-        if (obj.checked) {
+	    var val = getValue(obj);
+        if (val === true) {
             sound = AUDIO_ACTION_CHECK;
-        } else {
+        } else if (val === false) {
             sound = AUDIO_ACTION_UNCHECK;
+        } else {
+	        sound = AUDIO_ACTION;
         }
 
     } else {
