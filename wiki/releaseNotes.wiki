@@ -1,4 +1,4 @@
-#summary One-sentence summary of this page.
+#summary Release notes for stable versions of the EZ Access extension.
 
 = Release Notes =
 
@@ -30,6 +30,9 @@ The following interactive elements are completely supported by v. 1.0.
   * Radio buttons
     * `<input type="radio" />`
     * Elements with `aria-role="radio"`
+  * Hyperlinks
+    * `<a href="`...`">`
+    * Elements with `aria-role="link"`
   * Clickable elements with `onclick` attribute
 
-Other interactive elements are navigable and will be read to the user, but may not work properly in this version.
+Other interactive elements are navigable and will be read to the user, but may not behave as expected in this version.
