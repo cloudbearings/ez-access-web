@@ -68,7 +68,8 @@ var allowReorder = false;
 var INTERACTIVE_TYPES = [
     'checkbox', 'radio', 'select', 'button', 'submit', 'reset',
     'range', 'number', 'image',
-    'text', 'password', 'email', 'search', 'url', 'tel', 'textarea'];
+    'text', 'password', 'email', 'search', 'url', 'tel', 'textarea',
+    'hyperlink'];
 
 /**
  * An array/list of HTML tags that are inline and should not normally be
@@ -332,12 +333,7 @@ function isInteractive(o) {
     if (o.hasAttribute('onlick')) {
         return true;
     }
-    var type = getType(o);
-    if (type === 'a') {
-        //<a> without href is not interactive
-        return o.hasAttribute('href');
-    }
-    return INTERACTIVE_TYPES.indexOf(type) > -1;
+    return INTERACTIVE_TYPES.indexOf(getType(o)) > -1;
 }
 
 /**

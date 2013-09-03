@@ -209,7 +209,7 @@ function voice_element(obj, source, options) {
         }
     }
 
-    if (type === 'a' && obj.hasAttribute('href')) {
+    if (type === 'hyperlink') {
         speech = role + ': ' + name;
     }
 
@@ -230,14 +230,15 @@ function getType(obj) {
      * @type {Array}
      * @const
      */
-    var ariaRoles = ['checkbox', 'radio', 'button'];
+    var ariaRoles = ['checkbox', 'radio', 'button', 'link'];
 
     // Check for aria-role, and return iff valid
     if (obj.hasAttribute('aria-role')) {
         var type = obj.getAttribute('aria-role').toLowerCase();
         for (var i = 0; i < ariaRoles.length; i++) {
             if (type === ariaRoles[i]) {
-                return type;
+                if (type === 'link') type = 'hyperlink';
+	            return type;
             }
         }
     }
@@ -245,7 +246,9 @@ function getType(obj) {
     // Special case
     if (obj.tagName === 'INPUT') {
         return obj.type.toLowerCase();
-    }
+    } if (obj.tagName === 'A' && obj.hasAttribute('href')) {
+		return 'hyperlink';
+	}
 
     // Else return tag name
     return obj.tagName.toLowerCase();
@@ -348,7 +351,7 @@ function getName(obj, source, defaultString) {
         if (obj.hasAttribute('alt')) {
             ret = obj.getAttribute('alt')
         } else ret = 'Image.';
-    } else if (type === 'a' && obj.hasAttribute('href')) {
+    } else if (type === 'hyperlink') {
         ret = get_inner_alt(obj, source);
     } else if (type === 'select') {
         //do nothing
@@ -421,7 +424,7 @@ function getRole(obj, defaultString) {
         if (!obj.hasAttribute('alt')) {
             ret = "Image";
         }
-    } else if (type === 'a' && obj.hasAttribute('href')) {
+    } else if (type === 'hyperlink') {
         ret = 'Link';
     } else if (type === 'select') {
         if (obj.hasAttribute('multiple')) {
