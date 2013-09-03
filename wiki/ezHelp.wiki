@@ -122,7 +122,7 @@ The EZ Help lightbox is comprised of multiple `<div>`s that can be styled with c
 {{{
 p { //paragraphs for the main appliction
   font-size: 24px;
-  font-family: Times "Times New Roman" serif;
+  font-family: Times, "Times New Roman", serif;
 }
 #tinycontenthelp p { //help paragraphs styled differently
   font-size: 32px;
