@@ -1,8 +1,13 @@
 #summary Details about the <body data-ez-startat> attribute.
 
+{{{
+<body data-ez-startat="logo maincontent">
+}}}
 
 = Description =
-Specifies element/s on the page the EZ Navigation Highlight starts on a page when the user activates it when first pressing EZ Up or Down and where it starts when the EZ Highlight was on just prior to the current page.
+Specifies elements on the page where the EZ Navigation Highlight starts. There are two starting cases:
+  # Where the EZ Highlight starts on a page when the user turns on EZ Access mode by pressing EZ Up or Down.
+  # Where the EZ Highlight starts on a page when EZ Access mode was already on just prior to the current page.
 
   * Applies to: `<body>` only
   * Inheritable: no
