@@ -1,0 +1,33 @@
+#summary Details about the data-ez-sayalt attribute and variants.
+
+{{{
+<input type="submit" data-ez-sayalt="Submit form, button." />
+}}}
+
+= Description =
+Specifies what the speech output should say for a given element. This attribute overrides any default speech output that would otherwise be provided for the element. There are three variants:
+
+  * `data-ez-sayalt`
+    * Preferred. It specifies speech output in all modes unless overridden by a more specific modal attribute below.
+  * `data-ez-sayalt-nav`
+    * Specifies speech output for the EZ Navigation mode, where users press EZ Up or Down to get to an element. This overrides the general `data-ez-sayalt` attribute for the EZ Navigation mode only.
+  * `data-ez-sayalt-point`
+    * Specifies speech output for the EZ Pointing modes, like Slide-to-read and Button Help, where users point to elements to have them read. This overrides the general `data-ez-sayalt` attribute for the EZ Pointing mode only.
+
+  * Applies to: all content elements except `<body>`
+  * Inheritable: no
+  * Supported since: 1.0.0
+
+== Values ==
+  * `data-ez-sayalt="`_`string`_`"`
+    * _string_ is the string to be spoken instead of the default speech output that would otherwise be generated for that element.
+
+== Behavior with missing attribute ==
+The speech output is the default for that type of element.
+
+== Best practices ==
+The `data-ez-sayalt` attribute should be used with caution, only when the default text is insufficient. Many people who may use EZ Access's speech output may be able to see, which means that spoken text that differs greatly from that on the screen can be confusing.
+
+The `data-ez-sayalt` attribute could be used to fix pronunciation. Note however, that pronunciation is often voice dependent.
+
+If you need to add helpful speech before or after a particular element, consider instead using the `data-ez-saybefore` and `data-ez-sayafter` attributes.
