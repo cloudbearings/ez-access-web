@@ -1,0 +1,38 @@
+#summary Details about the data-ez-saybefore attribute and variants.
+
+{{{
+<button data-ez-saybefore="Volume" onclick="volumeUp()">Up</button>
+}}}
+
+= Description =
+Specifies what the speech output should say before the speech output specific to a given element. There are three variants:
+
+  * `data-ez-saybefore`
+    * Preferred. It specifies the prepended speech output in all modes unless overridden by a more specific modal attribute below.
+  * `data-ez-sayalt-nav`
+    * Specifies the prepended speech output for the EZ Navigation mode, where users press EZ Up or Down to get to an element. This overrides the general `data-ez-saybefore` attribute for the EZ Navigation mode only.
+  * `data-ez-sayalt-point`
+    * Specifies the prepended speech output for the EZ Pointing modes, like Slide-to-read and Button Help, where users point to elements to have them read. This overrides the general `data-ez-saybefore` attribute for the EZ Pointing mode only.
+
+  * Applies to: all content elements except `<body>`
+  * Inheritable: no
+  * Supported since: 1.0.0
+
+== Values ==
+  * `data-ez-saybefore="`_`string`_`"`
+    * _string_ is the string to be spoken before that (prepended) of the speech output for the given element.
+
+== Behavior with missing attribute ==
+The speech output is the default for that type of element with nothing prepended.
+
+== Best practices ==
+The `data-ez-saybefore` is useful when you need to prepend some additional speech to make something clearer. This is particularly useful for data displayed in tabular or list format.
+
+{{{
+<dl data-ez-chunking="group">
+  <dt data-ez-sayafter="is a">Ticket type</dt>
+  <dd>Round Trip Adult Fare</dd>
+</dl>
+}}}
+
+With this example, the system would read: "Ticket type is a Round Trip Adult Fare"
