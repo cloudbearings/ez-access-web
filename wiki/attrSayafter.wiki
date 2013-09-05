@@ -1,0 +1,49 @@
+#summary Details about the data-ez-sayafter attribute and variants.
+
+{{{
+<button data-ez-sayafter="a page" onclick="pageUp()">Up</button>
+}}}
+
+= Description =
+Specifies what the speech output should say after the speech output specific to a given element. There are three variants:
+
+  * `data-ez-sayafter`
+    * Preferred. It specifies the speech output to be appended in all modes unless overridden by a more specific modal attribute below.
+  * `data-ez-sayalt-nav`
+    * Specifies the speech output to be appended in EZ Navigation mode, where users press EZ Up or Down to get to an element. This overrides the general `data-ez-sayafter` attribute for the EZ Navigation mode only.
+  * `data-ez-sayalt-point`
+    * Specifies the speech output to be appended in EZ Pointing modes, like Slide-to-read and Button Help, where users point to elements to have them read. This overrides the general `data-ez-sayafter` attribute for the EZ Pointing mode only.
+
+  * Applies to: all content elements except `<body>`
+  * Inheritable: no
+  * Supported since: 1.0.0
+
+== Values ==
+  * `data-ez-sayafter="`_`string`_`"`
+    * _string_ is the string to be spoken after that (appended) of the speech output for the given element.
+
+== Behavior with missing attribute ==
+The speech output is the default for that type of element with nothing appended.
+
+== Best practices ==
+The `data-ez-sayafter` attribute is useful when you need add speech or instructions after an element is read.
+
+{{{
+<input id="candidate1" type="checkbox" 
+ data-ez-sayafter-nav="Use the green, round EZ Action button to choose this candidate." />
+<label for="candidate1">Candidate One</label> 
+}}}
+
+  * In this example, the system would read: "Candidate One, checkbox, is not checked. Use the green, round EZ Action button to choose this candidate."
+  * Note that the label is read as part of the checkbox element because of the `for` attribute.
+
+The `data-ez-sayafter` attribute may be useful for data displayed in tabular or list format.
+
+{{{
+<dl data-ez-chunking="group">
+  <dt data-ez-sayafter="is">Price</dt>
+  <dd>$3.00</dd>
+</dl>
+}}}
+
+  * With this example, the system would read: "Price is $3.00."
