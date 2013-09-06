@@ -1,3 +1,19 @@
+/*----------------------------------------------------------------------------------------------------------------------
+ |  COPYRIGHT       (c) 2012 - 2013 Trace Research and Development Center,
+ |                  The Board of Regents of the University of Wisconsin System.
+ |                  All rights reserved.
+ |
+ |  LICENSE         New BSD License
+ |
+ |  CODE            Alexander Harding and Bern Jordan
+ |  SPECIFICATIONS  Bern Jordan
+ |
+ |  FILE            background.js
+ |  DESCRIPTION     This file contains the background file for the Chrome extension, including variables
+ |                  that need to be stored permanently such as EZ Access options.
+ *--------------------------------------------------------------------------------------------------------------------*/
+
+
 // If not initialized
 if (localStorage.ezHighlightColor === undefined) {
     localStorage.ezHighlightColor = "#0000FF";

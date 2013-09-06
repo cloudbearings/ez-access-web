@@ -1,8 +1,24 @@
+/*----------------------------------------------------------------------------------------------------------------------
+ |  COPYRIGHT       (c) 2012 - 2013 Trace Research and Development Center,
+ |                  The Board of Regents of the University of Wisconsin System.
+ |                  All rights reserved.
+ |
+ |  LICENSE         New BSD License
+ |
+ |  CODE            Alexander Harding and Bern Jordan
+ |  SPECIFICATIONS  Bern Jordan
+ |
+ |  FILE            ezsound.js
+ |  DESCRIPTION     This file contains the EZ Sound audio icons, which includes determining the sound file to play
+ |                  (given the DOM node), loading the HTML5 audio, and playing it.
+ *--------------------------------------------------------------------------------------------------------------------*/
+
+
 /**
  * Volume of the audio elements (0-100)
  */
 var audioVolume;
-if(sessionStorage.getItem("EZ_Volume") !== null) {
+if (sessionStorage.getItem("EZ_Volume") !== null) {
     audioVolume = parseInt(sessionStorage.getItem("EZ_Volume"));
 } else {
     audioVolume = 100;
@@ -14,7 +30,7 @@ if(sessionStorage.getItem("EZ_Volume") !== null) {
  */
 function load_audio() {
     var i;
-    for(i = 0; i < sounds.length; i++) {
+    for (i = 0; i < sounds.length; i++) {
         sounds[i].feed = new Audio(chrome.extension.getURL(sounds[i].src));
     }
 }
@@ -24,18 +40,18 @@ function load_audio() {
  * These usually shouldn't be changed (cached indexes): just change
  * the URL for the audio name in the settings.js file.
  */
-var AUDIO_ACTION =          find_audio('action');
-var AUDIO_ACTION_NONE =     find_audio('action-none');
-var AUDIO_ACTION_CHECK =    find_audio('action-check');
-var AUDIO_ACTION_UNCHECK =  find_audio('action-uncheck');
+var AUDIO_ACTION = find_audio('action');
+var AUDIO_ACTION_NONE = find_audio('action-none');
+var AUDIO_ACTION_CHECK = find_audio('action-check');
+var AUDIO_ACTION_UNCHECK = find_audio('action-uncheck');
 
 var AUDIO_NAV_INTERACTIVE = find_audio('nav-interactive');
-var AUDIO_NAV_MOVE =        find_audio('nav-move');
-var AUDIO_NAV_CHECKED =     find_audio('nav-checked');
-var AUDIO_NAV_UNCHECKED =   find_audio('nav-unchecked');
+var AUDIO_NAV_MOVE = find_audio('nav-move');
+var AUDIO_NAV_CHECKED = find_audio('nav-checked');
+var AUDIO_NAV_UNCHECKED = find_audio('nav-unchecked');
 
-var AUDIO_PAGECHANGE =      find_audio('pagechange');
-var AUDIO_ALERT =           find_audio('alert');
+var AUDIO_PAGECHANGE = find_audio('pagechange');
+var AUDIO_ALERT = find_audio('alert');
 
 /**
  * Searches sounds array of objects for name of sound
@@ -43,8 +59,8 @@ var AUDIO_ALERT =           find_audio('alert');
  * @return {number} Position in sounds[].name array
  */
 function find_audio(audio_name) {
-    for(var i = 0; i < sounds.length; i++) {
-        if(audio_name === sounds[i].name) {
+    for (var i = 0; i < sounds.length; i++) {
+        if (audio_name === sounds[i].name) {
             return i;
         }
     }
@@ -56,7 +72,7 @@ function find_audio(audio_name) {
  * Sets to volume of all audio feeds.
  */
 function set_volume() {
-    for(var i = 0; i < sounds.length; i++) {
+    for (var i = 0; i < sounds.length; i++) {
         sounds[i].feed.volume = audioVolume / 100;
     }
 }
@@ -85,7 +101,7 @@ function playSFX(arg, source) {
         _debug('Undefined arg in playSFX(arg).');
         return false;
     }
-    if(source === undefined) {
+    if (source === undefined) {
         source = 'nav'
     }
 
@@ -106,18 +122,18 @@ function playSFX(arg, source) {
         } else if (type === 'checkbox' || type === 'radio') {
             //example of value-dependent SFX
             var val = getValue(arg);
-	        if (val === true) {
+            if (val === true) {
                 sfxRef = AUDIO_NAV_CHECKED;
             } else if (val === false) {
                 sfxRef = AUDIO_NAV_UNCHECKED;
             } else {
-			    sfxRef = AUDIO_NAV_INTERACTIVE;
-	        }
+                sfxRef = AUDIO_NAV_INTERACTIVE;
+            }
         } else {
             sfxRef = AUDIO_NAV_INTERACTIVE;
         }
 
-        if(isElement(arg)) {
+        if (isElement(arg)) {
             //Override above if there are data-ez-sfx* attributes
             if (arg.hasAttribute('data-ez-sfx')) {
                 sfxRef = arg.getAttribute('data-ez-sfx');
@@ -127,7 +143,7 @@ function playSFX(arg, source) {
                         ' not found in sounds[]');
                 }
             }
-            if (source ==='nav' && arg.hasAttribute('data-ez-sfx-nav')) {
+            if (source === 'nav' && arg.hasAttribute('data-ez-sfx-nav')) {
                 sfxRef = arg.getAttribute('data-ez-sfx-nav');
                 if (sfxRev < 0) {
                     sfxRef = DEFAULT_SOUND;
@@ -136,7 +152,7 @@ function playSFX(arg, source) {
                         ' not found in sounds[]');
                 }
             }
-            if (source ==='point' && arg.hasAttribute('data-ez-sfx-point')) {
+            if (source === 'point' && arg.hasAttribute('data-ez-sfx-point')) {
                 sfxRef = arg.getAttribute('data-ez-sfx-point');
                 if (sfxRev < 0) {
                     sfxRef = DEFAULT_SOUND;

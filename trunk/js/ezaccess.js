@@ -1,3 +1,20 @@
+/*----------------------------------------------------------------------------------------------------------------------
+ |  COPYRIGHT       (c) 2012 - 2013 Trace Research and Development Center,
+ |                  The Board of Regents of the University of Wisconsin System.
+ |                  All rights reserved.
+ |
+ |  LICENSE         New BSD License
+ |
+ |  CODE            Alexander Harding and Bern Jordan
+ |  SPECIFICATIONS  Bern Jordan
+ |
+ |  FILE            ezaccess.js
+ |  DESCRIPTION     This file contains the low-level DOM parsing for the current page, including deciding where to
+ |                  move the highlight to, and the process of actually doing so. This file also manages
+ |                  loading of EZ Access content pages & initialization.
+ *--------------------------------------------------------------------------------------------------------------------*/
+
+
 /**
  * The DOM node(s), if any, in order, on the page being highlighted.
  * @type {Array}
