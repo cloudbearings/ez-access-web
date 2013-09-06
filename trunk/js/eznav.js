@@ -10,7 +10,7 @@
  |
  |  FILE            eznav.js
  |  DESCRIPTION     This file contains the EZ Navigation (not EZ point/slidetoread), which includes key listeners
- |                  and invoking "ezaccess.js"to find the next/previous element(s), among other things.
+ |                  and invoking "ezaccess.js" to find the next/previous element(s), among other things.
  *--------------------------------------------------------------------------------------------------------------------*/
 
 
@@ -106,6 +106,7 @@ function key_up_event(e) {
  * @returns {boolean} If false, disables default key action.
  */
 function key_down_event(e) {
+    idle_loop(false);
 
     // 'if' keycode statements
     if (e.keyCode == EZ_KEY_HELP || e.keyCode == KB_F2) {
