@@ -20,10 +20,6 @@
  Use http://jsonlint.com/ to validate WITHOUT the "var foo = " part.
  */
 var alerts = {
-    "idle": {
-        "value": "If you have difficulty using the touchscreen, press the blue, diamond-shaped EZ Help button.",
-        "wait": "-1" // In milliseconds, -1 for infinity
-    },
     "top": [
         {"value": ""},
         {"value": "First item on screen."},

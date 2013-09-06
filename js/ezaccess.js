@@ -1135,6 +1135,20 @@ function load_ez() {
         allowReorder = true;
     }
 
+    if (document.body.hasAttribute('data-ez-idlespeech')) {
+        idleSpeech = document.body.getAttribute('data-ez-idlespeech')
+    }
+
+    if (document.body.hasAttribute('data-ez-idlespeech-delay')) {
+        if (!isNaN(document.body.getAttribute('data-ez-idlespeech-delay'))) {
+            idleDelay = Number(document.body.getAttribute('data-ez-idlespeech-delay'));
+        }
+    }
+
+    if (document.body.hasAttribute('data-ez-idlespeech-loop')) {
+        idleLoop = document.body.getAttribute('data-ez-idlespeech-loop') !== 'false';
+    }
+
     if (document.body.getAttribute('data-ez-autorepeat') === 'keyboard') {
         autoRepeat = 'keyboard';
     } else if (document.body.getAttribute('data-ez-autorepeat') === 'on') {
@@ -1210,11 +1224,12 @@ function load_ez() {
         }, 10);
     }
 
-    //idle_loop(); // TODO/ TEMP
+    idle_loop(false);
 
     // Touch gesture dragging
     if (slideToRead) {
         document.addEventListener('touchmove', function (e) {
+            idle_loop(false);
 
             e = e || window.event;
 
@@ -1403,7 +1418,7 @@ window.onresize = function () {
  */
 function stopEZ() {
     ez_navigateToggle = false;
-    idle_loop();
+    idle_loop(false);
     selectedEls = [];
     chrome.extension.sendRequest({stop: "true"});
     sessionStorage.setItem("EZ_Toggle", "0");

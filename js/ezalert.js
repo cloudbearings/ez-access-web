@@ -23,6 +23,29 @@
 var tinyAlertOpen = false;
 
 /**
+ * Keeps track of the idle timer (to overwrite, modify, remove etc)
+ */
+var idleTimer;
+
+/**
+ * By default, diplay the following text in the alert.
+ * @type {string}
+ */
+var idleSpeech = "If you have difficulty using the touchscreen, press the blue, diamond-shaped EZ Help button";
+
+/**
+ * By default, do not loop.
+ * @type {boolean}
+ */
+var idleLoop = false;
+
+/**
+ * By default, never go off.
+ * @type {number}
+ */
+var idleDelay = 0;
+
+/**
  * The alert to open and speak
  * @param str The string to alert and read
  * @param source {'nav'|'point'} Navigation method
@@ -56,21 +79,24 @@ function closeAlert(source) {
 
 /**
  * Alerts EZ Access idle loop lightbox asking user if still there.
- * TODO Not currently b/c of debugging + development
  * @param {boolean} display If false, start timer for idle loop. Otherwise, display lightbox + reset.
  */
 function idle_loop(display) {
     if (!display) {
-        if (alerts.idle.wait != -1) {
-            idleLoop = self.setInterval(function () {
+        if (idleDelay != 0) {
+            idleTimer = clearInterval(idleTimer);
+            idleTimer = setInterval(function () {
                 idle_loop(true)
-            }, alerts.idle.wait);
+            }, idleDelay);
         }
     } else {
-        if (!tinyHelpOpen && !ez_navigateToggle) {
-            idleLoop = self.clearInterval(idleLoop);
-            tinyHelpOpen = true;
-            ez_help(alerts.idle.value);
+        if (!tinyHelpOpen && ez_navigateToggle) {
+            if (!tinyAlertOpen) {
+                if (!idleLoop) idleTimer = clearInterval(idleTimer);
+                newAlert(idleSpeech, 'nav');
+            } else if (idleLoop) {
+                newAlert(idleSpeech, 'nav');
+            }
         }
     }
 }
