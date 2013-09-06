@@ -18,6 +18,12 @@ var dictionary = null;
 var ALPHABET_CHAR = /[a-zA-Z]/;
 
 /**
+ * Time, in milliseconds, to delay speech before playing.
+ * @type {number}
+ */
+var speechDelay = 200;
+
+/**
  * A parameter for whether speech should be generated with SSML markup.
  * @const
  */
@@ -85,7 +91,11 @@ function voice(obj, options) {
         "enqueue": options.enqueue
     };
 
-    chrome.extension.sendRequest(req);
+    chrome.extension.sendRequest({stop: "true"});
+
+    window.setTimeout(function () {
+        chrome.extension.sendRequest(req)
+    }, speechDelay);
 }
 
 function voice_node(nod) {
@@ -238,7 +248,7 @@ function getType(obj) {
         for (var i = 0; i < ariaRoles.length; i++) {
             if (type === ariaRoles[i]) {
                 if (type === 'link') type = 'hyperlink';
-	            return type;
+                return type;
             }
         }
     }
@@ -246,9 +256,10 @@ function getType(obj) {
     // Special case
     if (obj.tagName === 'INPUT') {
         return obj.type.toLowerCase();
-    } if (obj.tagName === 'A' && obj.hasAttribute('href')) {
-		return 'hyperlink';
-	}
+    }
+    if (obj.tagName === 'A' && obj.hasAttribute('href')) {
+        return 'hyperlink';
+    }
 
     // Else return tag name
     return obj.tagName.toLowerCase();
@@ -435,7 +446,7 @@ function getRole(obj, defaultString) {
     } else if (type === 'textarea') {
         ret = 'Text area';
     } else if (obj.hasAttribute('onclick')) {
-	    ret = 'Click-able';
+        ret = 'Click-able';
     }
 
     return ret;
