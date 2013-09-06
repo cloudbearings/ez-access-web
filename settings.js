@@ -1,3 +1,18 @@
+/*----------------------------------------------------------------------------------------------------------------------
+ |  COPYRIGHT       (c) 2012 - 2013 Trace Research and Development Center,
+ |                  The Board of Regents of the University of Wisconsin System.
+ |                  All rights reserved.
+ |
+ |  LICENSE         New BSD License
+ |
+ |  CODE            Alexander Harding and Bern Jordan
+ |  SPECIFICATIONS  Bern Jordan
+ |
+ |  FILE            settings.js
+ |  DESCRIPTION     This file contains the informally static information to be used internally by EZ Access.
+ *--------------------------------------------------------------------------------------------------------------------*/
+
+
 /* Feel free to change, add and remove elements, but MAKE SURE it is valid JSON.
  Common mistakes:
  1. Not including comma after every element (except for last, or first if only one)

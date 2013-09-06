@@ -1,3 +1,19 @@
+/*----------------------------------------------------------------------------------------------------------------------
+ |  COPYRIGHT       (c) 2012 - 2013 Trace Research and Development Center,
+ |                  The Board of Regents of the University of Wisconsin System.
+ |                  All rights reserved.
+ |
+ |  LICENSE         New BSD License
+ |
+ |  CODE            Alexander Harding and Bern Jordan
+ |  SPECIFICATIONS  Bern Jordan
+ |
+ |  FILE            eznav.js
+ |  DESCRIPTION     This file contains the EZ Navigation (not EZ point/slidetoread), which includes key listeners
+ |                  and invoking "ezaccess.js"to find the next/previous element(s), among other things.
+ *--------------------------------------------------------------------------------------------------------------------*/
+
+
 /**
  * Tab keycodes
  */
@@ -509,13 +525,13 @@ function ez_enter(nodArr, source, userDid) {
     } else if (type === 'radio' || type === 'checkbox') {
         // Radios and checkboxes are currently supported
         obj.click();
-	    var val = getValue(obj);
+        var val = getValue(obj);
         if (val === true) {
             sound = AUDIO_ACTION_CHECK;
         } else if (val === false) {
             sound = AUDIO_ACTION_UNCHECK;
         } else {
-	        sound = AUDIO_ACTION;
+            sound = AUDIO_ACTION;
         }
 
     } else {

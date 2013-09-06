@@ -1,3 +1,20 @@
+/*----------------------------------------------------------------------------------------------------------------------
+ |  COPYRIGHT       (c) 2012 - 2013 Trace Research and Development Center,
+ |                  The Board of Regents of the University of Wisconsin System.
+ |                  All rights reserved.
+ |
+ |  LICENSE         New BSD License
+ |
+ |  CODE            Alexander Harding and Bern Jordan
+ |  SPECIFICATIONS  Bern Jordan
+ |
+ |  FILE            ezhelp.js
+ |  DESCRIPTION     This file contains the driver for the EZ Help module of the EZ Access plugin, including
+ |                  parsing contents for the help lightbox, invoking the lightbox, and navigation through it.
+ |                  Lightbox-general code for EZ Help is found in "eztinyhelp.js".
+ *--------------------------------------------------------------------------------------------------------------------*/
+
+
 /**
  * Keep track if the TINY modal is open or not
  */
@@ -170,27 +187,6 @@ function closeTinyHelp(source) {
     playSFX(AUDIO_NAV_MOVE, 'nav');
     TINYHELP.box.hide();
     tinyHelpOpen = false;
-}
-
-/**
- * Alerts EZ Access idle loop lightbox asking user if still there.
- * TODO Not currently b/c of debugging + development
- * @param {boolean} display If false, start timer for idle loop. Otherwise, display lightbox + reset.
- */
-function idle_loop(display) {
-    if (!display) {
-        if (alerts.idle.wait != -1) {
-            idleLoop = self.setInterval(function () {
-                idle_loop(true)
-            }, alerts.idle.wait);
-        }
-    } else {
-        if (!tinyHelpOpen && !ez_navigateToggle) {
-            idleLoop = self.clearInterval(idleLoop);
-            tinyHelpOpen = true;
-            ez_help(alerts.idle.value);
-        }
-    }
 }
 
 /**
