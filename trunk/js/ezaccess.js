@@ -1388,7 +1388,7 @@ function stopEZ() {
     ez_navigateToggle = false;
     idle_loop();
     selectedEls = [];
-    voice("");
+    chrome.extension.sendRequest({stop: "true"});
     sessionStorage.setItem("EZ_Toggle", "0");
     var old = document.getElementById(ezSelectorId);
     if (old !== null) {
