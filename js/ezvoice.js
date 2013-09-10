@@ -46,6 +46,23 @@ var speechDelay = 200;
  */
 var SSML = true;
 
+/**
+ * Handles calling for a speech output to let the user know to push the EZ down button.
+ */
+var beginIdleTimer;
+
+/**
+ * Time, in milliseconds, between each speech alert interval.
+ * @type {number}
+ */
+var beginIdleTimerInterval = 10000;
+
+/**
+ * The default voice speech string to send to the tts engine.
+ * @type {string}
+ */
+var idleVoiceSpeech = "If you have difficulty using the touchscreen, press the blue, diamond-shaped EZ Help button.";
+
 
 /**
  * Provide easy place to change method of speech synthesis
@@ -1093,4 +1110,12 @@ function alertEdgeNav(move) {
 
     if (edgeNavAttempt !== 0) newAlert(alerts[move][edgeNavAttempt].value, 'nav');
 
+}
+
+function idleVoiceLoop() {
+    /* No distractors/conflicts -- all modules that could be potentially interrupted are off --
+       this module has the lowest priority. */
+    if(!ez_navigateToggle && !tinyHelpOpen && !tinyAlertOpen) {
+        voice(idleVoiceSpeech);
+    }
 }
