@@ -69,7 +69,7 @@ chrome.extension.onRequest.addListener(
                     }
                 }
             });
-        } else if (request.stop = "true") {
+        } else if (request.stop == "true") {
             chrome.tts.stop();
         } else if (request.ezShow == "true") {
             chrome.pageAction.show(sender.tab.id);
