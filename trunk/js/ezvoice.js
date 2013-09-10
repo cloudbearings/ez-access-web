@@ -55,7 +55,13 @@ var beginIdleTimer;
  * Time, in milliseconds, between each speech alert interval.
  * @type {number}
  */
-var beginIdleTimerInterval = 10000;
+var beginIdleTimerInterval = 0;
+
+/**
+ * True iff restate every certain amount of time.
+ * @type {boolean}
+ */
+var beginIdleTimerLoop = false;
 
 /**
  * The default voice speech string to send to the tts engine.
@@ -1112,10 +1118,19 @@ function alertEdgeNav(move) {
 
 }
 
-function idleVoiceLoop() {
-    /* No distractors/conflicts -- all modules that could be potentially interrupted are off --
-       this module has the lowest priority. */
-    if(!ez_navigateToggle && !tinyHelpOpen && !tinyAlertOpen) {
-        voice(idleVoiceSpeech);
+
+function idleVoiceLoop(display) {
+    if (!display) {
+        if (beginIdleTimerInterval > 0) {
+            beginIdleTimer = clearInterval(beginIdleTimer);
+            beginIdleTimer = setInterval(function () {
+                idleVoiceLoop(true);
+            }, beginIdleTimerInterval);
+        }
+    } else {
+        if (beginIdleTimerInterval > 0 && !tinyHelpOpen && !tinyAlertOpen && !ez_navigateToggle) {
+            if (!beginIdleTimerLoop) beginIdleTimer = clearInterval(beginIdleTimer);
+            voice(idleVoiceSpeech);
+        }
     }
 }

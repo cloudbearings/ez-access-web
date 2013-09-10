@@ -1134,23 +1134,36 @@ function ez_navigate_start(propagated, source) {
  */
 function load_ez() {
 
+    // EZ TIMEOUT DIALOGUE
     if (document.body.hasAttribute('data-ez-allowreorder')) {
         allowReorder = true;
     }
 
+    if (document.body.hasAttribute('data-ez-timeout')) {
+        idleSpeech = document.body.getAttribute('data-ez-timeout')
+    }
+
+    if (document.body.hasAttribute('data-ez-timeout-delay')) {
+        if (!isNaN(document.body.getAttribute('data-ez-timeout-delay'))) {
+            idleDelay = Number(document.body.getAttribute('data-ez-timeout-delay'));
+        }
+    }
+
+    // EZ IDLESPEECH
     if (document.body.hasAttribute('data-ez-idlespeech')) {
-        idleSpeech = document.body.getAttribute('data-ez-idlespeech')
+        idleVoiceSpeech = document.body.getAttribute('data-ez-idlespeech')
     }
 
     if (document.body.hasAttribute('data-ez-idlespeech-delay')) {
         if (!isNaN(document.body.getAttribute('data-ez-idlespeech-delay'))) {
-            idleDelay = Number(document.body.getAttribute('data-ez-idlespeech-delay'));
+            beginIdleTimerInterval = Number(document.body.getAttribute('data-ez-idlespeech-delay'));
         }
     }
 
     if (document.body.hasAttribute('data-ez-idlespeech-loop')) {
-        idleLoop = document.body.getAttribute('data-ez-idlespeech-loop') !== 'false';
+        beginIdleTimerLoop = document.body.getAttribute('data-ez-idlespeech-loop') !== 'false';
     }
+
 
     if (document.body.getAttribute('data-ez-autorepeat') === 'keyboard') {
         autoRepeat = 'keyboard';

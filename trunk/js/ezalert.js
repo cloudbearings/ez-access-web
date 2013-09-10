@@ -83,7 +83,7 @@ function closeAlert(source) {
  */
 function idle_loop(display) {
     if (!display) {
-        if (idleDelay != 0) {
+        if (idleDelay > 0) {
             timeoutIdleTimer = clearInterval(timeoutIdleTimer);
             timeoutIdleTimer = setInterval(function () {
                 idle_loop(true);

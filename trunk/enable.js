@@ -71,9 +71,7 @@ setTimeout(function () {
     checkingIfEz();
 
     // Handle idle loop when EZ Access is disabled.
-    beginIdleTimer = setInterval(function () {
-        idleVoiceLoop();
-    }, beginIdleTimerInterval);
+    idleVoiceLoop(false);
 }, 5);
 
 // Storing whether to disable for this session
