@@ -25,7 +25,7 @@ var tinyAlertOpen = false;
 /**
  * Keeps track of the idle timer (to overwrite, modify, remove etc)
  */
-var idleTimer;
+var timeoutIdleTimer;
 
 /**
  * By default, diplay the following text in the alert.
@@ -84,15 +84,15 @@ function closeAlert(source) {
 function idle_loop(display) {
     if (!display) {
         if (idleDelay != 0) {
-            idleTimer = clearInterval(idleTimer);
-            idleTimer = setInterval(function () {
-                idle_loop(true)
+            timeoutIdleTimer = clearInterval(timeoutIdleTimer);
+            timeoutIdleTimer = setInterval(function () {
+                idle_loop(true);
             }, idleDelay);
         }
     } else {
         if (!tinyHelpOpen && ez_navigateToggle) {
             if (!tinyAlertOpen) {
-                if (!idleLoop) idleTimer = clearInterval(idleTimer);
+                if (!idleLoop) timeoutIdleTimer = clearInterval(timeoutIdleTimer);
                 newAlert(idleSpeech, 'nav');
             } else if (idleLoop) {
                 newAlert(idleSpeech, 'nav');

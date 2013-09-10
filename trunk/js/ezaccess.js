@@ -216,7 +216,7 @@ var ALL_HTML_TAGS = [
  * so this function checks for inheritance.
  * @author J. Bern Jordan, Alexander Harding
  * @param {object} o The DOM object to be checked.
- * @param [{'nav'|'point'}] source Navigation method passed from calling function
+ * @param source {'nav'|'point'} Navigation method passed from calling function
  * @return {boolean} Whether o is focusable with EZ Access navigation.
  */
 function isFocusable(o, source) {
@@ -656,6 +656,7 @@ function is_ignorable(nod) {
  * public domain (please check the site if the exact license is important to
  * you).
  * @param sib  The reference node.
+ * @param source {'nav'|'point'} The EZ Access navigation method
  * @return     Either:
  *               1) The closest previous sibling to |sib| that is not
  *                  ignorable according to |is_ignorable|, or
@@ -680,6 +681,7 @@ function node_before(sib, source) {
  * public domain (please check the site if the exact license is important to
  * you).
  * @param sib  The reference node.
+ * @param source {'nav'|'point'} The navigation method
  * @return     Either:
  *               1) The closest next sibling to |sib| that is not
  *                  ignorable according to |is_ignorable|, or
@@ -734,7 +736,8 @@ function last_child(par, source) {
  * on 2013-06-14 and is available either under the MIT License or is in the
  * public domain (please check the site if the exact license is important to
  * you).
- * @param sib  The reference node.
+ * @param par  The reference node.
+ * @param source {'nav'|'point'} The EZ Access navigation method
  * @return     Either:
  *               1) The first child of |sib| that is not
  *                  ignorable according to |is_ignorable|, or
