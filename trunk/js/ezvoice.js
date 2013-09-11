@@ -55,7 +55,7 @@ var beginIdleTimer;
  * Time, in milliseconds, between each speech alert interval.
  * @type {number}
  */
-var beginIdleTimerInterval = 0;
+var beginIdleTimerInterval = -1;
 
 /**
  * True iff restate every certain amount of time.
@@ -1124,13 +1124,13 @@ function alertEdgeNav(move) {
 function idleVoiceLoop(display) {
     beginIdleTimer = clearInterval(beginIdleTimer);
     if (!display) {
-        if (beginIdleTimerInterval > 0) {
+        if (beginIdleTimerInterval >= 0) {
             beginIdleTimer = setInterval(function () {
                 idleVoiceLoop(true);
             }, beginIdleTimerInterval);
         }
     } else {
-        if (beginIdleTimerInterval > 0 && !tinyHelpOpen && !tinyAlertOpen && !ez_navigateToggle) {
+        if (beginIdleTimerInterval >= 0 && !tinyHelpOpen && !tinyAlertOpen && !ez_navigateToggle) {
             voice(idleVoiceSpeech, {onTTSDone: 'idleVoiceLoop'});
         }
     }

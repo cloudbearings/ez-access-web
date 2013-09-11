@@ -37,7 +37,7 @@ var idleSpeech = "If you have difficulty using the touchscreen, press the blue, 
  * By default, never go off.
  * @type {number}
  */
-var idleDelay = 0;
+var idleDelay = -1;
 
 /**
  * The alert to open and speak
@@ -75,7 +75,7 @@ function closeAlert(source) {
  * Alerts EZ Access idle loop lightbox asking user if still there.
  */
 function idle_loop() {
-    if (idleDelay > 0) {
+    if (idleDelay >= 0) {
         timeoutIdleTimer = setTimeout(function () {
             newAlert(idleSpeech, 'nav');
         }, idleDelay);
