@@ -1442,7 +1442,7 @@ function stopEZ() {
 
     selectedEls = [];
 
-    chrome.extension.sendRequest({stop: "true"});
+    chrome.extension.sendMessage({stop: "true"});
 
     sessionStorage.setItem("EZ_Toggle", "0");
     var old = document.getElementById(ezSelectorId);

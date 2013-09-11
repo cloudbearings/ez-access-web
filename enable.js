@@ -16,19 +16,19 @@
 
 
 var EzCustomColor;
-chrome.extension.sendRequest({
+chrome.extension.sendMessage({
     localstorage: "ezHighlightColor"
 }, function (response) {
     EzCustomColor = response.ezHighlightColor;
 });
 
-chrome.extension.sendRequest({
+chrome.extension.sendMessage({
     localstorage: "ssml"
 }, function (response) {
     SSML = response.ssml === "true";
 });
 
-chrome.extension.sendRequest({
+chrome.extension.sendMessage({
     localstorage: "debug"
 }, function (response) {
     debugMode = response.debug === "true";
@@ -39,26 +39,26 @@ var ezSessionDisable = sessionStorage["ezSessionDisable"];
 
 function checkingIfEz() {
     if (ezSessionDisable == "true") {
-        chrome.extension.sendRequest({
+        chrome.extension.sendMessage({
             ezShow: "true"
         }, function (response) {
         });
     } else if (document.body.getAttribute('data-ez') !== null) {
         // The regular expression produced a match, so notify the background page.
         load_ez();
-        chrome.extension.sendRequest({
+        chrome.extension.sendMessage({
             ezShow: "true"
         }, function (response) {
         });
     } else {
         // No match was found.
-        chrome.extension.sendRequest({
+        chrome.extension.sendMessage({
             localstorage: "ezNavigate"
         }, function (response) {
             ezNavigate = response.ezNavigate;
             if (ezNavigate == 'all') {
                 load_ez();
-                chrome.extension.sendRequest({
+                chrome.extension.sendMessage({
                     ezShow: "true"
                 }, function (response) {
                 });
@@ -75,7 +75,7 @@ setTimeout(function () {
 }, 5);
 
 // Storing whether to disable for this session
-chrome.extension.onRequest.addListener(
+chrome.extension.onMessage.addListener(
     function (request, sender, sendResponse) {
         if (request.ezSessionDisable == "true") {
             sessionStorage["ezSessionDisable"] = "true";
