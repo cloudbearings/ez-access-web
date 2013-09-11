@@ -1241,11 +1241,13 @@ function load_ez() {
     }
 
     idle_loop(false);
+    idleVoiceLoop(false);
 
     // Touch gesture dragging
     if (slideToRead) {
         document.addEventListener('touchmove', function (e) {
             idle_loop(false);
+            idleVoiceLoop(false);
 
             e = e || window.event;
 
@@ -1434,9 +1436,14 @@ window.onresize = function () {
  */
 function stopEZ() {
     ez_navigateToggle = false;
+
     idle_loop(false);
+    idleVoiceLoop(false);
+
     selectedEls = [];
+
     chrome.extension.sendRequest({stop: "true"});
+
     sessionStorage.setItem("EZ_Toggle", "0");
     var old = document.getElementById(ezSelectorId);
     if (old !== null) {

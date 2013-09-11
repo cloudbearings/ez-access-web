@@ -107,6 +107,7 @@ function key_up_event(e) {
  */
 function key_down_event(e) {
     idle_loop(false);
+    idleVoiceLoop(false);
 
     // 'if' keycode statements
     if (e.keyCode == EZ_KEY_HELP || e.keyCode == KB_F2) {
