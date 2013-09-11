@@ -34,12 +34,6 @@ var timeoutIdleTimer;
 var idleSpeech = "If you have difficulty using the touchscreen, press the blue, diamond-shaped EZ Help button";
 
 /**
- * By default, do not loop.
- * @type {boolean}
- */
-var idleLoop = false;
-
-/**
  * By default, never go off.
  * @type {number}
  */
@@ -79,24 +73,11 @@ function closeAlert(source) {
 
 /**
  * Alerts EZ Access idle loop lightbox asking user if still there.
- * @param {boolean} display If false, start timer for idle loop. Otherwise, display lightbox + reset.
  */
-function idle_loop(display) {
-    if (!display) {
-        if (idleDelay > 0) {
-            timeoutIdleTimer = clearInterval(timeoutIdleTimer);
-            timeoutIdleTimer = setInterval(function () {
-                idle_loop(true);
-            }, idleDelay);
-        }
-    } else {
-        if (!tinyHelpOpen && ez_navigateToggle) {
-            if (!tinyAlertOpen) {
-                if (!idleLoop) timeoutIdleTimer = clearInterval(timeoutIdleTimer);
-                newAlert(idleSpeech, 'nav');
-            } else if (idleLoop) {
-                newAlert(idleSpeech, 'nav');
-            }
-        }
+function idle_loop() {
+    if (idleDelay > 0) {
+        timeoutIdleTimer = setTimeout(function () {
+            newAlert(idleSpeech, 'nav');
+        }, idleDelay);
     }
 }

@@ -1240,13 +1240,13 @@ function load_ez() {
         }, 10);
     }
 
-    idle_loop(false);
+    idle_loop();
     idleVoiceLoop(false);
 
     // Touch gesture dragging
     if (slideToRead) {
         document.addEventListener('touchmove', function (e) {
-            idle_loop(false);
+            idle_loop();
             idleVoiceLoop(false);
 
             e = e || window.event;
@@ -1437,7 +1437,7 @@ window.onresize = function () {
 function stopEZ() {
     ez_navigateToggle = false;
 
-    idle_loop(false);
+    idle_loop();
     idleVoiceLoop(false);
 
     selectedEls = [];

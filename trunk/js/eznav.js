@@ -106,7 +106,7 @@ function key_up_event(e) {
  * @returns {boolean} If false, disables default key action.
  */
 function key_down_event(e) {
-    idle_loop(false);
+    idle_loop();
     idleVoiceLoop(false);
 
     // 'if' keycode statements
