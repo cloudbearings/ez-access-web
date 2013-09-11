@@ -63,7 +63,8 @@ chrome.extension.onMessage.addListener(
                 onEvent: function (event) {
                     if (event.type === 'end') {
                         chrome.tabs.sendMessage(parseFloat(sessionStorage.getItem("tabid")), {
-                            ezTtsState: 'done'
+                            ezTtsState: 'done',
+                            onTTSDone: request.onTTSDone
                         }, function (response) {
                         });
                     }

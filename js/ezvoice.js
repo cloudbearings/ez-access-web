@@ -86,7 +86,7 @@ function voice(obj, options) {
         enqueue: false,
         pre: '',
         ssml: SSML,
-        onTTSDone: {}
+        onTTSDone: ''
     };
     options = merge_options(defaults, options);
 
@@ -129,7 +129,8 @@ function voice(obj, options) {
     var req = {
         "tts": speech,
         "volume": String(audioVolume / 100),
-        "enqueue": options.enqueue
+        "enqueue": options.enqueue,
+        "onTTSDone": options.onTTSDone
     };
 
     chrome.extension.sendMessage({stop: "true"});
@@ -1121,17 +1122,16 @@ function alertEdgeNav(move) {
 
 
 function idleVoiceLoop(display) {
+    beginIdleTimer = clearInterval(beginIdleTimer);
     if (!display) {
         if (beginIdleTimerInterval > 0) {
-            beginIdleTimer = clearInterval(beginIdleTimer);
             beginIdleTimer = setInterval(function () {
                 idleVoiceLoop(true);
             }, beginIdleTimerInterval);
         }
     } else {
         if (beginIdleTimerInterval > 0 && !tinyHelpOpen && !tinyAlertOpen && !ez_navigateToggle) {
-            if (!beginIdleTimerLoop) beginIdleTimer = clearInterval(beginIdleTimer);
-            voice(idleVoiceSpeech);
+            voice(idleVoiceSpeech, {onTTSDone: 'idleVoiceLoop'});
         }
     }
 }
