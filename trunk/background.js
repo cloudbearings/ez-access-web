@@ -34,7 +34,7 @@ if (localStorage.debug === undefined) {
 }
 
 // SETTINGS STORAGE
-chrome.extension.onRequest.addListener(
+chrome.extension.onMessage.addListener(
     function (request, sender, sendResponse) {
         if (request.localstorage == "ezNavigate") {
             sendResponse({
@@ -62,7 +62,7 @@ chrome.extension.onRequest.addListener(
                 requiredEventTypes: ['end'],
                 onEvent: function (event) {
                     if (event.type === 'end') {
-                        chrome.tabs.sendRequest(parseFloat(sessionStorage.getItem("tabid")), {
+                        chrome.tabs.sendMessage(parseFloat(sessionStorage.getItem("tabid")), {
                             ezTtsState: 'done'
                         }, function (response) {
                         });

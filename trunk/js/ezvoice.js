@@ -85,7 +85,8 @@ function voice(obj, options) {
         repeat: false,
         enqueue: false,
         pre: '',
-        ssml: SSML
+        ssml: SSML,
+        onTTSDone: {}
     };
     options = merge_options(defaults, options);
 
@@ -131,10 +132,10 @@ function voice(obj, options) {
         "enqueue": options.enqueue
     };
 
-    chrome.extension.sendRequest({stop: "true"});
+    chrome.extension.sendMessage({stop: "true"});
 
     window.setTimeout(function () {
-        chrome.extension.sendRequest(req)
+        chrome.extension.sendMessage(req)
     }, speechDelay);
 }
 
