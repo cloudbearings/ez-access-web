@@ -81,9 +81,10 @@ var allowReorder = false;
  * highlighted separately from other elements.
  * NOTE: 'image' refers to the <input type="image">, and not the <img> tag (which
  * getType returns as 'img')
+ * Multiselect refers to a <select> element with the 'multiple' attribute
  */
 var INTERACTIVE_TYPES = [
-    'checkbox', 'radio', 'select', 'button', 'submit', 'reset',
+    'checkbox', 'radio', 'select', 'multiselect', 'button', 'submit', 'reset',
     'range', 'number', 'image',
     'text', 'password', 'email', 'search', 'url', 'tel', 'textarea',
     'hyperlink'];

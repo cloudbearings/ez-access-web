@@ -274,7 +274,7 @@ function voice_element(obj, source, options) {
 /**
  * Gets the type of the object and returns type as a string. Aria-role can overwrite.
  * @param {object} obj The object to be checked. Returns lowercase.
- * For inputs, returns type. For select w/ multiple, returns 'multiple'. Otherwise, returns tag name.
+ * For inputs, returns type. For select w/ multiple, returns 'multiselect'. Otherwise, returns tag name.
  */
 function getType(obj) {
     /**
@@ -301,6 +301,9 @@ function getType(obj) {
     }
     if (obj.tagName === 'A' && obj.hasAttribute('href')) {
         return 'hyperlink';
+    }
+    if (obj.tagName === 'SELECT' && obj.hasAttribute('multiple')) {
+        return 'multiselect';
     }
 
     // Else return tag name
@@ -406,7 +409,7 @@ function getName(obj, source, defaultString) {
         } else ret = 'Image.';
     } else if (type === 'hyperlink') {
         ret = get_inner_alt(obj, source);
-    } else if (type === 'select') {
+    } else if (type === 'select' || type === 'multiselect') {
         //do nothing
         //don't want to get_inner_alt, which would read all of the <option>s
     } else {
@@ -480,11 +483,9 @@ function getRole(obj, defaultString) {
     } else if (type === 'hyperlink') {
         ret = 'Link';
     } else if (type === 'select') {
-        if (obj.hasAttribute('multiple')) {
-            ret = 'Multiple-selections menu';
-        } else {
-            ret = 'Menu';
-        }
+        ret = 'Menu';
+    } else if (type === 'multiselect') {
+        ret = 'Multiple-selections menu';
     } else if (type === 'textarea') {
         ret = 'Text area';
     } else if (obj.hasAttribute('onclick')) {
@@ -572,19 +573,19 @@ function getValue(obj) {
         }
     }
     //HTML <select>
-    else if (type === 'select') {
-        if (obj.hasAttribute('multiple')) {
-            ret = [];
-            for (var i = 0; i < obj.length; i++) {
-                if (obj.options[i].selected) {
-                    ret.push(obj.options[i].value + ', option ' + (i + 1));
-                }
-            }
+    else if(type === 'select') {
+        if (obj.selectedIndex !== -1) {
+            ret = obj.options[obj.selectedIndex].value;
         } else {
-            if (obj.selectedIndex !== -1) {
-                ret = obj.options[obj.selectedIndex].value;
-            } else {
-                ret = '';
+            ret = '';
+        }
+    }
+    //HTML <select multiple>
+    else if (type === 'multiselect') {
+        ret = [];
+        for (var i = 0; i < obj.length; i++) {
+            if (obj.options[i].selected) {
+                ret.push(obj.options[i].value + ', option ' + (i + 1));
             }
         }
     }
@@ -699,7 +700,7 @@ function getValueSubstring(obj, userDid) {
         }
     }
     //HTML <select>
-    else if (type === 'select') {
+    else if (type === 'select' || type === 'multiselect') {
         if (typeof value === 'string' || value instanceof String) {
             if (value.length <= 0) {
                 ret = 'is blank'
@@ -779,7 +780,7 @@ function getDataDomainSubstring(obj) {
         } else {
             ret = ''; //no range specified
         }
-    } else if (type === 'select') {
+    } else if (type === 'select' || type === 'multiselect') {
         var num = getNumOptions(obj);
         if (num !== null) {
             ret = 'has ' + num + ' options';
