@@ -1,0 +1,77 @@
+#summary Details about the <body> data-ez-idlespeech, -loop, and -repeat attributes.
+
+{{{
+<body data-ez
+data-ez-idlespeech="If you have difficulty reading or using the touchscreen, press the blue, diamond-shaped EZ Help button."
+data-ez-idlespeech-loop="true"
+data-ez-idlespeech-delay="5000">
+}}}
+
+= Description =
+Three attributes are related to the idle speech for a page. The idle speech will be provided when the system is idle and EZ Access is off.
+
+  * `data-ez-idlespeech`
+    * Specifies what is to be spoken when the system is idle and EZ Access if off.
+  * `data-ez-idlespeech-loop`
+    * Specifies whether the idle speech should loop continuously or not.
+  * `data-ez-idlespeech-delay`
+    * Specifies the delay before the idle speech is spoken.
+
+  * Applies to: `<body>` only
+  * Inheritable: no
+  * Supported since: 1.0.0
+
+== Values ==
+  * `data-ez-idlespeech="`_`string`_`"`
+    * _string_ is the string to be spoken when the system is idle and EZ Access mode is not on.
+
+  * `data-ez-idlespeech-loop="`_`boolean`_`"`
+    * If _boolean_ is "`true`", the idle speech will loop and play continuously when the EZ Access mode is off.
+    * If _boolean_ is "`false`", the idle speech will only play once on the page if EZ Access mode is off.
+
+  * `data-ez-idlespeech-delay="`_`integer`_`"`
+    * Before the idle speech is presented to the user, the system will wait _integer_ ms.
+
+== Behavior with missing or invalid attributes ==
+  * If `data-ez-idlespeech` is not provided, no idle speech will be provided. The values of the `*-loop` and `*-delay` attributes will effectively be ignored.
+  * If `data-ez-idlespeech-loop` is missing or invalid, then the idle speech will not loop by default.
+  * If `data-ez-idlespeech-delay` is missing or invalid, then the idle speech will have the default delay.
+
+== Best practices ==
+=== Systems without speakers ===
+For systems without speakers, or systems with separate channels for the speakers and headphones, it is best to include an idle speech loop on the first page that plays through headphones. The loop on the first page should read something like the following:
+
+  "If you have difficulty reading or using the touchscreen, you can use EZ Access to operate this kiosk. To learn how, press the blue, diamond-shaped EZ Help button below the screen. The EZ Help button has a small raised bump on it."
+
+It is best practice to include a similar message on the screen for people who may find EZ Access to be helpful but do not wish to use headphones (e.g., some people with limited reach or mobility): 
+  "If you have difficulty reading or using the touchscreen, you can use EZ Access to operate this kiosk. To learn how, press the blue, diamond-shaped EZ Help button below the screen."
+
+Appropriate code to do this:
+{{{
+<body data-ez
+data-ez-idlespeech="If you have difficulty reading or using the 
+touchscreen, you can use EZ Access to operate this kiosk. 
+To learn how, press the blue, diamond-shaped EZ Help button 
+below the screen. The EZ Help button has a small raised bump on it."
+data-ez-idlespeech-loop="true"
+data-ez-idlespeech-delay="5000">
+
+...
+<div class="accessibility">If you have difficulty reading or using 
+the touchscreen, you can use EZ Access to operate this kiosk. 
+To learn how, press the blue, diamond-shaped EZ Help button below 
+the screen.</div>
+...
+}}}
+
+On subsequent pages it may be helpful to provide a reminder to users who are using the audio to press the EZ Down button. We have found this to be particularly helpful for users with low vision who switch between using the keypad and the touchscreen.
+
+{{{
+<body data-ez
+data-ez-idlespeech="For more choices, press the EZ Down arrow."
+data-ez-idlespeech-loop="false"
+data-ez-idlespeech-delay="1000">
+}}}
+
+=== Systems with speakers ===
+For systems with speakers, the idle speech loop would quickly become annoying to anybody who is nearby, so it should not be included. Unfortunately, this will make it much harder for people who cannot see well to discover the EZ Access features. Information on how to learn about EZ Access should be provided in braille and large print on the system.
