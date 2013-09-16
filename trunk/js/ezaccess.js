@@ -1162,8 +1162,7 @@ function load_ez() {
     }
 
     if (document.body.hasAttribute('data-ez-idlespeech-loop')) {
-        beginIdleTimerLoop = document.body.getAttribute('data-ez-idlespeech-loop') === 'true';
-        //so that an invalid value will default to 'false'
+        beginIdleTimerLoop = document.body.getAttribute('data-ez-idlespeech-loop') !== 'false';
     }
 
 

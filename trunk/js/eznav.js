@@ -156,7 +156,7 @@ function key_down_event(e) {
             closeTinyHelp('nav');
         } else {
             var el = getKeyBinding('back');
-            if (el === null) {
+            if (el === null && ezBackEnabled) {
                 window.history.back();
             } else {
                 el.click();
