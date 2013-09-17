@@ -38,6 +38,10 @@ TINYHELP.box = function () {
                 b = document.createElement('div');
                 b.id = 'tinycontenthelp';
 
+                q = document.createElement('div');
+                q.id = 'closexbuffer';
+                b.appendChild(q);
+
                 closer = document.createElement('div');
                 closer.id = 'closexhelp';
 

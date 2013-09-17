@@ -114,6 +114,12 @@
     cursor: pointer;
 }
 
+#closexbuffer {
+    float: right;
+    width: 40px;
+    height: 40px;
+}
+
 #tinycontenthelp h1, #tinycontenthelp h2, #tinycontenthelp h3,
 #tinycontenthelp h4, #tinycontenthelp h5, #tinycontenthelp h6 {
     margin-top: 0;
