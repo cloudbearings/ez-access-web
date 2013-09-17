@@ -7,7 +7,7 @@
     /*border:5px solid rgba(255,255,0,1);*/
     position: absolute;
     border-radius: 15px;
-    z-index: 2147483647; /* Maximum z-index supported ;) */
+    z-index: 2000000000; /* Almost maximum z-index supported ;) */
     -webkit-box-shadow: 0px 0px 15px 5px rgba(255, 255, 100, .80);
     -moz-box-shadow: 0px 0px 15px 5px rgba(255, 255, 100, .80);
     /*box-shadow: 0px 0px 15px 5px rgba(255, 255, 100, .80);*/
@@ -22,26 +22,26 @@
 
 /* TINYBOX MODAL POPUP */
 #tinyboxhelp {
+    z-index: 2000000002; /* Higher than EZ selector & tinybox alert */
     background: #FFFFCC;
     color: #000000;
     position: absolute;
     display: none;
     padding: 10px;
     border: 10px solid #e1e1af;
-    z-index: 20000;
     width: 80% !important;
     left: 10% !important;
 }
 
 /* TINYBOX MODAL POPUP */
 #tinyboxalert {
+    z-index: 2000000001; /* Higher than EZ selector */
     background: #FFFFCC;
     color: #000000;
     position: absolute;
     display: none;
     padding: 10px;
     border: 10px solid #e1e1af;
-    z-index: 20000;
     width: 50% !important;
     left: 25% !important;
 }
