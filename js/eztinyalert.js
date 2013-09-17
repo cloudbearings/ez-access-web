@@ -38,6 +38,10 @@ TINYALERT.box = function () {
                 b = document.createElement('div');
                 b.id = 'tinycontentalert';
 
+                buffer = document.createElement('div');
+                buffer.id = 'closexbuffer';
+                p.appendChild(buffer);
+
                 closer = document.createElement('div');
                 closer.id = 'closexalert';
 
