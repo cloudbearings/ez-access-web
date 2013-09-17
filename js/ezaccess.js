@@ -1229,17 +1229,23 @@ function load_ez() {
     if (document.body.getAttribute('data-ez-slidetoread') == 'off') {
         slideToRead = false;
     }
-    if (document.body.getAttribute('data-ez-startingmode') == 'ezon') {
+    if (document.body.getAttribute('data-ez-start') == 'on') {
         // On chrome, will not draw until a small amount of time passes for some reason
         setTimeout(function () {
             ez_navigate_start(false, 'nav');
             drawSelected(selectedEls);
         }, 10);
-    } else if (parseInt(sessionStorage.getItem("EZ_Toggle")) == true && document.body.getAttribute('data-ez-startingmode') != 'ezoff') {
+    } else if (parseInt(sessionStorage.getItem("EZ_Toggle")) == true && document.body.getAttribute('data-ez-start') != 'off') {
         setTimeout(function () {
             ez_navigate_start(true, 'nav');
             drawSelected(selectedEls);
         }, 10);
+    }
+
+    if(!document.body.hasAttribute('data-ez-reset') || document.body.getAttribute('data-ez-reset') === 'false') {
+        ezBackEnabled = true;
+        audioVolume = 100;
+        set_volume();
     }
 
     idle_loop();

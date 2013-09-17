@@ -403,7 +403,7 @@ function getName(obj, source, defaultString) {
              */
             ret = obj.getAttribute('placeholder');
         }
-    } else if (type === 'img') { //TODO - check if necessary
+    } else if (type === 'img') {
         if (obj.hasAttribute('alt')) {
             ret = obj.getAttribute('alt')
         } else ret = 'Image.';
@@ -476,7 +476,7 @@ function getRole(obj, defaultString) {
         ret = 'Number field'; //spinner in Chrome
     } else if (type === 'button') {
         ret = 'Button';
-    } else if (type === 'img') { //TODO - check if necessary
+    } else if (type === 'img') {
         if (!obj.hasAttribute('alt')) {
             ret = "Image";
         }
