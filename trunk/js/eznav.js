@@ -62,6 +62,12 @@ var autoRepeat = 'off';
 var tabNav = 'ezaccess';
 
 /**
+ * Whether EZ back is enabled for changing to previous page
+ * @type {boolean}
+ */
+var ezBackEnabled = false;
+
+/**
  * Global idle loop timer if no user action is taken
  */
 var idleLoop;
@@ -156,8 +162,10 @@ function key_down_event(e) {
             closeTinyHelp('nav');
         } else {
             var el = getKeyBinding('back');
-            if (el === null && ezBackEnabled) {
-                window.history.back();
+            if (el === null) {
+                if(ezBackEnabled) {
+                    window.history.back();
+                }
             } else {
                 el.click();
             }
