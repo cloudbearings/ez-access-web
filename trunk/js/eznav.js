@@ -417,6 +417,13 @@ function ez_navigate(move, options) {
         return;
     }
 
+    // If there is just text, and parent can group it (sole child)
+    if(selectedEls.length === 1
+        && selectedEls[0].nodeType === 3
+        && selectedEls[0].parentElement.childNodes.length === 1) {
+        selectedEls[0] = selectedEls[0].parentElement;
+    }
+
     var actionable = getActionableElement(selectedEls, 'nav');
 
     // Check to make sure not label
