@@ -1,0 +1,40 @@
+#summary Details about the data-ez-sayvalue attribute.
+
+{{{
+<div class="label" id="switch1label"
+data-ez-focusable="false">Front Light:</div>
+
+<div class="switch" onclick="flipSwitch();"
+aria-labelledby="switch1label"
+data-ez-sayrole="switch" 
+data-ez-sayvalue="is on">
+  <span class="selected">On</span>
+  <span>Off</span>
+</div>
+}}}
+Such an element, which would look and act like a light switch, would be read as:
+ "Front light: switch is on"
+
+= Description =
+A spoken _value_ is the spoken representation of the current data associated with a given control or other element. Not all controls have values, but when they do, the value is read after both the name and role associated with the element. Native HTML elements and elements with supported ARIA roles already have a default value, but the `data-ez-sayvalue` can be used to override or specify a different value to be spoken.
+
+  * Applies to: all content elements except `<body>`
+  * Inheritable: no
+  * Supported since: 1.0.0
+
+== Values ==
+  * `data-ez-sayvalue="`_`string`_`"`
+    * _string_ is the string to be spoken as the value for the given element.
+
+== Behavior with missing attribute ==
+The speech output for the value is the default for that type of element, which might be based on ARIA or native HTML roles.
+
+== Best practices ==
+  * Use HTML native elements where possible.
+  * Use [http://www.w3.org/TR/wai-aria/states_and_properties#aria-valuenow `aria-valuenow`] or [http://www.w3.org/TR/wai-aria/states_and_properties#aria-valuetext `aria-valuetext`] as appropriate.
+
+Using the `data-ez-sayrole` attribute where there are no appropriate HTML elements or ARIA roles:
+  * The string should represent an understandable sentence or sentence fragment when spoken with the elements name/label.
+
+== See also ==
+  * [attrSayrole `data-ez-sayrole` attribute]
