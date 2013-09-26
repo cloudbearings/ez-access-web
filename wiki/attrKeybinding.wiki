@@ -19,6 +19,10 @@ There should only be one element with a particular attribute value on the page.
     * When the EZ Back button is pushed, the element with the `data-ez-keybinding="back"` attribute will act as if it were clicked.
   * `next` (v. 1.0)
     * When the EZ Next button is pushed, the element with the `data-ez-keybinding="next"` attribute will act as if it were clicked.
+  * `skipbackward` (v. 1.0)
+    * When the EZ Skip Backward button (a black button on the 8-button keypad labeled with '<<') is pushed, the element with the `data-ez-keybinding="skipbackward"` attribute will act as if it were clicked.
+  * `skipforward` (v. 1.0)
+    * When the EZ Skip Forward button (a red button on the 8-button keypad labeled with '>>') is pushed, the element with the `data-ez-keybinding="skipforward"` attribute will act as if it were clicked.
 
 == Error behavior ==
   * If the value of the `data-ez-keybinding` attribute is not supported, then it will be ignored.
