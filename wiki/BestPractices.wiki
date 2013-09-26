@@ -1,4 +1,4 @@
-#summary Best practices for authoring pages for EZ Accesss.
+#summary Best practices for authoring pages for EZ Access.
 
 = Introduction =
 
@@ -6,10 +6,66 @@ The EZ Access extension works best on pages that are specifically designed to su
 
 Following these best practice will help you to create pages that behave as expected with EZ Access.
 
+<wiki:toc max_depth="2" />
+
+= Recommended kiosk hardware =
+The Trace Center strongly recommends the following hardware for public kiosk EZ Access implementations:
+  * A 3.5-mm headphone jack. This allows for private listening and the connection of assistive technology such as neck loops.
+  * A label with braille with basic instructions on how to start using EZ Access. This can be similar to those used on accessible ATMs.
+    * As an example, one label might say in both print and braille, "Insert headphones to initiate speech mode." A second label placed near the jack would point out the headphone jack location.
+  * An EZ Access keypad or other EZ Access input hardware. This allows people who cannot use the touchscreen to provide input to the system.
+  * Volume control hardware. Users need to be able to adjust the audio to get it to a comfortable and usable level.
+    * The best location for volume controls is adjacent to the headphone jack.
+    * The top two buttons on the 8-button EZ Access keypad (black and red labeled with '<<' and '>>' respectively) may be used for volume control if they are not needed in the application.
+
 
 = Authoring Best-Practices =
 
 More best practices will be added in the future...
+
+
+
+== For all pages within the application ==
+There are very few things that are required for applications that use basic HTML pages.
+  * Add the `data-ez` attribute to the `<body>` tag on all pages. This lets the EZ Access extension know that the page is compatible.
+  {{{
+<body data-ez>
+
+<!-- or for XML-like HTML -->
+<body data-ez="data-ez">
+}}}
+  * Try using the application with the speech output. This is important to do to catch any strange behaviors that might be caused by unusual HTML code or interaction with other scripts.
+
+== For the first page of the application ==
+Often in kiosk applications, there is a starting screen that all users see before they start using the application. Such a screen has basic instructions for getting started (such as "Tap the 'Begin' button to get started," or "Touch the screen anywhere to get started."). Users with disabilities need help getting started as well. At this point in the application, the system knows nothing about the individual, so it should not start in EZ Access mode.
+ 
+  * Reset the EZ Back button, volume, and other session variables with the `data-ez-reset` attribute.
+  * Turn off EZ Access mode when a user first arrives on the page with `data-ez-start="off`.
+  * Start with the help tutorial when the user presses the EZ Help button. This can be done with the `data-ez-help` attribute ([ezHelp documentation]).
+  * If the device does not have speakers, add a continuous speech loop to the page, so someone who plugs in headphones knows what to do next. For more details, see the page on the [attrIdlespeech `data-ez-idlespeech` and related attributes].
+    * If you have a continuous speech loop, be sure that similar text is displayed on the screen or on the device itself to help those who are not using headphones.
+
+=== Example ===
+{{{
+<body data-ez 
+data-ez-reset 
+data-ez-start="off"
+data-ez-help="defaultEZHelp.html#keypad8-tutorial"
+data-ez-idlespeech="If you have difficulty reading or using the 
+touchscreen, you can use EZ Access to operate this kiosk. 
+To learn how, press the blue, diamond-shaped EZ Help button 
+below the screen. The EZ Help button has a small raised bump on it."
+data-ez-idlespeech-loop="true"
+data-ez-idlespeech-delay="5000"
+>
+...
+<div class="accessibility">If you have difficulty reading or using 
+the touchscreen, you can use EZ Access to operate this kiosk. 
+To learn how, press the blue, diamond-shaped EZ Help button below 
+the screen.</div>
+...
+</body>
+}}}
 
 == For public devices, turn off autocomplete ==
 === Rationale ===
