@@ -8,16 +8,6 @@ Following these best practice will help you to create pages that behave as expec
 
 <wiki:toc max_depth="2" />
 
-= Recommended kiosk hardware =
-The Trace Center strongly recommends the following hardware for public kiosk EZ Access implementations:
-  * A 3.5-mm headphone jack. This allows for private listening and the connection of assistive technology such as neck loops.
-  * A label with braille with basic instructions on how to start using EZ Access. This can be similar to those used on accessible ATMs.
-    * As an example, one label might say in both print and braille, "Insert headphones to initiate speech mode." A second label placed near the jack would point out the headphone jack location.
-  * An EZ Access keypad or other EZ Access input hardware. This allows people who cannot use the touchscreen to provide input to the system.
-  * Volume control hardware. Users need to be able to adjust the audio to get it to a comfortable and usable level.
-    * The best location for volume controls is adjacent to the headphone jack.
-    * The top two buttons on the 8-button EZ Access keypad (black and red labeled with '<<' and '>>' respectively) may be used for volume control if they are not needed in the application.
-
 
 = Authoring Best-Practices =
 
@@ -68,7 +58,6 @@ the screen.</div>
 }}}
 
 == For public devices, turn off autocomplete ==
-=== Rationale ===
 Many browsers have an autocomplete function that remembers text that has been typed into text fields of various types. While this functionality may be good for personal devices, this is not good for public devices, such as kiosks, because data from previous users may be exposed.
 
 === What to do ===
@@ -85,12 +74,13 @@ Turn off autocomplete on individual `<input>` elements with `autocomplete="off"`
 Alternatively, you may turn off Autofill in Chrome by going to the settings page (chrome://settings/) and unchecking the checkbox labeled "Enable Autofill to fill out web forms in a single click."
 
 == Add key bindings for some EZ Access keys ==
-=== Rationale ===
 The EZ Access keypad has from 5 to 8 buttons depending on the model. Several of the buttons have well-defined behaviors specific to EZ Access, but several of the other buttons can have application-specific behaviors.
 
-The `data-ez-keybinding` attribute supports the following values for the respective EZ Access keys:
+The [attrKeybinding `data-ez-keybinding` attribute] supports the following values for the respective EZ Access keys:
  * `back` for the EZ Back key
  * `next` for the EZ Next key
+ * `skipbackward` for the EZ Skip Backward key
+ * `skipforward` for the EZ Skip Forward key
 
 === What to do ===
 Add the `data-ez-keybinding` attribute to buttons on the screen that go to back and next pages. For example:
@@ -104,7 +94,6 @@ data-ez-keybinding="KEY_EZ_NEXT">Continue</button>
 }}}
 
 == Wrap text-only content in paragraphs with hyperlinks ==
-=== Rationale ===
 The EZ Access highlight navigates to elements that are interactive (such as buttons, checkboxes, and hyperlinks) or block-level (such as headings, and paragraphs). This becomes more of an issue when a block-level element contains both interactive elements and plain text nodes--for example, hyperlinks in paragraphs:
 
 ==== Bad example ====
@@ -126,3 +115,13 @@ There should be no text-only nodes within that parent block-level element. If yo
 <span>and some more paragraph text.</span></p>
 }}}
 This type of code will work well for both navigation and Slide-to-read.
+
+= Kiosk hardware =
+The Trace Center strongly recommends the following hardware for public kiosk EZ Access implementations:
+  * A 3.5-mm headphone jack. This allows for private listening and the connection of assistive technology such as neck loops.
+  * A label with braille with basic instructions on how to start using EZ Access. This can be similar to those used on accessible ATMs.
+    * As an example, one label might say in both print and braille, "Insert headphones to initiate speech mode." A second label placed near the jack would point out the headphone jack location.
+  * An EZ Access keypad or other EZ Access input hardware. This allows people who cannot use the touchscreen to provide input to the system.
+  * Volume control hardware. Users need to be able to adjust the audio to get it to a comfortable and usable level.
+    * The best location for volume controls is adjacent to the headphone jack.
+    * The top two buttons on the 8-button EZ Access keypad (black and red labeled with '<<' and '>>' respectively) may be used for volume control if they are not needed in the application.
