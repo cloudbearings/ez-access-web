@@ -212,20 +212,7 @@ function key_down_event(e) {
                 playSFX(AUDIO_ACTION_NONE, 'nav');
             }
         } else {
-            if (audioVolume <= 90) {
-                audioVolume += 10;
-                sessionStorage.setItem("EZ_Volume", audioVolume);
-                set_volume();
-                playSFX(AUDIO_NAV_MOVE, 'nav');
-                voice("Volume... " + audioVolume + " percent");
-            } else {
-                document.getElementById(ezSelectorId).className = 'pulse';
-                setTimeout(function () {
-                    document.getElementById(ezSelectorId).className = '';
-                }, 300);
-                playSFX(AUDIO_ACTION_NONE, 'nav');
-                voice("Maximum volume");
-            }
+            changeVolume('up');
         }
     } else if (e.keyCode == EZ_KEY_SKIPBACKWARD) {
         var el = getKeyBinding('skipbackward');
@@ -248,20 +235,7 @@ function key_down_event(e) {
                 playSFX(AUDIO_ACTION_NONE, 'nav');
             }
         } else {
-            if (audioVolume >= 10) {
-                sessionStorage.setItem("EZ_Volume", audioVolume);
-                audioVolume -= 10;
-                set_volume();
-                playSFX(AUDIO_NAV_MOVE, 'nav');
-                voice("Volume... " + audioVolume + " percent");
-            } else {
-                document.getElementById(ezSelectorId).className = 'pulse';
-                setTimeout(function () {
-                    document.getElementById(ezSelectorId).className = '';
-                }, 300);
-                playSFX(AUDIO_ACTION_NONE, 'nav');
-                voice("Minimum volume");
-            }
+            changeVolume('down');
         }
     } else if (selectedEls.type == 'textarea' || selectedEls.type == 'text') {
         var key = String.fromCharCode(e.keyCode);
@@ -270,6 +244,56 @@ function key_down_event(e) {
     return true;
 }
 
+/**
+ * Changes the volume of the system one step and notifies the user in speech.
+ * @param {'up'|'down'} direction The direction in which the volume is
+ * supposed to be changed : 'up' increments/increases the volume,
+ *                          'down' decrements/decreases the volume.
+ * @throws {TypeError} If an invalid direction is passed.
+ */
+function changeVolume(direction) {
+    'use strict';
+    var VOL_STEP_SIZE = 10;
+    var VOL_MAX = 100;
+    var VOL_MIN = 10; //do not allow the volume to be completely turned off
+    var message;
+
+    if (direction === 'down') {
+        if (audioVolume >= VOL_MIN + VOL_STEP_SIZE) {
+            sessionStorage.setItem("EZ_Volume", audioVolume);
+            audioVolume -= VOL_STEP_SIZE;
+            set_volume();
+            playSFX(AUDIO_NAV_MOVE, 'nav');
+            message = 'Quieter';
+        } else {
+            document.getElementById(ezSelectorId).className = 'pulse';
+            setTimeout(function () {
+                document.getElementById(ezSelectorId).className = '';
+            }, 300);
+            playSFX(AUDIO_ACTION_NONE, 'nav');
+            message = 'Quietest volume';
+        }
+        voice(message);
+    } else if (direction === 'up') {
+        if (audioVolume <= VOL_MAX - VOL_STEP_SIZE) {
+            audioVolume += VOL_STEP_SIZE;
+            sessionStorage.setItem("EZ_Volume", audioVolume);
+            set_volume();
+            playSFX(AUDIO_NAV_MOVE, 'nav');
+            message = 'Louder';
+        } else {
+            document.getElementById(ezSelectorId).className = 'pulse';
+            setTimeout(function () {
+                document.getElementById(ezSelectorId).className = '';
+            }, 300);
+            playSFX(AUDIO_ACTION_NONE, 'nav');
+            message = 'Loudest volume';
+        }
+        voice(message);
+    } else {
+        throw new TypeError('Illegal direction="' + direction +'" passed to changeVolume().');
+    }
+}
 
 /**
  * Finds the DOM element where key matches the data-ez-keybinding attribute.
