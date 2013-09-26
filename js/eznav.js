@@ -192,7 +192,10 @@ function key_down_event(e) {
             return false; // Disable any browser actions
         }
     } else if (e.keyCode == EZ_KEY_SKIPFORWARD) {
-        if (selectedEls.type == 'range') {
+        var el = getKeyBinding('skipforward');
+        if (el !== null) {
+            el.click();
+        } else if (selectedEls.type == 'range') {
             selectedEls.value = parseFloat(selectedEls.value) + parseFloat(selectedEls.step);
             playSFX(AUDIO_NAV_MOVE, 'nav');
             voice(selectedEls.value);
@@ -225,7 +228,10 @@ function key_down_event(e) {
             }
         }
     } else if (e.keyCode == EZ_KEY_SKIPBACKWARD) {
-        if (selectedEls.type == 'range') {
+        var el = getKeyBinding('skipbackward');
+        if (el !== null) {
+            el.click();
+        } else if (selectedEls.type == 'range') {
             selectedEls.value = parseFloat(selectedEls.value) - parseFloat(selectedEls.step);
             playSFX(AUDIO_NAV_MOVE, 'nav');
             voice(selectedEls.value);
@@ -279,7 +285,7 @@ function getKeyBinding(key) {
     // Allow any case (consistent w/ HTML)
     key = key.toLowerCase();
 
-    var SUPPORTED_KEY_NAMES = ['back', 'next'];
+    var SUPPORTED_KEY_NAMES = ['back', 'next', 'skipforward', 'skipbackward'];
 
     if (SUPPORTED_KEY_NAMES.indexOf(key.toString()) < 0) {
         _debug('getKeyBinding(): key=' + key + ' is not supported.');
