@@ -1,0 +1,41 @@
+#summary Details about the data-ez-sayrole attribute.
+
+{{{
+<div class="label" id="switch1label"
+data-ez-focusable="false">Front Light:</div>
+
+<div class="switch" onclick="flipSwitch();"
+aria-labelledby="switch1label"
+data-ez-sayrole="switch" 
+data-ez-sayvalue="is on">
+  <span class="selected">On</span>
+  <span>Off</span>
+</div>
+}}}
+Such an element, which would look and act like a light switch, would be read as:
+ "Front light: switch is on"
+
+= Description =
+A role is the main indication to the user about what type of object, element, or control with which a person may interact. By default for controls, the role is spoken after the name (which is frequently a label) for the control. The `data-ez-sayrole` attribute can be used to specify a role to be spoken to the user.
+
+  * Applies to: all content elements except `<body>`
+  * Inheritable: no
+  * Supported since: 1.0.0
+
+== Values ==
+  * `data-ez-sayrole="`_`string`_`"`
+    * _string_ is the string to be spoken as the role for the given element.
+
+== Behavior with missing attribute ==
+The speech output for the role is the default for that type of element, which might be based on ARIA roles or native HTML roles.
+
+== Best practices ==
+  * Use HTML native elements where possible.
+  * Use appropriate, supported [http://www.w3.org/TR/wai-aria/roles ARIA roles] if no native HTML elements are sufficient.
+
+Using the `data-ez-sayrole` attribute where there are no appropriate HTML elements or ARIA roles:
+  * Use short text (one or two words)  for roles.
+  * The role ideally should be a concept with which a user is already familiar (such as a switch like the example above). The user should have a strong sense of what should happen if the activate the element.
+
+== See also ==
+  * [attrSayvalue `data-ez-sayvalue` attribute]
