@@ -1145,9 +1145,22 @@ function load_ez() {
     }
 
     if (document.body.hasAttribute('data-ez-timeout-delay')) {
-        if (!isNaN(document.body.getAttribute('data-ez-timeout-delay'))) {
-            idleDelay = Number(document.body.getAttribute('data-ez-timeout-delay'));
+        var parseAttr = document.body.getAttribute('data-ez-timeout-delay').split(' ');
+
+        if(parseAttr.length >= 1) {
+            if (!isNaN(parseAttr[0])) {
+                idleDelay = Number(parseAttr[0]);
+            }
         }
+        if(parseAttr.length >= 2) {
+            if (!isNaN(parseAttr[1])) {
+                idleDelayAfter = Number(parseAttr[1]);
+            }
+        }
+    }
+
+    if (document.body.hasAttribute('data-ez-timeout-href')) {
+        idleTimeoutHref = document.body.getAttribute('data-ez-timeout-href');
     }
 
     // EZ IDLESPEECH
@@ -1248,14 +1261,13 @@ function load_ez() {
         set_volume();
     }
 
-    idle_loop();
-    idleVoiceLoop(false);
+    resetTimeouts();
+    document.onmousemove = function() { resetTimeouts(); };
 
     // Touch gesture dragging
     if (slideToRead) {
         document.addEventListener('touchmove', function (e) {
-            idle_loop();
-            idleVoiceLoop(false);
+            resetTimeouts();
 
             e = e || window.event;
 
@@ -1272,6 +1284,8 @@ function load_ez() {
         }, false);
 
         document.addEventListener('touchstart', function (e) {
+            resetTimeouts();
+
             touchStartTime = new Date().getTime();
 
             touchTap = true;
