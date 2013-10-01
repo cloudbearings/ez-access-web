@@ -1,0 +1,27 @@
+#summary Details about the <body data-ez-start> attribute.
+
+{{{
+<body data-ez data-ez-start="off">
+}}}
+
+= Description =
+The `data-ez-start` attribute defines if EZ Access mode is on or not when a page is loaded. By default, if the user is in EZ Access mode and then goes to the next page with EZ Access, then the subsequent page is loaded and EZ Access is on. Similarly, if the user loads a page and EZ Access mode is off, then EZ Access will be off when the new page loads.
+
+The `data-ez-start` attribute can be used to override the default behavior. 
+
+  * Applies to: `<body>` only
+  * Inheritable: no
+  * Supported since: 1.0.0
+
+== Values ==
+  * `data-ez-start="off"`
+    * EZ Access will be off when the page is loaded regardless of the mode the system was in just prior. The user can turn on EZ Access by pressing EZ Up or EZ Down if they desire.
+  * `data-ez-start="on"`
+    * EZ Access will be forced on when the page is loaded regardless of the mode the system was in just prior. The user can turn off EZ Access by touching the screen if they desire.
+
+== Behavior with missing or invalid values ==
+EZ Access will be on or off when the page loads following the default behavior, (which depends on if EZ Access was on or off just prior to the page load).
+
+== Best Practices ==
+  * This attribute should be included on the first page of an application. Consider also including the [attrReset `data-ez-reset`] attribute.
+  * It may alternately be included on a reset page, which then redirects automatically to the first page of the application.
