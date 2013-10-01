@@ -1,0 +1,22 @@
+#summary Details about the <body data-ez-reset> attribute.
+
+{{{
+<body data-ez data-ez-reset>
+}}}
+
+= Description =
+The `data-ez-reset` attribute signals to the EZ Access extension that session variables should be reset. This resets:
+  * The EZ Back button so that it does not go back using the browser's history. (v 1.0)
+  * The system volume to the default level. (v 1.0)
+
+  * Applies to: `<body>` only
+  * Inheritable: no
+  * Supported since: 1.0.0
+
+== Values ==
+The `data-ez-reset` attribute takes no values. If using an XML variant, you may use `data-ez-reset="data-ez-reset"`.
+
+== Best Practices ==
+  * This attribute should be included on the first page of an application. 
+  * It may alternately be included on a reset page, which then redirects automatically to the first page of the application.
+  * Consider also including the [attrStart `data-ez-start="off"`] attribute when using the `data-ez-reset` attribute.
