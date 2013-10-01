@@ -89,7 +89,7 @@
     top: -10px;
     right: -10px;
     z-index: 5000;
-    background-image: url('data:image/svg+xml;utf8,<?xml version="1.0"?><svg width="60" height="60" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="button"><circle cx="30" cy="30" r="29.5" fill="#FFFFFF" stroke="#000000" stroke-opacity="0.5" stroke-width="1" id="circle1" /><circle cx="30" cy="30" r="26" fill="#666666" id="circle2" /><path id="x" d="M36,30 l10,10 l-6,6 l-10,-10 l-10,10 l-6,-6 l10,-10 l-10,-10 l6,-6 l10,10 l10,-10 l6,6 z" fill="#FFFFFF" /></g></svg>');
+    background-image: url('data:image/svg+xml;utf8,<?xml version="1.0"?><svg width="60" height="60" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="closebutton"><circle cx="30" cy="30" r="29.5" fill="#FFFFFF" stroke="#333300" stroke-opacity="0.5" stroke-width="1" id="circle1" /><circle cx="30" cy="30" r="26" fill="#666633" id="circle2" /><path id="x" d="M36,30 l10,10 l-6,6 l-10,-10 l-10,10 l-6,-6 l10,-10 l-10,-10 l6,-6 l10,10 l10,-10 l6,6 z" fill="#FFFFFF" /></g></svg>');
     background-repeat: no-repeat;
     width: 60px;
     background-size: 100%;
@@ -104,7 +104,7 @@
     top: -10px;
     right: -10px;
     z-index: 5000;
-    background-image: url('data:image/svg+xml;utf8,<?xml version="1.0"?><svg width="60" height="60" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="button"><circle cx="30" cy="30" r="29.5" fill="#FFFFFF" stroke="#000000" stroke-opacity="0.5" stroke-width="1" id="circle1" /><circle cx="30" cy="30" r="26" fill="#666666" id="circle2" /><path id="x" d="M36,30 l10,10 l-6,6 l-10,-10 l-10,10 l-6,-6 l10,-10 l-10,-10 l6,-6 l10,10 l10,-10 l6,6 z" fill="#FFFFFF" /></g></svg>');
+    background-image: url('data:image/svg+xml;utf8,<?xml version="1.0"?><svg width="60" height="60" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="closebutton"><circle cx="30" cy="30" r="29.5" fill="#FFFFFF" stroke="#333300" stroke-opacity="0.5" stroke-width="1" id="circle1" /><circle cx="30" cy="30" r="26" fill="#666633" id="circle2" /><path id="x" d="M36,30 l10,10 l-6,6 l-10,-10 l-10,10 l-6,-6 l10,-10 l-10,-10 l6,-6 l10,10 l10,-10 l6,6 z" fill="#FFFFFF" /></g></svg>');
     background-repeat: no-repeat;
     width: 60px;
     background-size: 100%;
