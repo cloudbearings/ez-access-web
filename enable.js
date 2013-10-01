@@ -102,6 +102,8 @@ chrome.extension.onMessage.addListener(
         } else if (request.ezTtsState == "done") {
             if(request.onTTSDone === 'idleVoiceLoop') {
                 if (beginIdleTimerLoop) idleVoiceLoop(false);
+            } else if(request.onTTSDone === 'timeout') {
+                idle_loop_after_speech();
             }
             auto_advance_decide();
         } else if (request.ezVolume !== undefined) {

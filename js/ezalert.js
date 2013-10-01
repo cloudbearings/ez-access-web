@@ -40,17 +40,46 @@ var idleSpeech = "If you have difficulty using the touchscreen, press the blue, 
 var idleDelay = -1;
 
 /**
+ * By default, if not specified, go off after 20 seconds.
+ * @type {number}
+ */
+var idleDelayAfter = 20000;
+
+/**
+ * Location to redirect user to
+ * @type {string}
+ */
+var idleTimeoutHref = '';
+
+/**
+ * If user interaction has been found. Global variable is proprietary for timeout.
+ * @type {boolean}
+ */
+var noUserInteraction = true;
+
+/**
  * The alert to open and speak
  * @param str The string to alert and read
- * @param source {'nav'|'point'} Navigation method
+ * @param [options] {Object} Various optional configurations:
+ *      source
+ *      callback:   Called after speech is completed from alert.
+ *                  NOT GUARANTEED to be called (if speech interrupted)
+ *                  If === 'timeout' then call idle_loop_after_speech()
  */
-function newAlert(str, source) {
+function newAlert(str, options) {
+
+    // set up default options
+    var defaults = {
+        source: 'nav',
+        callback: ''
+    };
+    options = merge_options(defaults, options);
 
     playSFX(AUDIO_ACTION_NONE);
 
-    voice(str);
+    voice(str, {onTTSDone: options.callback});
 
-    if (tinyHelpOpen) closeTinyHelp(source);
+    if (tinyHelpOpen) closeTinyHelp(options.source);
 
     TINYALERT.box.show('<p style="text-align:center">' + str + '</p>', 0, 400, 0, 0);
 
@@ -75,9 +104,20 @@ function closeAlert(source) {
  * Alerts EZ Access idle loop lightbox asking user if still there.
  */
 function idle_loop() {
+    timeoutIdleTimer = clearTimeout(timeoutIdleTimer);
     if (idleDelay >= 0) {
         timeoutIdleTimer = setTimeout(function () {
-            newAlert(idleSpeech, 'nav');
+            newAlert(idleSpeech, {callback: 'timeout'});
+            noUserInteraction = true;
         }, idleDelay);
+    }
+}
+
+function idle_loop_after_speech() {
+    timeoutIdleTimer = clearTimeout(timeoutIdleTimer);
+    if (noUserInteraction && idleDelayAfter >= 0) {
+        timeoutIdleTimer = setTimeout(function () {
+            window.location.href = idleTimeoutHref;
+        }, idleDelayAfter);
     }
 }

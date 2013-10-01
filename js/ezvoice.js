@@ -1117,7 +1117,7 @@ function alertEdgeNav(move) {
         edgeNavAttempt = alerts[move].length - 1;
     }
 
-    if (edgeNavAttempt !== 0) newAlert(alerts[move][edgeNavAttempt].value, 'nav');
+    if (edgeNavAttempt !== 0) newAlert(alerts[move][edgeNavAttempt].value);
 
 }
 

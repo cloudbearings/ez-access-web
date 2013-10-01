@@ -107,13 +107,21 @@ function key_up_event(e) {
 }
 
 /**
+ * If action is found on page, do this to prevent moving the user.
+ */
+function resetTimeouts() {
+    idle_loop();
+    idleVoiceLoop(false);
+    noUserInteraction = false;
+}
+
+/**
  * Handles key on *pressed* events for EZ Access (except for multi-key, like tab+shift handled by multikey_event)
  * @param {event} e Event object passed from set up on EZ Access startup.
  * @returns {boolean} If false, disables default key action.
  */
 function key_down_event(e) {
-    idle_loop();
-    idleVoiceLoop(false);
+    resetTimeouts();
 
     // 'if' keycode statements
     if (e.keyCode == EZ_KEY_HELP || e.keyCode == KB_F2) {
