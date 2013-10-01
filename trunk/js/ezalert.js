@@ -113,6 +113,9 @@ function idle_loop() {
     }
 }
 
+/**
+ * Is called after the speech loop is done called from idle_loop to redirect the user somewhere.
+ */
 function idle_loop_after_speech() {
     timeoutIdleTimer = clearTimeout(timeoutIdleTimer);
     if (noUserInteraction && idleDelayAfter >= 0) {
