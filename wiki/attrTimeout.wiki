@@ -43,8 +43,8 @@ All three attributes must be defined for the timeout to work properly.
 
 == Behavior with missing or invalid attributes ==
   * If any of the tree attributes, `data-ez-timeout`, `data-ez-timeout-delay`, or `data-ez-timeout-href` are missing, no time out behavior will take place.
-  * `data-ez-timeout="`_`url`_`"` does not have a valid URL, then ???
-  * If `data-ez-timeout-delay` is invalid, ???
+  * If `data-ez-timeout="`_`url`_`"` does not check for invalid URLs.
+  * If `data-ez-timeout-delay` is not a number in the one/two entries, that entry(s) is/are ignored and the default value is used as if it didn't exist. If more than two valid space-separated values are passed, the first two are used.
   * If `data-ez-timeout-href` is invalid, then the system will either not load a new page or will load a 404 error page.
 
 == Best practices ==
