@@ -13,7 +13,10 @@ Following these best practice will help you to create pages that behave as expec
 
 More best practices will be added in the future...
 
-
+== 404 Page ==
+The 404 page should be setup on the server to inform the user of a problem. It should be EZ-access navigable and either:
+  * Have a button resetting the kiosk (back to splash page).
+  * Inform the user that the kiosk is down and disable navigating back or forwards (do not include links, and use the [attrReset data-ez-reset] attribute).
 
 == For all pages within the application ==
 There are very few things that are required for applications that use basic HTML pages.
