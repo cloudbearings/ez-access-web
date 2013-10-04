@@ -1,0 +1,58 @@
+#summary Details about the data-ez-help attribute.
+
+{{{
+<body data-ez
+data-ez-help="Use this page to vote for a candidate for the 
+President of the United States|defaultHelp.html#keypad8">
+...
+
+<nav class="toolbar"
+data-ez-help="Buttons on the toolbar at the bottom of the page can 
+be used to navigate through the application.">
+  <button 
+  data-ez-help="This button goes back to the previous ballot page."
+  onclick="goBack();">Back</button>
+  <button data-ez-help="This button goes to the next ballot page."
+  onclick="goFwd();">Next</button>
+  <button data-ez-help="This button jumps to the ballot summary at
+  the end of the ballot and skips all of the races after this page."
+  onclick="goEnd();">End</button>
+</nav>
+</body>
+}}}
+
+= Description =
+The `data-ez-help` attribute can be used to supply help for a single element, a group of elements, and the entire page. The help is supplied to the user in layers (separate pages) wen they press the EZ Help key. The user then navigates through the layers with the EZ Up and EZ Down keys.
+
+By default, help layers are presented to the user in a cascading order starting with layers associated with the focused element, followed by help layers of the parents, grand-parents, etc. up to the `<body>`. If no element is in focus, then only help layers associated with the `<body>` will be provided.
+
+The `<body>` has default help layers if none are provided (see [ezHelp#Default_help this section] for details).
+
+  * Applies to: all elements
+  * Inheritable: yes
+  * Supported since: 1.0.0
+
+== Values ==
+  * `data-ez-help="`_`string`_`"`
+    * Where _string_ is the content for a single layer of help for the element with that attribute.
+  * `data-ez-help="`_`url`_`"`
+    * Where _url_ is the URL for the content to be displayed in help for the element with that attribute. Note that _url_ may have several help layers embedded in it (See [ezHelp#URL_references_that_contain_multiple_layers this section] of the EZ Help usage notes for more details).
+  * `data-ez-help="`_`string1/url1`_`|`_`string2/url2`_`(|...)"`
+    * Additional help layers can be added to an element with a vertical bar '|' delimiter. 
+    * Where _string1/url1_ is the content for the first layer/s.
+    * Where _string2/url2_ is the content for a subsequent layer/s.
+    * Where _(|...)_ may be additional help layers.
+  * `data-ez-help="...||"`
+    * Ending the attribute value with a double vertical bar '||' stops the help cascade, so the help layers associated with parent elements are *not* provided.
+    * Where _..._ represents one or more help layers.
+  * `data-ez-help="||"`
+    * Stops or terminates the help cascade.
+    * If the focused element has this attribute and value, then no help will be provided.
+    * If a parent element has this attribute and value, the help layers associated with focused children will be provided, but none of the layers for this level or its parent, grand-parent, etc. will be provided.
+
+== Behavior if attribute is missing ==
+  * If the attribute is not present on a focused element, then help layers associated with the parent, grand-parent, etc. elements will be provided.
+  * If this attribute is not present for the `<body>`, default help text will be supplied for the `<body>` element (see [ezHelp#Default_help this section] for details) and will be supplied as part of the help cascade.
+
+== Best Practices ==
+Please see the [ezHelp detailed usage notes].
