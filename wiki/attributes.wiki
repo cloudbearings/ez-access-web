@@ -10,15 +10,23 @@ The following attributes are from the official [http://code.google.com/p/ez-acce
 = Details =
 
 === {{{<body>}}} tag attributes ===
-|| *Name* || *Code* || *Description* || *Support* ||
-|| EZ Access supported || {{{data-ez}}} || When included, the EZ Access plugin detects the page as EZ Access-compatible. || <font color="green">Fully supported</font> ||
-|| Screenwrap toggle || {{{data-ez-screenwrap}}} || If tag present, specifies if the EZ navigation highlight exhibits a wrapping behavior at the top and bottom of the page. || <font color="green">Fully supported</font> ||
-|| Start at || {{{data-ez-startat="IDREF IDREF"}}} || [dataEzStartat] || <font color="green">Fully supported</font> ||
-|| Allow re-order || {{{data-ez-allowreorder}}} || Specifies if the page is to be navigated in the DOM order only or if it is to be navigated in a re-ordered fashion as specified by the {{{tabindex}}} and {{{aria-flowto}}} attributes. || <font color="green">Fully supported</font> ||
-|| [dataEzTabnav Tab Navigation] || {{{data-ez-tabnav}}} || Specifies how Tab and Shift+Tab navigate on the screen. || <font color="orange">Partially supported</font><br>[dataEzTabnav More information] ||
-|| Auto Repeat || {{{data-ez-autorepeat}}} || Specifies the auto-repeat behavior of the EZ Access buttons and keyboard keys: default 'off', other options are 'keyboard' for repeat only on keyboard, or 'on' for OS default autorepeat on everything. || <font color="green">Supported</font> ('modal' option not to be supported) ||
-|| EZ Access starting mode || {{{data-ez-startingmode}}}<br>*Values:* default, ezon, ezoff || Specifies if EZ Access mode is on when the user opens the page. || <font color="green">Fully supported</font> ||
-|| Slide to read on/off || {{{data-ez-slidetoread}}}<br>*Values:* on, off || Default is on. Specifies that the slide-to-read functionality is turned on or off for a page. || <font color="green">Fully supported</font> ||
+|| *Name* || *Code* || *Description* || *Documentation* || *Support* || 
+|| EZ Access supported || {{{data-ez}}} || When included, the EZ Access plugin detects the page as EZ Access-compatible. || [attrEZ `data-ez` documentation] || <font color="green">Fully supported</font> || 
+|| Screenwrap toggle || {{{data-ez-screenwrap}}} || If tag present, specifies if the EZ navigation highlight exhibits a wrapping behavior at the top and bottom of the page. || || <font color="green">Fully supported</font> ||
+|| Start at || {{{data-ez-startat="IDREF IDREF"}}} || [dataEzStartat] ||[attrStartat `data-ez-startat` documentation] || <font color="green">Fully supported</font> || 
+|| Allow re-order || {{{data-ez-allowreorder}}} || Specifies if the page is to be navigated in the DOM order only or if it is to be navigated in a re-ordered fashion as specified by the {{{tabindex}}} and {{{aria-flowto}}} attributes. || || <font color="green">Fully supported</font> ||
+|| [dataEzTabnav Tab Navigation] || {{{data-ez-tabnav}}} || Specifies how Tab and Shift+Tab navigate on the screen. || || <font color="orange">Partially supported</font><br>[dataEzTabnav More information] ||
+|| Auto Repeat || {{{data-ez-autorepeat}}} || Specifies the auto-repeat behavior of the EZ Access buttons and keyboard keys: default 'off', other options are 'keyboard' for repeat only on keyboard, or 'on' for OS default autorepeat on everything. || || <font color="green">Supported</font> ('modal' option not to be supported) ||
+|| EZ Access starting mode || {{{data-ez-start}}}<br>*Values:* on, off || Specifies if EZ Access mode is forced on or off when the page loads rather than relying on the default behavior. || [attrStart `data-ez-start` documentation] || <font color="green">Fully supported</font> ||
+|| Slide to read on/off || {{{data-ez-slidetoread}}}<br>*Values:* on, off || Default is on. Specifies that the slide-to-read functionality is turned on or off for a page. || || <font color="green">Fully supported</font> ||
+|| Reset || `data-ez-reset` || Resets session variables, such as the behavior of the EZ Back button and the audio volume. || [attrReset `data-ez-reset` documentation] || <font color="green">Fully supported</font> ||
+|| Timeout<br>3 Attributes || `data-timeout` || Specifies the message to be read and displayed before the system times out || [attrTimeout `data-ez-timeout*` documentation] || ||
+|| " || `data-timeout-delay="`_`before`_` `_`after`_`"` || Specifies the delay (in ms) before and optionally after the timeout message is displayed. || " || ||
+|| " || `data-ez-timeout-href` || Specifies the page to load when the system completely times out. || " || ||
+|| Idle Speech<br>3 Attributes || `data-ez-idlespeech` || Specifies the speech to be spoken (not displayed) when the system is not in EZ Access. || [attrIdlespeech `data-ez-idlespeech*` documentation] || ||
+|| " || `data-ez-idlespeech-loop`<br>*Values:* `true`, `false` || Specifies if the idle speech is run in a continuous loop when EZ Access mode is off or only plays when the page is first loaded. || " || ||
+|| " || `data-ez-idlespeech-delay` || Specifies a delay (in ms) before the idle speech is spoken to the user. || " || ||
+
 
 Note: data-ez-help-{{{*}}} is not supported yet.
 
