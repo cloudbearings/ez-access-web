@@ -26,9 +26,7 @@ The following attributes are from the official [http://code.google.com/p/ez-acce
 || Idle Speech<br>3 Attributes || `data-ez-idlespeech` || Specifies the speech to be spoken (not displayed) when the system is not in EZ Access. || [attrIdlespeech `data-ez-idlespeech*` documentation] || ||
 || " || `data-ez-idlespeech-loop`<br>*Values:* `true`, `false` || Specifies if the idle speech is run in a continuous loop when EZ Access mode is off or only plays when the page is first loaded. || " || ||
 || " || `data-ez-idlespeech-delay` || Specifies a delay (in ms) before the idle speech is spoken to the user. || " || ||
-
-
-Note: data-ez-help-{{{*}}} is not supported yet.
+|| Help || `data-ez-help` || Specifies one or more help layers associated with the page. Default help is provided if this attribute is missing. || [attrHelp `data-ez-help` documentation]<br><br>[ezHelp EZ Help best practices]|| ||
 
 === Content element tags ===
 Please note that content element tags are the tags specified in the comma-separated string called {{{COMPATIBLE_TAGS}}} declared at the top of the ezaccess.js file.
@@ -52,8 +50,5 @@ By default, the following tags are supported:
 || Slide to read || {{{data-ez-slidetoread}}} || Specifies whether the Slide-to-read functionality is turned on or off for an element (or contained elements as inherited). || || <font color="red">Not supported</font> ||
 || Tab index || {{{tabindex}}} any number || Follows specifications [http://reference.sitepoint.com/html/a/tabindex here]. Negative numbers have same behavior as {{{data-ez-focusable="false"}}}. || || <font color="green">Fully supported</font> ||
 || Aria flowto || {{{aria-flowto}}} any id || Only one element id. When navigating and press down, the highlight jumps to that id. If you press up from the id jumped to, you will go back to the original. || || <font color="green">Fully supported</font> ||
-|| Key binding || {{{data-ez-keybinding}}}<br>*Values:* {{{KEY_EZ_BACK}}}, {{{KEY_EZ_NEXT}}} || If the user presses a specified EZ Access key, then it acts as if the element with the {{{data-ez-keybinding}}} attribute was clicked rather than relying on the default EZ Access behavior. Note that only the first element with each key binding is clicked.|| [attrKeybinding `data-ez-keybinding` documentation] || ||
-
-
-
-Note: data-ez-help-{{{*}}} is not supported yet.
+|| Key binding || {{{data-ez-keybinding}}}<br>*Values:* `back`, `next`, `skipbackward`, `skipforward` || If the user presses a specified EZ Access key, then it acts as if the element with the {{{data-ez-keybinding}}} attribute was clicked rather than relying on the default EZ Access behavior. Note that only the first element with each key binding is clicked.|| [attrKeybinding `data-ez-keybinding` documentation] || ||
+|| Help || `data-ez-help` || Specifies one or more help layers associated with the element. The help layer cascade can be terminated with a double vertical bar at the end of the attribute value. || [attrHelp `data-ez-help` documentation]<br><br>[ezHelp EZ Help best practices]|| ||
