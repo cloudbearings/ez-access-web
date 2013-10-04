@@ -18,6 +18,10 @@ DATE - The initial stable release.
   * Slide-to-read
   * Customizable help
 
+=== Limitations ===
+This version works properly with systems that use touchscreen through dedicated touchscreen drivers and input methods. Touchscreens that implement mouse-type input will not behave the same and transition properly between EZ Access and touchscreen modes, but will be usable.
+  * At this point, touch screen input is best supported in Windows 7 and 8. 
+
 === Elements completely supported ===
 The following interactive elements are completely supported by v. 1.0.
   * Buttons
