@@ -1,0 +1,20 @@
+#summary Details about the <body data-ez> attribute.
+
+{{{
+<body data-ez>
+}}}
+
+= Description =
+The `data-ez` attribute signals to the EZ Access extension that the page purports to be EZ Access-compatible and that the EZ Access extension should load when the paged does.
+
+In its default configuration, the EZ Access extension will not operate on pages that do not have the `data-ez` attribute.
+
+  * Applies to: `<body>` only
+  * Inheritable: no
+  * Supported since: 1.0.0
+
+== Values ==
+The `data-ez` attribute takes no values. If using an XML variant, you may use `data-ez="data-ez"`.
+
+== Best Practices ==
+  * This attribute should be included on every page of the application.
