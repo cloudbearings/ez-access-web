@@ -28,7 +28,7 @@ var tinyAlertOpen = false;
 var timeoutIdleTimer;
 
 /**
- * By default, diplay the following text in the alert.
+ * By default, display the following text in the alert.
  * @type {string}
  */
 var idleSpeech = "If you have difficulty using the touchscreen, press the blue, diamond-shaped EZ Help button";
