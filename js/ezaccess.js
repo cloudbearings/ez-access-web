@@ -1300,6 +1300,11 @@ function load_ez() {
 
     }
 
+    // Mouse clicks always turn off EZ Access
+    document.addEventListener('mousedown', function (e) {
+        stopEZ();
+    });
+
     // Load any potential dictionary
     if (document.body.hasAttribute('data-ez-pronounce')) {
         Lib.ajax.getJSON({
