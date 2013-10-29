@@ -95,7 +95,7 @@ function getClick(obj) {
     while (obj !== null) {
         if (typeof obj.href == "string") {
             return obj;
-        } else if (typeof obj.onclick == "string" || typeof obj.onclick == "function") {
+        } else if (obj.hasAttribute('onclick') || typeof obj.onclick == "function") {
             return obj;
         }
         obj = obj.parentNode;
