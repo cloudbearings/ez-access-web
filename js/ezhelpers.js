@@ -92,7 +92,7 @@ function find_parent_attr(obj, attr) {
  * @returns {object|null} The object, if one is found clickable
  */
 function getClick(obj) {
-    while (obj !== null) {
+    while (obj.nodeType !== 9) {
         if (typeof obj.href == "string") {
             return obj;
         } else if (obj.hasAttribute('onclick') || typeof obj.onclick == "function") {

@@ -248,6 +248,10 @@ function key_down_event(e) {
     } else if (selectedEls.type == 'textarea' || selectedEls.type == 'text') {
         var key = String.fromCharCode(e.keyCode);
         if (!key.match(/[^A-Za-z0-9\-_]/)) voice(key);
+    } else if(e.keyCode !== KB_SHIFT && e.keyCode !== KB_TAB) { // Not tab and/or shift (which navs as well)
+        if(tinyHelpOpen) {
+            closeTinyHelp('nav');
+        }
     }
     return true;
 }
