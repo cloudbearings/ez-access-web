@@ -1,0 +1,29 @@
+
+```
+<button type="button" onclick="goBack();"
+data-ez-keybinding="back" />Back<button>
+```
+
+# Description #
+Allows the binding of some EZ Access keypad buttons to particular elements of the page. When the user presses an EZ button that has a binding to an element, then the system acts as if the element with the binding was clicked.
+
+There should only be one element with a particular attribute value on the page.
+
+  * Applies to: all interactive content elements (typically used on buttons and hyperlinks)
+  * Inheritable: no
+  * Supported since: 1.0.0
+
+## Values ##
+  * `back` (v. 1.0)
+    * When the EZ Back button is pushed, the element with the `data-ez-keybinding="back"` attribute will act as if it were clicked.
+  * `next` (v. 1.0)
+    * When the EZ Next button is pushed, the element with the `data-ez-keybinding="next"` attribute will act as if it were clicked.
+  * `skipbackward` (v. 1.0)
+    * When the EZ Skip Backward button (a black button on the 8-button keypad labeled with '<<') is pushed, the element with the `data-ez-keybinding="skipbackward"` attribute will act as if it were clicked.
+  * `skipforward` (v. 1.0)
+    * When the EZ Skip Forward button (a red button on the 8-button keypad labeled with '>>') is pushed, the element with the `data-ez-keybinding="skipforward"` attribute will act as if it were clicked.
+
+## Error behavior ##
+  * If the value of the `data-ez-keybinding` attribute is not supported, then it will be ignored.
+  * If there is no `data-ez-keybinding` attribute value on the page for a particular EZ button, then the EZ button will take its default behavior (which may be to do nothing) when pressed.
+  * If there is more than one `data-ez-keybinding` attribute with the same value, then only the first element with a matching attribute will act as if it were clicked.

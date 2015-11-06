@@ -1,0 +1,23 @@
+
+```
+<body data-ez-startat="logo maincontent">
+```
+
+# Description #
+Specifies elements on the page where the EZ Navigation Highlight starts. There are two starting cases:
+  1. Where the EZ Highlight starts on a page when the user turns on EZ Access mode by pressing EZ Up or Down.
+  1. Where the EZ Highlight starts on a page when EZ Access mode was already on just prior to the current page.
+
+  * Applies to: `<body>` only
+  * Inheritable: no
+  * Supported since: 1.0.0
+
+## Values ##
+  * `data-ez-startat="`_`idref`_`"`
+    * _idref_ is the IDREF of the element where the EZ Highlight starts both when the EZ Highlight is activated on this page and when the EZ Highlight was already on just before the user got to this page.
+  * `data-ez-startat="`_`idref1`_ _`idref2`_`"`
+    * _idref1_ is the IDREF for where the EZ Highlight starts if the user turns on EZ Access (by pressing EZ Up or Down) when on this page.
+    * _idref2_ is the IDREF for where the EZ Highlight starts if the system was already in EZ Access mode (i.e., the EZ Highlight was on just before the user got to this page).
+
+## Behavior with missing attribute or invalid value ##
+The EZ Highlight starts at the first focusable element in the HTML DOM.

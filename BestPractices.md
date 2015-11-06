@@ -1,0 +1,128 @@
+# Introduction #
+
+The EZ Access extension works best on pages that are specifically designed to support the behaviors and features of the extension. The extension may work on "wild" internet content, but there may be some unexpected behaviors.
+
+Following these best practice will help you to create pages that behave as expected with EZ Access.
+
+
+
+
+# Authoring Best-Practices #
+
+More best practices will be added in the future...
+
+## 404 Page ##
+The 404 page should be setup on the server to inform the user of a problem. It should be EZ-access navigable and either:
+  * Have a button resetting the kiosk (back to splash page).
+  * Inform the user that the kiosk is down and disable navigating back or forwards (do not include links, and use the [data-ez-reset](attrReset.md) attribute).
+
+## For all pages within the application ##
+There are very few things that are required for applications that use basic HTML pages.
+  * Add the `data-ez` attribute to the `<body>` tag on all pages. This lets the EZ Access extension know that the page is compatible.
+```
+<body data-ez>
+
+<!-- or for XML-like HTML -->
+<body data-ez="data-ez">
+```
+  * Try using the application with the speech output. This is important to do to catch any strange behaviors that might be caused by unusual HTML code or interaction with other scripts.
+
+## For the first page of the application ##
+Often in kiosk applications, there is a starting screen that all users see before they start using the application. Such a screen has basic instructions for getting started (such as "Tap the 'Begin' button to get started," or "Touch the screen anywhere to get started."). Users with disabilities need help getting started as well. At this point in the application, the system knows nothing about the individual, so it should not start in EZ Access mode.
+
+  * Reset the EZ Back button, volume, and other session variables with the `data-ez-reset` attribute.
+  * Turn off EZ Access mode when a user first arrives on the page with `data-ez-start="off`.
+  * Start with the help tutorial when the user presses the EZ Help button. This can be done with the `data-ez-help` attribute ([documentation](ezHelp.md)).
+  * If the device does not have speakers, add a continuous speech loop to the page, so someone who plugs in headphones knows what to do next. For more details, see the page on the [`data-ez-idlespeech` and related attributes](attrIdlespeech.md).
+    * If you have a continuous speech loop, be sure that similar text is displayed on the screen or on the device itself to help those who are not using headphones.
+
+### Example ###
+```
+<body data-ez 
+data-ez-reset 
+data-ez-start="off"
+data-ez-help="defaultEZHelp.html#keypad8-tutorial"
+data-ez-idlespeech="If you have difficulty reading or using the 
+touchscreen, you can use EZ Access to operate this kiosk. 
+To learn how, press the blue, diamond-shaped EZ Help button 
+below the screen. The EZ Help button has a small raised bump on it."
+data-ez-idlespeech-loop="true"
+data-ez-idlespeech-delay="5000"
+>
+...
+<div class="accessibility">If you have difficulty reading or using 
+the touchscreen, you can use EZ Access to operate this kiosk. 
+To learn how, press the blue, diamond-shaped EZ Help button below 
+the screen.</div>
+...
+</body>
+```
+
+## For public devices, turn off autocomplete ##
+Many browsers have an autocomplete function that remembers text that has been typed into text fields of various types. While this functionality may be good for personal devices, this is not good for public devices, such as kiosks, because data from previous users may be exposed.
+
+### What to do ###
+Turn off autocomplete on individual `<input>` elements with `autocomplete="off"`.
+
+```
+<label for="firstname">First Name:</label>
+<input id="firstname" type="text" autocomplete="off" />
+...
+<label for="email">E-mail Address:</label>
+<input id="email" type="email" autocomplete="off" />
+```
+
+Alternatively, you may turn off Autofill in Chrome by going to the settings page (chrome://settings/) and unchecking the checkbox labeled "Enable Autofill to fill out web forms in a single click."
+
+## Add key bindings for some EZ Access keys ##
+The EZ Access keypad has from 5 to 8 buttons depending on the model. Several of the buttons have well-defined behaviors specific to EZ Access, but several of the other buttons can have application-specific behaviors.
+
+The [`data-ez-keybinding` attribute](attrKeybinding.md) supports the following values for the respective EZ Access keys:
+  * `back` for the EZ Back key
+  * `next` for the EZ Next key
+  * `skipbackward` for the EZ Skip Backward key
+  * `skipforward` for the EZ Skip Forward key
+
+### What to do ###
+Add the `data-ez-keybinding` attribute to buttons on the screen that go to back and next pages. For example:
+#### Example ####
+```
+<button type="button" onClick="goBack()" 
+data-ez-keybinding="KEY_EZ_BACK">Back</button>
+...
+<button type="submit" 
+data-ez-keybinding="KEY_EZ_NEXT">Continue</button>
+```
+
+## Wrap text-only content in paragraphs with hyperlinks ##
+The EZ Access highlight navigates to elements that are interactive (such as buttons, checkboxes, and hyperlinks) or block-level (such as headings, and paragraphs). This becomes more of an issue when a block-level element contains both interactive elements and plain text nodes--for example, hyperlinks in paragraphs:
+
+#### Bad example ####
+```
+<p>Paragraph text
+<a href="#">with some link text</a>
+and some more paragraph text.</p>
+```
+
+EZ Access will navigate the above paragraph correctly in three chunks [(1) "Paragraph text" (2) "with some link text" link (3) "and some more paragraph text"], however, the Slide-to-Read feature will not work properly, because Slide-to-Read relies on HTML elements.
+
+### What to do ###
+There should be no text-only nodes within that parent block-level element. If you have a paragraph or other block-level elements that contain links or other interactive content, ensure that the non-interactive content of the blocks is wrapped with a `<span>` or other element. For example:
+
+#### Good example ####
+```
+<p><span>Paragraph text</span>
+<a href="#">with some link text</a>
+<span>and some more paragraph text.</span></p>
+```
+This type of code will work well for both navigation and Slide-to-read.
+
+# Kiosk hardware #
+The Trace Center strongly recommends the following hardware for public kiosk EZ Access implementations:
+  * A 3.5-mm headphone jack. This allows for private listening and the connection of assistive technology such as neck loops.
+  * A label with braille with basic instructions on how to start using EZ Access. This can be similar to those used on accessible ATMs.
+    * As an example, one label might say in both print and braille, "Insert headphones to initiate speech mode." A second label placed near the jack would point out the headphone jack location.
+  * An EZ Access keypad or other EZ Access input hardware. This allows people who cannot use the touchscreen to provide input to the system.
+  * Volume control hardware. Users need to be able to adjust the audio to get it to a comfortable and usable level.
+    * The best location for volume controls is adjacent to the headphone jack.
+    * The top two buttons on the 8-button EZ Access keypad (black and red labeled with '<<' and '>>' respectively) may be used for volume control if they are not needed in the application.

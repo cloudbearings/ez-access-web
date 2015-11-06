@@ -1,0 +1,131 @@
+# EZ Help #
+
+An important part of EZ Access is providing help to users. Those using EZ Access for the first time may need help getting started. Some applications may be more complex and may provide extra help for users. To get help, users simply press the dedicated EZ Help button.
+
+
+
+## Important things to remember ##
+  * Help content must **not** contain any buttons or other interactive elements, because the user cannot navigate to them.
+  * Help content is read as a block.
+  * Help content should be kept as simple and short as possible. Details can potentially be left to later layers.
+  * Help content may be split into multiple layers as appropriate.
+
+
+## Default help ##
+By default, context-sensitive help is available on all pages. This help file is a core EZ Access extension file: `defaultEZHelp.html`. For some applications, this help file may be all that is needed.
+
+The default EZ Access installation assumes that your application uses the 8-button EZ Access keypad. If this is not the case with your application, then the help file will need to be changed.
+
+## Layers of help ##
+EZ Help is provided in layers. When in help, users can press the EZ Down key to get to the next help screen or layer. Ideally, the most appropriate layers are presented first so that a user who only needs a little bit of help can exit early and not continue to listen to later layers. Those who need more help can continue to later help layers.
+
+Context-sensitive help can be provided for any HTML element (see the next section for details). For example, the navigation buttons of an application might provide extra help describing where the buttons navigate. On a fare machine, buttons to each of the destinations may provide help that describes attractions that might be served by a particular station.
+
+EZ Help layers associated with the most local context (the highlighted element) are presented first. This is then followed by EZ Help layers of parent elements, grandparent elements, etc. in the DOM up until the `<body>` element. The `<body>` has default help layers which are the last ones presented unless different help is specified by the page author.
+
+## The `data-ez-help` Attribute ##
+The contents of help at any point in the application can be controlled by the `data-ez-help` attribute. This attribute can be provided on any HTML element.
+
+### General attribute values ###
+With the `data-ez-help` attribute, the page author can specify the content and layers of help that are presented.
+  * **Plain text.** The plain text content of the attribute will be the content of a help layer. The help content cannot have rich formatting in this case.
+  * **A URL reference.** The element at the referenced URL will be parsed and included as one or more help layers. This allows help to have rich formatting.
+  * **`|` delimiter.** The `|` character delimits layers of help within the attribute.
+```
+<input type="submit" data-ez-help="Layer 1|Layer 2|Layer 3" />
+```
+  * **`||` terminator.** When `||` is used at the **end** of the `data-ez-help` attribute, then the help layers end and do not continue with the help layers associated with parent elements.
+```
+<input type="submit" data-ez-help="Layer 1|No help layers after this.||" />
+```
+
+The plain text and URL reference values may be mixed.
+
+### `data-ez-help=`_URL_ ###
+Data at the URL is parsed before being presented as layers. Typically, the _URL_ references an element with a specific ID, which may be on the current page or a separate page. Using a separate page may make it easier to have and maintain all of the help content in one place rather than across the application.
+```
+<!-- On-page reference -->
+<button data-ez-help="#cancelHelp">Cancel</button>
+
+<!-- External URL reference -->
+<button data-ez-help="extHelp.htm#continueHelp">Continue</button>
+
+<div id="cancelHelp" hidden>
+Canceling will reset <strong>all</strong> of the information 
+you have entered so far.
+</div>
+```
+Note that referenced elements that are hidden or otherwise not visible will be displayed in help. However, any hidden content inside of a referenced element will not be displayed.
+
+#### URL references that contain multiple layers ####
+_For many cases, this is the preferred method of providing help content because it allows for rich formatting and easy code reuse._
+
+If the referenced element contains any `<section>` tags, then the help will be parsed in a special way that allows for multiple embedded layers. Each `<section>` will be a help layer. Any HTML content outside of a `<section>` will **not** be presented in help to the user.
+```
+<div id="help1">
+<section>
+  <h1>Help Layer 1</h1>
+  <p>This would be the first help layer of the 
+  `#help1` content.</p>
+</section>
+
+<p>This content would not be displayed in help. 
+It could be used for author comments, 
+documentation, or other purposes.</p>
+
+<section>
+  <h1>Help Layer 2</h1>
+  <p>This would be the second help layer.</p>
+</section>
+</div>
+```
+
+#### URL references without multiple layers ####
+If the referenced element does not contain any `<section>` tags, then the entire contents of the referenced element will be provided as a single layer of help. This method allows for rich text formatting.
+```
+<div id="help2">
+<section>
+  <h1>Help Layer 1</h1>
+  <p>This would be the first paragraph of the 
+  `#help2` content.</p>
+  <p>Second paragraph.</p>
+  <p>
+  
+
+<p>This content would not be displayed in help. 
+It could be used for author comments, 
+documentation, or other purposes.</p>
+
+<section>
+  <h1>Help Layer 2</h1>
+  <p>This would be the second help layer.</p>
+</section>
+</div>
+```
+
+### `data-ez-help=`_Plain text_ ###
+Plain text in the attribute will be presented to the user as a help layer without any specialized formatting. Carriage returns in the attribute and extra whitespace are all converted to a single space.
+```
+<button data-ez-help="
+  This button cancels your transaction|
+  Canceling will end your transaction. You will need to
+  login again if you want to continue.">
+Cancel
+</button>
+```
+
+## Styling EZ Help ##
+The EZ Help lightbox is comprised of multiple `<div>`s that can be styled with custom CSS. If help is provided using the URL reference values, then that HTML content is inserted into the help screen and may be further styled.
+  * `#tinycontenthelp` is the `<div>` which contains all of the help content. This can be used if you want help content to be styled differently than the default styling of the page.
+```
+p { //paragraphs for the main appliction
+  font-size: 24px;
+  font-family: Times, "Times New Roman", serif;
+}
+#tinycontenthelp p { //help paragraphs styled differently
+  font-size: 32px;
+  font-family: sans-serif;
+}
+```
+  * `#tinyboxhelp` is the `<div>` for the "dialog box" or lightbox. This styles the box into which all of the content is inserted.
+  * `#tinymaskhelp` is the `<div>` which masks the rest of the screen behind the help screen. By default, this is semi-transparent so that the underlying page is still somewhat visible.

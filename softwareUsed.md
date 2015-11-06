@@ -1,0 +1,9 @@
+# Main libraries/software #
+
+There is only one library used:
+
+  1. TinyBox   - Modal window script for help
+    * http://creativecommons.org/licenses/by/3.0/us/ - Only need to provide attribution. Can be used in commercial works.
+
+# Code snippets #
+Any code snippets have a comment with the link in which they originated, although they are public domain and free to use by the author if I used it in EZ Access.

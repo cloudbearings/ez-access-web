@@ -1,0 +1,53 @@
+# Note: This functionality is not complete  yet! #
+
+```
+<body data-ez
+data-ez-timeout="Are you still here? To continue, press any key or touch the screen."
+data-ez-timeout-delay="40000 20000"
+data-ez-timeout-href="index.html">
+```
+
+# Description #
+Three attributes are related to system timeouts, which are frequently used to reset the system after a period of inactivity. After a delay, the system will provide a popup alert with a timeout message. If there is no user activity after another delay, the system will timeout and go to another page.
+
+All three attributes must be defined for the timeout to work properly.
+
+  * `data-ez-timeout`
+    * Specifies what is to be displayed and spoken when the system times out because the user has not taken any action.
+  * `data-ez-timeout-delay`
+    * Specifies the delays associated with timeout.
+  * `data-ez-timeout-href`
+    * Specifies the page that the system will load if the system times out.
+
+  * Applies to: `<body>` only
+  * Inheritable: no
+  * Supported since: feature currently being coded
+
+## Values ##
+  * `data-ez-timeout="`_`string`_`"`
+    * _string_ is the string to be displayed and spoken when the system has not received any input from the user for a length of time.
+  * `data-ez-timeout="`_`url`_`"`
+    * _url_ is the URL from which the content to be displayed and spoken will be taken. This content will be presented to the user when the system has not received any input from the user for a length of time.
+
+  * `data-ez-timeout-delay="`_`before`_`"`
+    * _before_ is the number of milliseconds (ms) before the system provides the timeout message, which is defined with the `data-ez-timeout` attribute.
+    * After the message is displayed and read, the system will completely time out after 20 seconds of inactivity.
+  * `data-ez-timeout-delay="`_`before`_` `_`after`_`"`
+    * _before_ is the number of milliseconds (ms) before the system provides the timeout message, which is defined with the `data-ez-timeout` attribute.
+    * _after_ is the number of milliseconds (ms) before the system times out after the timeout alert message has been provided to the user.
+
+  * `data-ez-timeout-href="`_`url`_`"`
+    * _url_ is the URL of the page to be loaded when the system times out because of inactivity. The URL may be either relative or absolute.
+
+## Behavior with missing or invalid attributes ##
+  * If any of the tree attributes, `data-ez-timeout`, `data-ez-timeout-delay`, or `data-ez-timeout-href` are missing, no time out behavior will take place.
+  * If `data-ez-timeout="`_`url`_`"` does not check for invalid URLs.
+  * If `data-ez-timeout-delay` is not a number in the one/two entries, that entry(s) is/are ignored and the default value is used as if it didn't exist. If more than two valid space-separated values are passed, the first two are used.
+  * If `data-ez-timeout-href` is invalid, then the system will either not load a new page or will load a 404 error page.
+
+## Best practices ##
+  * If, for security reasons, you need the system to timeout after a particular length of time (say _length_), then supply both _before_ and _after_ values in the `data-ez-timeout-delay="`_`before`_` `_`after`_`"` attribute.
+    * _after_ should be 20000 or greater.
+    * _before_ = _length_ - _after_ - _the amount of time it takes to read the message_
+  * If specifying a second value (_after_) with the `data-ez-timeout-delay="`_`before`_` `_`after`_`"` attribute, the value should be equal to or greater than 20000 ms (20 s). This allows people with disabilities enough time to respond by pressing any key or touching the touchscreen. Shorter values may not give some people enough time.
+  * On the page that the system loads if it times out, consider resetting the session variables with the [`data-ez-reset`](attrReset.md) & [data-ez-start="off"](attrStart.md) attributes.

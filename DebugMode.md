@@ -1,0 +1,19 @@
+# Introduction #
+
+EZ Access has a debug mode that allows developers to troubleshoot EZ Access parsing of their HTML pages to determine what is going wrong.
+
+# How to enable #
+
+To enable, go to Tools-->Extensions-->EZ Access Browser-->Options, and check the checkbox 'Enable Debug Mode'.
+
+When on your EZ Access enabled page, open the developer tools (F11) and click the tab 'console'.
+
+# Information in Debug Mode #
+
+Many different things are displayed in debug mode, including:
+
+  * Warnings (errors [& non-breaking](breaking.md) are always displayed; debug mode or not)
+  * The current array of selected nodes
+  * The speech output when spoke in text
+
+Additionally, when each page is loaded, information on setup is displayed (such as EZ Help dependencies).

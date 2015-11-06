@@ -1,0 +1,7 @@
+# Coming Soon #
+
+# :hover is Evil #
+
+The :hover pseudo-selector in CSS is a horrible solution (especially as touch screens become more widely used) because they can _only_ be triggered by a mouse hovering. They are widely used for dropdown menus -- the one place that gives access to the rest of your site!
+
+The best solution is to also use the :focus selector, as this is accessible by JavaScript and gives developers something to work with. For more information, check out [this link](http://www.456bereastreet.com/archive/201004/whenever_you_use_hover_also_use_focus/).
